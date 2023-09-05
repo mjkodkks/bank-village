@@ -11,7 +11,7 @@ datasource db {
 }
 
 model User {
-  id        String    @id @unique @default(cuid())
+  id        Int    @id @unique @default(autoincrement())
   username  String    @unique
   password  String
   lastLogin DateTime?
@@ -27,24 +27,24 @@ model User {
 }
 
 model Account {
-  id           String        @id @unique @default(cuid())
+  id           Int        @id @unique @default(autoincrement())
   balance      Float
-  createdAt    DateTime
+  createdAt    DateTime     @default(now())
   owner        User?         @relation(fields: [userId], references: [id])
-  userId       String?
+  userId       Int?
   transactions Transaction[]
   type         AccountType   @default(SAVING)
 }
 
 model Transaction {
-  id              String            @id @unique @default(cuid())
+  id              Int            @id @unique @default(autoincrement())
   action          TransactionAction
   previousBalance Float?
   changeBalance   Float?
   account         Account?          @relation(fields: [accountId], references: [id])
-  accountId       String?
+  accountId       Int?
   note            String?
-  createdAt       DateTime
+  createdAt       DateTime      @default(now())
 }
 
 enum TransactionAction {

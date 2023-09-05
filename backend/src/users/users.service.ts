@@ -55,7 +55,45 @@ export class UsersService {
     return user;
   }
 
+  async findOneByUsernameNoPassword(username: string) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        username,
+      },
+      select: {
+        id: true,
+        username: true,
+        nickName: true,
+        citizenId: true,
+        brithday: true,
+        role: true,
+        firstname: true,
+        surname: true,
+        address: true,
+        lastLogin: true,
+        createdAt: true,
+      },
+    });
+
+    return user;
+  }
+
   update(id: number, updateUserDto: UpdateUserDto) {
+    const { address, nickName, citizenId, brithday, firstname, surname } =
+      updateUserDto;
+    this.prisma.user.update({
+      data: {
+        address,
+        nickName,
+        citizenId,
+        brithday,
+        firstname,
+        surname,
+      },
+      where: {
+        id: id,
+      },
+    });
     return `This action updates a #${id} user`;
   }
 

@@ -1,4 +1,6 @@
 export default defineNuxtConfig({
+  ssr: false,
+
   app: {
     head: {
       viewport: 'width=device-width,initial-scale=1',
@@ -18,7 +20,6 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: false,
       routes: ['/'],
-      ignore: ['/hi'],
     },
   },
 
@@ -29,11 +30,18 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
   ],
 
+  build: {
+		transpile: ["primevue"]
+	},
+
   colorMode: {
     classSuffix: '',
+    preference: 'light',
   },
 
-  css: ['~/assets/css/main.css'],
+  css: [ "primevue/resources/themes/lara-light-blue/theme.css", '~/assets/css/main.css'],
+
+  plugins: ['./plugins/primevue.js'],
 
   postcss: {
     plugins: {

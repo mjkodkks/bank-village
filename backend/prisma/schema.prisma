@@ -28,7 +28,7 @@ model User {
 
 model Account {
   id           Int        @id @unique @default(autoincrement())
-  balance      Float
+  balance      Decimal      @db.Decimal(10,2)
   createdAt    DateTime     @default(now())
   owner        User?         @relation(fields: [userId], references: [id])
   userId       Int?
@@ -39,9 +39,10 @@ model Account {
 model Transaction {
   id              Int            @id @unique @default(autoincrement())
   action          TransactionAction
-  previousBalance Float?
-  changeBalance   Float?
-  account         Account?          @relation(fields: [accountId], references: [id])
+  previousBalance Decimal?        @db.Decimal(10,2)
+  changeBalance   Decimal?        @db.Decimal(10,2)
+  amounts         Decimal         @db.Decimal(10,2)
+  account         Account?        @relation(fields: [accountId], references: [id])
   accountId       Int?
   note            String?
   createdAt       DateTime      @default(now())

@@ -25,9 +25,12 @@ export class AuthService {
 
   async login(user: any) {
     const payload = { username: user.username, sub: user.id };
+    const signedJWT = this.jwtService.sign(payload)
+    const decodedJwtAccessToken = this.jwtService.decode(signedJWT);
+    const expires = decodedJwtAccessToken['exp'];
     return {
-      access_token: this.jwtService.sign(payload),
-      expire: Math.floor(new Date().getTime() / 1000),
+      access_token: signedJWT,
+      expire: expires,
     };
   }
 }

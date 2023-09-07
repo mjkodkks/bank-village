@@ -1,8 +1,9 @@
-import { acceptHMRUpdate, defineStore } from 'pinia'
+import { acceptHMRUpdate } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => {
     return {
+      accessToken: ''
     }
   },
   getters: {

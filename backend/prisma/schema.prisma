@@ -44,6 +44,7 @@ model Transaction {
   amounts         Decimal         @db.Decimal(10,2)
   account         Account?        @relation(fields: [accountId], references: [id])
   accountId       Int?
+  staff           String?
   note            String?
   createdAt       DateTime      @default(now())
 }

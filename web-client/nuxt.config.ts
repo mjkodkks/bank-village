@@ -8,6 +8,8 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
       ],
+      link: [
+      ],
     },
   },
 
@@ -30,6 +32,13 @@ export default defineNuxtConfig({
     '@nuxtjs/color-mode',
   ],
 
+  pinia: {
+    autoImports: [
+      // automatically imports `defineStore`
+      'defineStore', // import { defineStore } from 'pinia'
+    ],
+  },
+
   build: {
 		transpile: ["primevue"]
 	},
@@ -41,7 +50,13 @@ export default defineNuxtConfig({
 
   css: [ "primevue/resources/themes/lara-light-blue/theme.css", '~/assets/css/main.css'],
 
-  plugins: ['./plugins/primevue.js'],
+  plugins: ['./plugins/primevue.ts'],
+
+  imports: {
+    dirs: [
+      'services'
+    ]
+  },
 
   postcss: {
     plugins: {
@@ -59,5 +74,10 @@ export default defineNuxtConfig({
 
   devtools: {
     enabled: true
+  },
+  runtimeConfig: {
+    public: {
+      API_URL: process.env.API_URL || ''
+    }
   }
 })

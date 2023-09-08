@@ -16,6 +16,12 @@ useHead({
     }
   ],
 })
+import { usePrimeVue } from "primevue/config";
+
+const $primevue = usePrimeVue();
+defineExpose({
+     $primevue
+})
 </script>
 
 <template>
@@ -24,6 +30,7 @@ useHead({
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <Toast></Toast>
   </div>
 </template>
 
@@ -36,10 +43,12 @@ useHead({
 
 html {
   font-size: var(--font-base);
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: var(--font-family);
+  overflow: hidden;
 }
 
 html,

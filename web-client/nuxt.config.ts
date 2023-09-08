@@ -50,7 +50,7 @@ export default defineNuxtConfig({
 
   css: [ "primevue/resources/themes/lara-light-blue/theme.css", '~/assets/css/main.css'],
 
-  plugins: ['./plugins/primevue.ts'],
+  plugins: ['./plugins/primevue.ts', './plugins/scroll.client.ts'],
 
   imports: {
     dirs: [

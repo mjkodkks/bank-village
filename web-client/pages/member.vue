@@ -6,5 +6,5 @@ const router = useRouter()
 </script>
 
 <template>
-    <div class="h-[200vh]">Home</div>
+    <div class="h-[200vh]">member</div>
 </template>

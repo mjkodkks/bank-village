@@ -13,7 +13,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
@@ -25,11 +25,15 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
+  @ApiOperation({
+    summary: 'get profile (ดึงข้อมูล profile ของตัวเอง)',
+  })
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   getProfile(@Request() req) {
@@ -38,10 +42,20 @@ export class UsersController {
     return user;
   }
 
+  @ApiOperation({
+    summary: 'get user profile by username (ค้นหาข้อมูลสมาชิกจาก username)',
+  })
   @UseGuards(JwtAuthGuard)
-  @Get(':username')
+  @Get('/username/:username')
   findOneByUsername(@Param('username') username: string) {
     return this.usersService.findOneByUsername(username);
+  }
+
+  @ApiOperation({ summary: 'get user profile by id (ค้นหาข้อมูลสมาชิกจาก id)' })
+  @UseGuards(JwtAuthGuard)
+  @Get(':id')
+  findOneById(@Param('id') id: number) {
+    return this.usersService.findOneByIdNoPassword(id);
   }
 
   @UseGuards(JwtAuthGuard)

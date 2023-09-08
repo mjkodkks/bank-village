@@ -6,8 +6,11 @@ import { useAuthStore } from '~/stores/auth'
 import Cookies from 'js-cookie';
 import { useToast } from 'primevue/usetoast'
 
-const toast = useToast()
+definePageMeta({
+    middleware: 'login'
+})
 
+const toast = useToast()
 const router = useRouter()
 
 
@@ -29,15 +32,16 @@ const { errors, handleSubmit, defineComponentBinds } = useForm({
 });
 
 const authStore = useAuthStore()
-
+const loading = ref(false)
 const onSubmit = handleSubmit(async (values) => {
   console.log(JSON.stringify(values, null, 2));
-  const { pending, isSuccess, data, error } = await loginByUsername(values.username, values.password);
-  console.log(pending.value, data);
+  loading.value = true;
+  const { isSuccess, data, error } = await loginByUsernameService(values.username, values.password);
   if (isSuccess && data) {
     console.log(data)
     authStore.$patch({
       accessToken: data.access_token,
+      isAuthenticated: true,
     })
     router.replace({
       path: '/home'
@@ -48,6 +52,11 @@ const onSubmit = handleSubmit(async (values) => {
       expires: new Date(data.expire * 1000),
     })
     toast.add({ severity: 'success', summary: 'เข้าสู่ระบบ', detail: 'การเข้าสู่ระบบสำเร็จ', life: 3000 });
+    loading.value = false;
+  } else {
+    const err = (error as any).statusMessage
+    toast.add({ severity: 'warn', summary: 'เข้าสู่ระบบไม่สำเร็จ', detail: 'การเข้าสู่ระบบไม่สำเร็จ ชื่อผู้ใช้ / รหัสผ่าน ไม่ถูกต้อง\n' + 'system message : ' + err, life: 8000 });
+    loading.value = false;
   }
 
 });
@@ -109,7 +118,7 @@ const password = defineComponentBinds('password')
           v-if="errors.password"
         >{{ errors.password }}</small>
         <div class="flex justify-center mt-8">
-          <Button type="submit">เข้าสู่ระบบ</Button>
+          <Button type="submit" :loading="loading">เข้าสู่ระบบ</Button>
       </div>
     </form>
   </div>

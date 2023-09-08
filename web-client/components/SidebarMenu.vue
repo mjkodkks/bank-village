@@ -12,7 +12,6 @@ const routes = ref([
         label: 'บัญชีทั้งหมด',
         route: '/account'
     },
-
 ])
 
 const routePage = useRoute()

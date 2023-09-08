@@ -8,21 +8,30 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
   async create(createUserDto: CreateUserDto) {
-    const { username, password } = createUserDto;
+    const { username, password, citizenId, isAdmin } = createUserDto;
 
-    const salt = await bcrypt.genSalt();
-    const hashPassword = await bcrypt.hash(password, salt);
+    if (isAdmin) {
+      const salt = await bcrypt.genSalt();
+      const hashPassword = await bcrypt.hash(password, salt);
 
-    const user = await this.prisma.user.upsert({
-      create: { username, password: hashPassword },
-      update: {},
-      where: {
-        username: username,
-      },
-    });
-
-    console.log(user);
-
+      const user = await this.prisma.user.upsert({
+        create: { username, password: hashPassword, citizenId, role: 'ADMIN' },
+        update: {},
+        where: {
+          username: username,
+        },
+      });
+      console.log(user);
+    } else {
+      const user = await this.prisma.user.upsert({
+        create: { username, citizenId, role: 'USER' },
+        update: {},
+        where: {
+          username: username,
+        },
+      });
+      console.log(user);
+    }
     return 'create success';
   }
 
@@ -72,6 +81,30 @@ export class UsersService {
         address: true,
         lastLogin: true,
         createdAt: true,
+      },
+    });
+
+    return user;
+  }
+
+  async findOneByIdNoPassword(id: number) {
+    const user = await this.prisma.user.findFirst({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        username: true,
+        nickName: true,
+        citizenId: true,
+        brithday: true,
+        role: true,
+        firstname: true,
+        surname: true,
+        address: true,
+        lastLogin: true,
+        createdAt: true,
+        accountId: true,
       },
     });
 

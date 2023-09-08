@@ -1,10 +1,11 @@
 <script setup lang="ts">
 definePageMeta({
-    layout: 'dashboard'
+    layout: 'dashboard',
+    middleware: ["auth"]
 })
 const router = useRouter()
 </script>
 
 <template>
-    <div class="h-[200vh]">member</div>
+    <div class="h-[200vh]">Account</div>
 </template>

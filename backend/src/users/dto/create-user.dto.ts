@@ -4,6 +4,10 @@ export class CreateUserDto {
   @IsNotEmpty()
   username: string;
 
+  password?: string;
+
+  citizenId?: string;
+
   @IsNotEmpty()
-  password: string;
+  isAdmin: boolean;
 }

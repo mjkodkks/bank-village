@@ -1,8 +1,9 @@
+import Cookies from 'js-cookie'
 import { ofetch } from 'ofetch'
 export async function requestAPI() {
     const runtimeConfig = useRuntimeConfig()
     const baseURL = runtimeConfig.public.API_URL
-    console.log(baseURL)
+
     const reuestNoneAuth = ofetch.create({
         baseURL,
         headers: {
@@ -22,6 +23,7 @@ export async function requestAPI() {
         baseURL,
         headers: {
             Accept: "application/json",
+            Authorization: "Bearer " + Cookies.get('accessToken') || ''
         },
         async onRequest({ request, options }) {
             // Log request

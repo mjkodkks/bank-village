@@ -48,7 +48,7 @@ export default defineNuxtConfig({
     preference: 'light',
   },
 
-  css: [ "primevue/resources/themes/lara-light-blue/theme.css", '~/assets/css/main.css'],
+  css: [ "primevue/resources/themes/lara-light-blue/theme.css", 'primevue/resources/primevue.min.css', '~/assets/css/main.css', 'primeicons/primeicons.css'],
 
   plugins: ['./plugins/primevue.ts', './plugins/scroll.client.ts'],
 
@@ -67,7 +67,7 @@ export default defineNuxtConfig({
 
   typescript: {
     tsConfig: {
-      include: ['./types/**/*.d.ts'],
+      include: ['./types/**/*.d.ts', './utils/**/*.ts'],
     },
     shim: false
   },

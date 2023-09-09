@@ -80,8 +80,11 @@ const password = defineComponentBinds('password')
         class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] text-primary lg:text-4xl text-2xl text-center bg-white p-4 rounded-lg"
       >ธนาคารหมู่บ้านตามแนวพระราชดำริ</h1>
     </div>
-    <div class="flex-none w-full xl:w-1/2 p-4 flex flex-col gap-2 lg:gap-4 justify-center items-center bg-slate-100">
-      <h1 class="text-center text-2xl">เข้าสู่ระบบพนักงาน</h1>
+    <div class="flex-none w-full xl:w-1/2 p-4 flex flex-col gap-2 lg:gap-6 justify-center items-center bg-slate-100">
+      <div>
+        <h1 class="text-center text-2xl m-0">เข้าสู่ระบบพนักงาน</h1>
+        <h4 class="text-center text-lg m-0 mt-2 text-primary">ธนาคารหมู่บ้านตามแนวพระราชดำริ</h4>
+      </div>
       <form
         @submit.prevent="onSubmit"
         class="md:max-w-xl rounded-lg shadow-lg pt-10 pb-5 lg:px-8 px-4 w-full border-solid border border-gray-300 bg-white"

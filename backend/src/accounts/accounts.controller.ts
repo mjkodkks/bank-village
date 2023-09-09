@@ -64,6 +64,13 @@ export class AccountsController {
     return result;
   }
 
+  @Get('/types')
+  @ApiOperation({ summary: 'List account type' })
+  @UseGuards(JwtAuthGuard)
+  findAccountTypeAll() {
+    return this.accountsService.findAllAccountType();
+  }
+
   @Get()
   @ApiOperation({ summary: 'List account' })
   @UseGuards(JwtAuthGuard)
@@ -72,8 +79,20 @@ export class AccountsController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'get account by id' })
+  @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
     return this.accountsService.findOne(+id);
+  }
+
+  @Get('/transactions/:id')
+  @ApiOperation({
+    summary:
+      'Get all transaction by account id (Transaction ทั้งหมดของ account จาก id)',
+  })
+  @UseGuards(JwtAuthGuard)
+  findTransactions(@Param('id') id: string) {
+    return this.accountsService.findTransactioonAll(+id);
   }
 
   @Patch(':id')

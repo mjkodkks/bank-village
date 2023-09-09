@@ -6,7 +6,7 @@ import {
 } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { PrismaService } from '@/prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { AccountType, Prisma } from '@prisma/client';
 
 @Injectable()
 export class AccountsService {
@@ -38,7 +38,7 @@ export class AccountsService {
   }
 
   async deposit(createTransactionDto: CreateDepositTransactionDto) {
-    const { account_id, balance } = createTransactionDto;
+    const { account_id, amount } = createTransactionDto;
     const account = await this.prisma.account.findFirst({
       where: {
         id: account_id,
@@ -49,7 +49,7 @@ export class AccountsService {
       return null;
     }
 
-    const balanceInDecimal = new Prisma.Decimal(balance);
+    const balanceInDecimal = new Prisma.Decimal(amount);
 
     const balanceTotal = account.balance.add(balanceInDecimal);
 
@@ -81,14 +81,14 @@ export class AccountsService {
   }
 
   async withdraw(createTransactionDto: CreateWithdrawTransactionDto) {
-    const { account_id, balance } = createTransactionDto;
+    const { account_id, amount } = createTransactionDto;
     const account = await this.prisma.account.findFirst({
       where: {
         id: account_id,
       },
     });
 
-    const balanceInDecimal = new Prisma.Decimal(balance);
+    const balanceInDecimal = new Prisma.Decimal(amount);
 
     if (!account) {
       return null;
@@ -120,12 +120,31 @@ export class AccountsService {
     return result;
   }
 
+  findAllAccountType() {
+    const accounts = Object.keys(AccountType);
+    return accounts;
+  }
+
   findAll() {
     return `This action returns all accounts`;
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} account`;
+    const account = this.prisma.account.findUnique({
+      where: {
+        id,
+      },
+    });
+    return account;
+  }
+
+  findTransactioonAll(id: number) {
+    const transactions = this.prisma.transaction.findMany({
+      where: {
+        accountId: id,
+      },
+    });
+    return transactions;
   }
 
   update(id: number, updateAccountDto: UpdateAccountDto) {

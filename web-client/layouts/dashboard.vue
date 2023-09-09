@@ -23,8 +23,8 @@ function logout() {
 
 
 <template>
-  <div class="grid grid-cols-[280px_1fr] h-full">
-    <aside class="shadow-lg h-[100vh] relative flex flex-col gap-1">
+  <div class="grid md:grid-cols-[280px_1fr] h-full">
+    <aside class="shadow-lg h-[100vh] relative hidden md:flex flex-col gap-1">
       <Sidebar v-model:visible="mainStore.isSidebarOpen">
         <h1 class="text-center flex-none">ธนาคารหมู่บ้าน</h1>
          <SidebarMenu></SidebarMenu>

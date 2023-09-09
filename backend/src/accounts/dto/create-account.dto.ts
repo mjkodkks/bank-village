@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export enum AccountType {
@@ -14,17 +15,21 @@ export class CreateAccountDto {
 }
 
 export class CreateDepositTransactionDto {
+  @ApiProperty()
   @IsNotEmpty()
   account_id: number;
 
+  @ApiProperty()
   @IsNotEmpty()
-  balance: number;
+  amount: number;
 }
 
 export class CreateWithdrawTransactionDto {
+  @ApiProperty()
   @IsNotEmpty()
   account_id: number;
 
+  @ApiProperty()
   @IsNotEmpty()
-  balance: number;
+  amount: number;
 }

@@ -62,4 +62,6 @@ enum Role {
 
 enum AccountType {
   SAVING
+  STOCK
+  LOAN
 }

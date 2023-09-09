@@ -30,6 +30,7 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
+    'dayjs-nuxt'
   ],
 
   pinia: {
@@ -46,6 +47,13 @@ export default defineNuxtConfig({
   colorMode: {
     classSuffix: '',
     preference: 'light',
+  },
+
+  dayjs: {
+    locales: ['en', 'th'],
+    plugins: ['relativeTime', 'utc', 'timezone'],
+    defaultLocale: 'en',
+    defaultTimezone: '	Asia/Bangkok',
   },
 
   css: [ "primevue/resources/themes/lara-light-blue/theme.css", 'primevue/resources/primevue.min.css', '~/assets/css/main.css', 'primeicons/primeicons.css'],

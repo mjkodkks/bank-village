@@ -21,3 +21,10 @@ export type User = {
     lastLogin: null | string;
     createdAt: string;
 }
+
+export type AdminList = {
+    id: number
+    username: string
+    firstname: string
+    surname: string
+}[]

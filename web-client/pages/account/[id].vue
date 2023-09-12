@@ -2,11 +2,12 @@
 import { MenuItem } from 'primevue/menuitem';
 import { useField, useForm } from 'vee-validate';
 import { useToast } from 'primevue/usetoast';
-import { getAccountProfileService, transactionDepositService, transactionWithdrawService } from '~/services/account';
+import { getAccountProfileService, transactionDepositService, transactionInterestService, transactionWithdrawService } from '~/services/account';
 import { useConfirm } from "primevue/useconfirm";
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
 import { mapTransactionType } from '~/utils/account';
+import { getAdminListService } from '~/services/user';
 
 definePageMeta({
     layout: 'dashboard',
@@ -27,7 +28,7 @@ const breadcrumbItems = ref<MenuItem[]>([
 
 const { handleSubmit } = useForm();
 
-const { value: amount, errorMessage: amountErrorMessage, resetField } = useField<number>('amount', toTypedSchema(z.number().nonnegative({
+const { value: amount, errorMessage: amountErrorMessage, resetField: resetFieldAmount } = useField<number>('amount', toTypedSchema(z.number().nonnegative({
     message: 'ไม่สามารถใส่ค่าที่เป็นลบได้'
 }).safe().min(1, {
     message: 'กรุณาใส่เงินที่มากกว่าหรือเท่ากับ 1 บาท เป็นอย่างน้อย'
@@ -35,22 +36,31 @@ const { value: amount, errorMessage: amountErrorMessage, resetField } = useField
     initialValue: 0
 });
 
+const { value: staff, errorMessage: staffErrorMessage, resetField: resetFieldStaff } = useField<{ id: number } | undefined>('staff', undefined, {
+    initialValue: undefined
+});
+
+const { value: note, errorMessage: noteErrorMessage, resetField: resetFieldNote } = useField<string | undefined>('note', undefined, {
+    initialValue: undefined
+});
+
 
 const onSubmit = handleSubmit(async (values) => {
     console.log(values)
-    const { amount } = values
+    const { amount, staff, note } = values
+    const userId = staff?.id
     confirm.require({
         message: `ยืนยันการ (${headerDialog.value}) จำนวน ${amount} บาท`,
         header: 'ยืนยัน',
         icon: 'pi pi-exclamation-triangle',
         accept: async () => {
-            transaction(+id, amount, dialogMode.value)
+            transaction(+id, amount, dialogMode.value, userId, note)
         },
     });
 });
 
 const loadingTransaction = ref(false)
-async function transaction(accountId: number, amount: number, type: string) {
+async function transaction(accountId: number, amount: number, type: string, userId?: number, note?: string) {
     let transactionService;
     let successMessage;
     let modeMessage
@@ -63,11 +73,15 @@ async function transaction(accountId: number, amount: number, type: string) {
         transactionService = transactionDepositService;
         modeMessage = 'การฝาก'
         successMessage = 'การฝากสำเร็จ';
+    } else if (type === 'interest') {
+        transactionService = transactionInterestService;
+        modeMessage = 'การฝากดอกเบี้ย'
+        successMessage = 'การฝากสำเร็จ';
     }
 
     if (transactionService) {
         loadingTransaction.value = true
-        const { isSuccess, data, error } = await transactionService(accountId, amount);
+        const { isSuccess, data, error } = await transactionService(accountId, amount, userId, note);
         if (isSuccess && data) {
             toast.add({ severity: 'success', summary: type, detail: successMessage, life: 3000 });
             console.info(data);
@@ -92,7 +106,7 @@ async function getAccountProfile(id: number) {
             type: mapAccoutType(data.type).th,
             createdAt: dayjs(data.createdAt).format('ddd DD MMMM YYYY เวลา HH:mm:ss')
         }
-        breadcrumbItems.value.push({ label: `${data.type} (${id})` })
+        breadcrumbItems.value[2] || breadcrumbItems.value.push({ label: `${data.type} (${id})` }) 
     }
 
     return data
@@ -106,9 +120,21 @@ async function getTransactions(id: number) {
         transactions.value = data.map(m => {
             return {
                 ...m,
+                staff: `${m.staff?.username ? '(' + m.staff.username + ')' : ''} ${m.staff?.firstname || ''} ${m.staff?.surname || ''}`,
                 createdAt: dayjs(m.createdAt).format('DD/MM/YYYY HH:mm:ss'),
             }
         })
+    }
+
+    return data
+}
+
+const adminList = ref<AdminList>([])
+async function getAdminList() {
+    const { isSuccess, data, error } = await getAdminListService()
+    if (isSuccess && data) {
+        console.log(data)
+        adminList.value = data
     }
 
     return data
@@ -127,6 +153,8 @@ const headerDialog = computed(() => {
 function openDialogTransaction(type: string) {
     isDialogVisible.value = true
     amount.value = 0
+    staff.value = undefined
+    note.value = undefined
     if (type === 'deposit') {
         dialogMode.value = 'deposit'
     }
@@ -143,6 +171,7 @@ function openDialogTransaction(type: string) {
 async function init() {
     await getAccountProfile(+id)
     await getTransactions(+id)
+    getAdminList()
 }
 
 init()
@@ -227,7 +256,7 @@ init()
                         header="ประเภทธุรกรรม"
                     >
                         <template #body="{ data }">
-                            <div :style="{ color: mapTransactionType(data.action).color }">{{ data.action  }}</div>
+                            <div :style="{ color: mapTransactionType(data.action).color }">{{ data.action }}</div>
                         </template>
                     </Column>
                     <Column
@@ -238,15 +267,43 @@ init()
                     <Column
                         field="previousBalance"
                         header="ยอดยกมา (บาท)"
-                    ></Column>
+                    >
+                        <template #body="{ data }">
+                            <div class="text-right">
+                                {{ data.previousBalance || '-' }}
+                            </div>
+                        </template>
+                    </Column>
                     <Column
                         field="amounts"
                         header="จำนวน (บาท)"
-                    ></Column>
+                    >
+                        <template #body="{ data }">
+                            <div class="text-right">
+                                {{ data.amounts || '-' }}
+                            </div>
+                        </template>
+                    </Column>
                     <Column
                         field="changeBalance"
                         header="ยอดคงเหลือ (บาท)"
-                    ></Column>
+                    >
+                        <template #body="{ data }">
+                            <div class="text-right">
+                                {{ data.changeBalance || '-' }}
+                            </div>
+                        </template>
+                    </Column>
+                    <Column
+                        field="interest"
+                        header="ดอกเบี้ย (บาท)"
+                    >
+                        <template #body="{ data }">
+                            <div class="text-right">
+                                {{ data.interest || '-' }}
+                            </div>
+                        </template>
+                    </Column>
                     <Column
                         field="staff"
                         header="ผู้ดำเนินการ"
@@ -269,13 +326,13 @@ init()
                 @submit.prevent="onSubmit"
                 class="lg:max-w-xl lg:px-8 lg:ml-auto px-4 pt-7 w-full bg-white"
             >
-                <div class="">
+                <div>
                     <label
-                        for="account"
+                        for="amount"
                         class="text-lg"
-                    >ระบุจำนวนเงิน (บาท)</label>
+                    >ระบุจำนวนเงิน (บาท)*</label>
                     <InputNumber
-                        inputId="account"
+                        inputId="amount"
                         v-model="amount"
                         :maxFractionDigits="2"
                         :class="{ 'p-invalid': amountErrorMessage }"
@@ -283,11 +340,53 @@ init()
                         class="w-full mt-4"
                         inputClass="text-right text-2xl"
                     />
+                    <small
+                        class="text-pink-500 font-extralight mt-2 p-error"
+                        v-if="amountErrorMessage"
+                    >{{ amountErrorMessage }}</small>
                 </div>
-                <small
-                    class="text-pink-500 font-extralight mt-2 p-error"
-                    v-if="amountErrorMessage"
-                >{{ amountErrorMessage }}</small>
+                <div>
+                    <label
+                        for="staff"
+                        class="text-lg"
+                    >ระบุเจ้าหน้าที่ ที่ทำรายการ*</label>
+                    <Dropdown
+                        inputId="staff"
+                        v-model="staff"
+                        :options="adminList"
+                        option-label="staff"
+                        :class="{ 'p-invalid': staffErrorMessage }"
+                        placeholder="เลือกเจ้าหน้าที่"
+                        class="w-full mt-4"
+                        inputClass="text-right l"
+                    >
+                        <template #value="{ value, placeholder }">
+                            {{ value ? `(${value.username}) ${value.firstname || ''} ${value.surname || ''}` : placeholder
+                            }}
+                        </template>
+                        <template #option="slotProps">
+                            <i class="pi pi-user mr-1"></i>
+                            ({{ slotProps.option.username }}) {{ slotProps.option.firstname }} {{ slotProps.option.surname }}
+                        </template>
+                    </Dropdown>
+                    <small
+                        class="text-pink-500 font-extralight mt-2 p-error"
+                        v-if="staffErrorMessage"
+                    >{{ staffErrorMessage }}</small>
+                </div>
+                <div class="mt-4">
+                    <label
+                        for="note"
+                        class="text-lg block"
+                    >หมายเหตุ</label>
+                    <Textarea
+                        id="note"
+                        v-model="note"
+                        rows="1"
+                        cols="10"
+                        class="w-full"
+                    />
+                </div>
 
                 <div class="mt-8 flex justify-end">
                     <Button
@@ -298,7 +397,6 @@ init()
                         :loading="loadingTransaction"
                     ></Button>
                 </div>
-            </form>
-        </Dialog>
-    </div>
-</template>
+        </form>
+    </Dialog>
+</div></template>

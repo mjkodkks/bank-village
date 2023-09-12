@@ -14,6 +14,7 @@ import { AccountsService } from './accounts.service';
 import {
   CreateAccountDto,
   CreateDepositTransactionDto,
+  CreateInterestTransactionDto,
   CreateWithdrawTransactionDto,
 } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
@@ -54,6 +55,24 @@ export class AccountsController {
   ) {
     const result = await this.accountsService.withdraw(
       createWithdrawTransactionDto,
+    );
+    if (result === null) {
+      throw new HttpException('Not Found Account!', HttpStatus.NOT_FOUND);
+    }
+    if (typeof result === 'string') {
+      throw new HttpException(result, HttpStatus.BAD_REQUEST);
+    }
+    return result;
+  }
+
+  @ApiOperation({ summary: 'Interest (ฝากดอกเบี้ยเข้าบัญชี)' })
+  @UseGuards(JwtAuthGuard)
+  @Post('interest')
+  async interest(
+    @Body() createInterestTransactionDto: CreateInterestTransactionDto,
+  ) {
+    const result = await this.accountsService.interest(
+      createInterestTransactionDto,
     );
     if (result === null) {
       throw new HttpException('Not Found Account!', HttpStatus.NOT_FOUND);

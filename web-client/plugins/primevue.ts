@@ -18,6 +18,7 @@ import ConfirmDialog from 'primevue/confirmdialog';
 import InputNumber from 'primevue/inputnumber';
 import InputMask from 'primevue/inputmask';
 import Skeleton from 'primevue/skeleton';
+import Textarea from 'primevue/textarea';
 
 export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.use(PrimeVue, { ripple: true } as PrimeVueConfiguration);
@@ -39,6 +40,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.component('InputNumber', InputNumber);
     nuxtApp.vueApp.component('InputMask', InputMask);
     nuxtApp.vueApp.component('Skeleton', Skeleton);
+    nuxtApp.vueApp.component('Textarea', Textarea);
     
     //other components that you need
 });

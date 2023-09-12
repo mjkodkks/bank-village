@@ -11,24 +11,26 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @unique @default(autoincrement())
-  username  String    @unique
-  password  String?
-  lastLogin DateTime?
-  role      Role      @default(USER)
-  accountId Account[]
-  address   String?
-  nickName  String?
-  citizenId String?
-  brithday  DateTime?
-  createdAt DateTime? @default(now())
-  firstname String?
-  surname   String?
+  id          Int           @id @unique @default(autoincrement())
+  username    String        @unique
+  password    String?
+  lastLogin   DateTime?
+  role        Role          @default(USER)
+  accountId   Account[]
+  address     String?
+  nickName    String?
+  citizenId   String?
+  brithday    DateTime?
+  createdAt   DateTime?     @default(now())
+  firstname   String?
+  surname     String?
+  transaction Transaction[]
 }
 
 model Account {
   id           Int           @id @unique @default(autoincrement())
-  balance      Decimal       @db.Decimal(10, 2)
+  balance      Decimal       @default(0) @db.Decimal(10, 2)
+  interest     Decimal?      @default(0) @db.Decimal(10, 2)
   createdAt    DateTime      @default(now())
   owner        User?         @relation(fields: [userId], references: [id])
   userId       Int?
@@ -41,10 +43,12 @@ model Transaction {
   action          TransactionAction
   previousBalance Decimal?          @db.Decimal(10, 2)
   changeBalance   Decimal?          @db.Decimal(10, 2)
-  amounts         Decimal           @db.Decimal(10, 2)
+  amounts         Decimal?           @db.Decimal(10, 2)
+  interest        Decimal?          @db.Decimal(10, 2)
   account         Account?          @relation(fields: [accountId], references: [id])
   accountId       Int?
-  staff           String?
+  staff           User?             @relation(fields: [staffId], references: [id])
+  staffId         Int?
   note            String?
   createdAt       DateTime          @default(now())
 }

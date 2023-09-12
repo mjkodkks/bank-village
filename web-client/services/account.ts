@@ -18,6 +18,23 @@ export async function getAccountTypesService() {
         }
     }
 }
+export async function getAccountListService() {
+    const { requestAuth } = await requestAPI()
+    try {
+        const data = await requestAuth('/accounts', {
+            method: 'GET',
+        })
+        return {
+            isSuccess: true,
+            data,
+        }
+    } catch (error) {
+        return {
+            isSuccess: false,
+            error,
+        }
+    }
+}
 
 export async function createAccountService(user_id: number, type: string) {
     const { requestAuth } = await requestAPI()
@@ -77,11 +94,20 @@ export async function getTransactionsServier(account_id: number) {
     }
 }
 
-export async function transactionDepositService(account_id: number, amount: number) {
+export async function transactionDepositService(account_id: number, amount: number, user_id?: number, note?: string) {
     const { requestAuth } = await requestAPI()
     const template = {
         account_id,
-        amount
+        amount,
+    } as {
+        [x: string]: string | number
+    }
+
+    if (user_id) {
+        template['user_id']= user_id
+    }
+    if (note) {
+        template['note']= note
     }
     try {
         const data = await requestAuth(`/accounts/deposit/`, {
@@ -100,14 +126,55 @@ export async function transactionDepositService(account_id: number, amount: numb
     }
 }
 
-export async function transactionWithdrawService(account_id: number, amount: number) {
+export async function transactionWithdrawService(account_id: number, amount: number, user_id?: number, note?: string) {
     const { requestAuth } = await requestAPI()
     const template = {
         account_id,
-        amount
+        amount,
+    } as {
+        [x: string]: string | number
+    }
+
+    if (user_id) {
+        template['user_id']= user_id
+    }
+    if (note) {
+        template['note']= note
     }
     try {
         const data = await requestAuth(`/accounts/withdraw`, {
+            method: 'POST',
+            body: template
+        })
+        return {
+            isSuccess: true,
+            data,
+        }
+    } catch (error) {
+        return {
+            isSuccess: false,
+            error,
+        }
+    }
+}
+
+export async function transactionInterestService(account_id: number, amount: number, user_id?: number, note?: string) {
+    const { requestAuth } = await requestAPI()
+    const template = {
+        account_id,
+        amount,
+    } as {
+        [x: string]: string | number
+    }
+
+    if (user_id) {
+        template['user_id']= user_id
+    }
+    if (note) {
+        template['note']= note
+    }
+    try {
+        const data = await requestAuth(`/accounts/interest`, {
             method: 'POST',
             body: template
         })

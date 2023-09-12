@@ -46,6 +46,16 @@ export class UsersController {
   }
 
   @ApiOperation({
+    summary: 'get )',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Get('adminList')
+  getAdminList() {
+    const user = this.usersService.findAdminAll();
+    return user;
+  }
+
+  @ApiOperation({
     summary: 'get user profile by username (ค้นหาข้อมูลสมาชิกจาก username)',
   })
   @UseGuards(JwtAuthGuard)

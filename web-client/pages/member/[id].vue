@@ -34,7 +34,7 @@ async function getUserProfile() {
         profile.value.createdAt = dayjs(data.createdAt).format('ddd DD MMMM YYYY เวลา HH:mm:ss')
         profile.value.role = mapRole(data.role).th
 
-            
+
         data.accountId.forEach(item => {
             accounts.value.forEach(acc => {
                 if (acc.type === item.type) {
@@ -170,7 +170,10 @@ init()
                 <h3 class="m-0">ประเภทบัญชี</h3>
                 <!-- <Button @click="isCreateAccountDialogVisible = true" class="" icon="pi pi-plus" size="small" label="เปิดบัญชี"></Button> -->
             </div>
-            <div class="mt-4 grid lg:grid-cols-[260px_260px_260px] gap-8" v-if="profile">
+            <div
+                class="mt-4 grid lg:grid-cols-[260px_260px_260px] gap-8"
+                v-if="profile"
+            >
                 <div
                     v-for="(accountCard, index) in accounts"
                     @click="() => onAccountClick(accountCard.id, accountCard.type, accountCard.isOpen)"
@@ -183,7 +186,6 @@ init()
                     <div v-if="accountCard.balance !== undefined">({{ accountCard.balance }} บาท)</div>
                     <Button
                         v-if="!accountCard.isOpen"
-                        :disabled="index === 1 || index === 2"
                         class=""
                         icon="pi pi-plus"
                         size="small"
@@ -227,5 +229,4 @@ init()
             </div>
         </form>
     </Dialog> -->
-    </div>
-</template>
+</div></template>

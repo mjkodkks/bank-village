@@ -77,6 +77,21 @@ export class UsersService {
     return alluser;
   }
 
+  findAdminAll() {
+    const alluser = this.prisma.user.findMany({
+      where: {
+        role: 'ADMIN',
+      },
+      select: {
+        id: true,
+        username: true,
+        firstname: true,
+        surname: true,
+      },
+    });
+    return alluser;
+  }
+
   async findOneByUsername(username: string) {
     const user = await this.prisma.user.findFirst({
       where: {

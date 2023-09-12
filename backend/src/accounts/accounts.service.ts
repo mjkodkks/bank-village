@@ -38,7 +38,7 @@ export class AccountsService {
   }
 
   async deposit(createTransactionDto: CreateDepositTransactionDto) {
-    const { account_id, amount } = createTransactionDto;
+    const { account_id, amount, user_id, note } = createTransactionDto;
     const account = await this.prisma.account.findFirst({
       where: {
         id: account_id,
@@ -65,6 +65,8 @@ export class AccountsService {
             changeBalance: balanceTotal,
             amounts: balanceInDecimal,
             action: 'DEPOSIT',
+            staffId: user_id,
+            note,
           },
         },
       },
@@ -81,7 +83,7 @@ export class AccountsService {
   }
 
   async withdraw(createTransactionDto: CreateWithdrawTransactionDto) {
-    const { account_id, amount } = createTransactionDto;
+    const { account_id, amount, user_id, note } = createTransactionDto;
     const account = await this.prisma.account.findFirst({
       where: {
         id: account_id,
@@ -112,8 +114,52 @@ export class AccountsService {
             changeBalance: balanceTotal,
             amounts: balanceInDecimal,
             action: 'WITHDRAWAL',
+            staffId: user_id,
+            note,
           },
         },
+      },
+    });
+
+    return result;
+  }
+
+  async interest(createTransactionDto: CreateDepositTransactionDto) {
+    const { account_id, amount, user_id, note } = createTransactionDto;
+    const account = await this.prisma.account.findFirst({
+      where: {
+        id: account_id,
+      },
+    });
+
+    if (!account) {
+      return null;
+    }
+
+    const interestInDecimal = new Prisma.Decimal(amount);
+
+    const result = this.prisma.account.update({
+      where: {
+        id: account_id,
+      },
+      data: {
+        transactions: {
+          create: {
+            previousBalance: account.balance,
+            action: 'INTEREST',
+            interest: interestInDecimal,
+            staffId: user_id,
+            note,
+          },
+        },
+      },
+      select: {
+        id: true,
+        balance: true,
+        interest: true,
+        createdAt: true,
+        userId: true,
+        type: true,
       },
     });
 
@@ -126,7 +172,25 @@ export class AccountsService {
   }
 
   findAll() {
-    return `This action returns all accounts`;
+    const account = this.prisma.account.findMany({
+      select: {
+        id: true,
+        balance: true,
+        interest: true,
+        createdAt: true,
+        userId: true,
+        type: true,
+        owner: {
+          select: {
+            username: true,
+            role: true,
+            firstname: true,
+            surname: true,
+          },
+        },
+      },
+    });
+    return account;
   }
 
   findOne(id: number) {
@@ -155,8 +219,28 @@ export class AccountsService {
 
   findTransactioonAll(id: number) {
     const transactions = this.prisma.transaction.findMany({
+      select: {
+        id: true,
+        action: true,
+        previousBalance: true,
+        changeBalance: true,
+        amounts: true,
+        interest: true,
+        note: true,
+        createdAt: true,
+        staff: {
+          select: {
+            username: true,
+            firstname: true,
+            surname: true,
+          },
+        },
+      },
       where: {
         accountId: id,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
     return transactions;

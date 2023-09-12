@@ -113,6 +113,7 @@ const password = defineComponentBinds('password')
             placeholder="กรุณาใส่รหัสผ่าน"
             :feedback="false"
             toggleMask
+            autocomplete="current-password"
           />
           <label for="password">รหัสผ่าน</label>
         </div>

@@ -1,5 +1,5 @@
 import { requestAPI } from "~/composables/request"
-import { createUser, User } from "~/utils/user"
+import { AdminList, createUser, User } from "~/utils/user"
 
 export async function getlistUserService() {
     const { requestAuth } = await requestAPI()
@@ -58,7 +58,25 @@ export async function createUserService({ username, password, citizenId, isAdmin
 export async function getUserProfileByIdService(id: number) {
     const { requestAuth } = await requestAPI()
     try {
-        const data = await requestAuth(`users/${id}`, {
+        const data = await requestAuth(`/users/${id}`, {
+            method: 'GET',
+        })
+        return {
+            isSuccess: true,
+            data,
+        }
+    } catch (error) {
+        return {
+            isSuccess: false,
+            error,
+        }
+    }
+}
+
+export async function getAdminListService() {
+    const { requestAuth } = await requestAPI()
+    try {
+        const data = await requestAuth<AdminList>(`/users/adminList`, {
             method: 'GET',
         })
         return {

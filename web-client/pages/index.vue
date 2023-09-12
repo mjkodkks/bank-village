@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 import { useToast } from 'primevue/usetoast'
 
 definePageMeta({
-    middleware: 'login'
+  middleware: 'login'
 })
 
 const toast = useToast()
@@ -77,19 +77,19 @@ const password = defineComponentBinds('password')
         alt="bg"
       >
       <h1
-        class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] text-primary lg:text-4xl text-2xl text-center bg-white p-4 rounded-lg"
-      >ธนาคารหมู่บ้านตามแนวพระราชดำริ</h1>
+        class="absolute w-[600px] top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] text-primary lg:text-4xl text-2xl text-center bg-white p-4 rounded-lg"
+      >ธนาคารหมู่บ้านตามแนวพระราชดำริ <br> <span class="text-black font-extralight">(สาขา บ้านกุดโดน)</span> </h1>
     </div>
     <div class="flex-none w-full xl:w-1/2 p-4 flex flex-col gap-2 lg:gap-6 justify-center items-center bg-slate-100">
-      <div>
-        <h1 class="text-center text-2xl m-0">เข้าสู่ระบบพนักงาน</h1>
-        <h4 class="text-center text-lg m-0 mt-2 text-primary">ธนาคารหมู่บ้านตามแนวพระราชดำริ</h4>
-      </div>
       <form
         @submit.prevent="onSubmit"
-        class="md:max-w-xl rounded-lg shadow-lg pt-10 pb-5 lg:px-8 px-4 w-full border-solid border border-gray-300 bg-white"
+        class="md:max-w-xl rounded-3xl shadow-lg py-10 lg:px-8 px-4 w-full border-solid border border-gray-300 bg-white"
       >
-        <div class="p-float-label">
+        <div>
+          <h1 class="text-center text-2xl m-0">เข้าสู่ระบบเจ้าหน้าที่</h1>
+          <h4 class="text-center text-lg m-0 mt-2 text-primary">ธนาคารหมู่บ้านตามแนวพระราชดำริ <br> <span class="text-black font-extralight">(สาขา บ้านกุดโดน)</span></h4>
+        </div>
+        <div class="p-float-label mt-8">
           <InputText
             id="username"
             name="username"
@@ -120,9 +120,13 @@ const password = defineComponentBinds('password')
           class="text-pink-500 font-extralight mt-2 p-error"
           v-if="errors.password"
         >{{ errors.password }}</small>
-        <div class="flex justify-center mt-8">
-          <Button type="submit" :loading="loading">เข้าสู่ระบบ</Button>
-      </div>
-    </form>
-  </div>
+        <div class="flex justify-center mt-4">
+          <Button
+            type="submit"
+            :loading="loading"
+            class="w-full max-w-[200px] flex justify-center"
+          >เข้าสู่ระบบ</Button>
+        </div>
+      </form>
+    </div>
 </div></template>

@@ -1,10 +1,10 @@
 import { requestAPI } from "~/composables/request"
-import { createUser } from "~/utils/user"
+import { createUser, User } from "~/utils/user"
 
 export async function getlistUserService() {
     const { requestAuth } = await requestAPI()
     try {
-        const data = await requestAuth('/users', {
+        const data = await requestAuth<User[]>('/users', {
             method: 'GET',
         })
         return {
@@ -19,19 +19,25 @@ export async function getlistUserService() {
     }
 }
 
-export async function createUserService({ username, password, citizenId, isAdmin }: createUser) {
+export async function createUserService({ username, password, citizenId, isAdmin, firstname, surname, address }: createUser) {
     const { requestAuth } = await requestAPI()
     try {
         let body = {} as {[x:string]: string | boolean}
         if (isAdmin) {
             body['username'] = username
             body['password'] = password ? password : ''
-            body['citizenId'] = citizenId
+            body['citizenId'] = citizenId.replaceAll("-","")
             body['isAdmin'] = true
+            body['firstname'] = firstname ? firstname : ''
+            body['surname'] = surname ? surname : ''
+            body['address'] = address ? address : ''
         } else {
             body['username'] = username 
-            body['citizenId'] = citizenId
+            body['citizenId'] = citizenId.replaceAll("-","")
             body['isAdmin'] = false
+            body['firstname'] = firstname ? firstname : ''
+            body['surname'] = surname ? surname : ''
+            body['address'] = address ? address : ''
         }
         const data = await requestAuth('/users', {
             method: 'POST',

@@ -53,6 +53,7 @@ enum TransactionAction {
   DEPOSIT
   WITHDRAWAL
   TRANSFER
+  INTEREST
 }
 
 enum Role {

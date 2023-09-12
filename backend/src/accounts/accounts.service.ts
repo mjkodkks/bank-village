@@ -134,6 +134,21 @@ export class AccountsService {
       where: {
         id,
       },
+      select: {
+        id: true,
+        balance: true,
+        createdAt: true,
+        userId: true,
+        type: true,
+        owner: {
+          select: {
+            username: true,
+            role: true,
+            firstname: true,
+            surname: true,
+          },
+        },
+      },
     });
     return account;
   }

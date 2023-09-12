@@ -6,6 +6,7 @@ import { getAccountProfileService, transactionDepositService, transactionWithdra
 import { useConfirm } from "primevue/useconfirm";
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
+import { mapTransactionType } from '~/utils/account';
 
 definePageMeta({
     layout: 'dashboard',
@@ -17,18 +18,20 @@ const dayjs = useDayjs()
 const route = useRoute()
 const router = useRouter();
 const id = route.params.id
+const userId = route.query.userId
 
 const breadcrumbItems = ref<MenuItem[]>([
     { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
-    { label: 'บัญชี', to: `/member/${id}`, icon: 'pi pi-wallet', class: '[&_.p-menuitem-text]:ml-2' },
-    { label: id + '' },
+    { label: 'บัญชี', to: `/member/${userId}`, icon: 'pi pi-wallet', class: '[&_.p-menuitem-text]:ml-2' },
 ]);
 
 const { handleSubmit } = useForm();
 
 const { value: amount, errorMessage: amountErrorMessage, resetField } = useField<number>('amount', toTypedSchema(z.number().nonnegative({
     message: 'ไม่สามารถใส่ค่าที่เป็นลบได้'
-}).safe()), {
+}).safe().min(1, {
+    message: 'กรุณาใส่เงินที่มากกว่าหรือเท่ากับ 1 บาท เป็นอย่างน้อย'
+})), {
     initialValue: 0
 });
 
@@ -36,7 +39,14 @@ const { value: amount, errorMessage: amountErrorMessage, resetField } = useField
 const onSubmit = handleSubmit(async (values) => {
     console.log(values)
     const { amount } = values
-    transaction(+id, amount, dialogMode.value)
+    confirm.require({
+        message: `ยืนยันการ (${headerDialog.value}) จำนวน ${amount} บาท`,
+        header: 'ยืนยัน',
+        icon: 'pi pi-exclamation-triangle',
+        accept: async () => {
+            transaction(+id, amount, dialogMode.value)
+        },
+    });
 });
 
 const loadingTransaction = ref(false)
@@ -79,8 +89,10 @@ async function getAccountProfile(id: number) {
         console.log(data)
         profile.value = {
             ...data,
+            type: mapAccoutType(data.type).th,
             createdAt: dayjs(data.createdAt).format('ddd DD MMMM YYYY เวลา HH:mm:ss')
         }
+        breadcrumbItems.value.push({ label: `${data.type} (${id})` })
     }
 
     return data
@@ -103,8 +115,15 @@ async function getTransactions(id: number) {
 }
 
 const isDialogVisible = ref(false)
-const dialogMode = ref<'deposit' | 'withdraw'>('deposit')
-const headerDialog = computed(() => dialogMode.value === 'deposit' ? 'ฝากเงิน' : 'ถอนเงิน')
+const dialogMode = ref<'deposit' | 'withdraw' | 'interest'>('deposit')
+const headerDialog = computed(() => {
+    const template = {
+        deposit: 'ฝากเงิน',
+        withdraw: 'ถอนเงิน',
+        interest: 'ฝากดอกเบี้ย',
+    }
+    return template[dialogMode.value]
+})
 function openDialogTransaction(type: string) {
     isDialogVisible.value = true
     amount.value = 0
@@ -114,6 +133,10 @@ function openDialogTransaction(type: string) {
 
     if (type === 'withdraw') {
         dialogMode.value = 'withdraw'
+    }
+
+    if (type === 'interest') {
+        dialogMode.value = 'interest'
     }
 }
 
@@ -126,7 +149,7 @@ init()
 </script>
 
 <template>
-    <div class="p-8">
+    <div class="p-8 h-full md:flex md:flex-col">
         <div class="max-w-lg">
             <Breadcrumb
                 :model="breadcrumbItems"
@@ -135,7 +158,7 @@ init()
         </div>
         <h3 class="mt-8">ข้อมูลทั่วไป</h3>
         <div
-            class="max-w-6xl grid sm:grid-cols-3 mt-4 gap-y-10"
+            class="max-w-6xl grid sm:grid-cols-3 gap-y-5 2xl:gap-y-10"
             v-if="profile"
         >
             <div>
@@ -148,36 +171,52 @@ init()
             </div>
             <div>
                 <label for="">เจ้าของบัญชี</label>
-                <div class="font-extralight">{{ profile.userId || '' }}</div>
+                <div class="font-extralight">{{ profile.owner?.username || '' }}</div>
             </div>
             <div>
                 <label for="">สร้างเมื่อ</label>
                 <div class="font-extralight">{{ profile.createdAt || '' }}</div>
             </div>
         </div>
-        <div class="flex gap-2 mt-8">
+        <div
+            class="flex gap-2 mt-4 2xl:mt-8"
+            v-if="profile"
+        >
             <Button
                 @click="() => openDialogTransaction('deposit')"
                 size="large"
                 severity="success"
+                icon="pi pi-angle-double-up"
                 label="ฝาก"
             ></Button>
             <Button
                 @click="() => openDialogTransaction('withdraw')"
                 size="large"
+                icon="pi pi-angle-double-down"
                 label="ถอน"
+            ></Button>
+            <Button
+                @click="() => openDialogTransaction('interest')"
+                severity="warning"
+                icon="pi pi-star"
+                size="large"
+                label="ดอกเบี้ย"
             ></Button>
         </div>
         <h3>บันทึกรายการธุรกรรม</h3>
-        <div class="table-wrapper mt-4">
+        <div class="table-wrapper flex-1 overflow-hidden">
             <ClientOnly>
                 <DataTable
                     :value="transactions"
                     stripedRows
+                    scrollable
+                    scrollHeight="flex"
                     class="p-datatable-sm text-sm"
                     tableStyle="min-width: 50rem"
                     :globalFilterFields="['name', 'id', 'username', 'role']"
-                    resizableColumns columnResizeMode="fit" showGridlines
+                    resizableColumns
+                    columnResizeMode="fit"
+                    showGridlines
                 >
                     <Column
                         field="id"
@@ -186,7 +225,11 @@ init()
                     <Column
                         field="action"
                         header="ประเภทธุรกรรม"
-                    ></Column>
+                    >
+                        <template #body="{ data }">
+                            <div :style="{ color: mapTransactionType(data.action).color }">{{ data.action  }}</div>
+                        </template>
+                    </Column>
                     <Column
                         field="createdAt"
                         header="เวลา"
@@ -197,12 +240,12 @@ init()
                         header="ยอดยกมา (บาท)"
                     ></Column>
                     <Column
-                        field="changeBalance"
-                        header="ยอดที่เปลี่ยนไป (บาท)"
-                    ></Column>
-                    <Column
                         field="amounts"
                         header="จำนวน (บาท)"
+                    ></Column>
+                    <Column
+                        field="changeBalance"
+                        header="ยอดคงเหลือ (บาท)"
                     ></Column>
                     <Column
                         field="staff"
@@ -234,6 +277,7 @@ init()
                     <InputNumber
                         inputId="account"
                         v-model="amount"
+                        :maxFractionDigits="2"
                         :class="{ 'p-invalid': amountErrorMessage }"
                         placeholder="ระบุจำนวนเงิน เช่น 200"
                         class="w-full mt-4"

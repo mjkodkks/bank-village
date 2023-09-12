@@ -4,8 +4,9 @@ import { getUserProfileByIdService } from '~/services/user';
 import { useField, useForm } from 'vee-validate';
 import { useToast } from 'primevue/usetoast';
 import { createAccountService, getAccountTypesService } from '~/services/account';
-import { mapAccoutType } from '~/utils/account';
+import { AccountType, mapAccoutType } from '~/utils/account';
 import { useConfirm } from "primevue/useconfirm";
+import { mapRole } from '~/utils/roles';
 
 definePageMeta({
     layout: 'dashboard',
@@ -13,6 +14,7 @@ definePageMeta({
 })
 const toast = useToast()
 const confirm = useConfirm();
+const dayjs = useDayjs();
 const route = useRoute()
 const router = useRouter();
 const id = route.params.id
@@ -25,10 +27,14 @@ async function getUserProfile() {
     if (isSuccess && data) {
         console.log(data)
         breadcrumbItems.value = [
-            { label: ' สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
-            { label: id + '' },
+            { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
+            { label: `${data.username} (${id})` },
         ]
         profile.value = data
+        profile.value.createdAt = dayjs(data.createdAt).format('ddd DD MMMM YYYY เวลา HH:mm:ss')
+        profile.value.role = mapRole(data.role).th
+
+            
         data.accountId.forEach(item => {
             accounts.value.forEach(acc => {
                 if (acc.type === item.type) {
@@ -56,22 +62,24 @@ async function getUserProfile() {
 // });
 
 const accounts = ref<{
-    type: string
+    type: AccountType
     label: string
     isOpen: boolean
     id: number
     userId: number
     balance?: number
+    color: string
 }[]>([])
 async function getAccountTypes() {
     const { isSuccess, data, error } = await getAccountTypesService()
     if (isSuccess && data) {
         console.log(data)
-        accounts.value = data.map((type: string) => {
+        accounts.value = data.map((type: AccountType) => {
             return {
                 type,
                 label: mapAccoutType(type).th,
-                isOpen: false
+                isOpen: false,
+                color: mapAccoutType(type).color
             }
         })
     }
@@ -79,14 +87,24 @@ async function getAccountTypes() {
     return data
 }
 
-async function onAccountClick(id: number) {
-    router.push(`/account/${id}`)
+async function onAccountClick(accountID: number, type: AccountType, isOpen: boolean) {
+    if (!isOpen) {
+        return
+    }
+
+    router.push({
+        path: `/account/${accountID}`,
+        query: {
+            userId: id
+        }
+    })
+
 }
 
 async function createAccount(user_id: number, type: string) {
     confirm.require({
         message: 'ยืนยันการเปิดบัญชี',
-        header: 'ยือยัน',
+        header: 'ยืนยัน',
         icon: 'pi pi-exclamation-triangle',
         accept: async () => {
             const { isSuccess, data, error } = await createAccountService(user_id, type)
@@ -97,9 +115,6 @@ async function createAccount(user_id: number, type: string) {
             }
             return data
         },
-        reject: () => {
-            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-        }
     });
 }
 
@@ -138,8 +153,8 @@ init()
                 <div class="font-extralight">{{ profile.role || '' }}</div>
             </div>
             <div>
-                <label for="">ชื่อจริง</label>
-                <div class="font-extralight">{{ (profile.firstname + profile.surname) || '' }}</div>
+                <label for="">ชื่อ-นามสกุล</label>
+                <div class="font-extralight">{{ (profile.firstname + ' ' + profile.surname) || '' }}</div>
             </div>
             <div>
                 <label for="">วันเกิด</label>
@@ -155,16 +170,20 @@ init()
                 <h3 class="m-0">ประเภทบัญชี</h3>
                 <!-- <Button @click="isCreateAccountDialogVisible = true" class="" icon="pi pi-plus" size="small" label="เปิดบัญชี"></Button> -->
             </div>
-            <div class="mt-4">
+            <div class="mt-4 grid lg:grid-cols-[260px_260px_260px] gap-8" v-if="profile">
                 <div
-                    v-for="accountCard in accounts"
-                    @click="() => onAccountClick(accountCard.id)"
-                    class="w-[260px] h-[150px] bg-purple-200 shadow-md rounded-md flex items-center justify-center flex-col gap-2 cursor-pointer hover:scale-105 transition-all duration-300"
+                    v-for="(accountCard, index) in accounts"
+                    @click="() => onAccountClick(accountCard.id, accountCard.type, accountCard.isOpen)"
+                    class="w-[260px] text-white h-[150px] shadow-md rounded-md flex items-center justify-center flex-col gap-2 cursor-pointer hover:scale-105 transition-all duration-300"
+                    :style="{
+                        background: accountCard.color
+                    }"
                 >
-                    <div>{{ accountCard.label }}</div>
-                    <div v-if="accountCard.balance !== undefined">{{ accountCard.balance }} บาท</div>
+                    <p class="text-xl m-0">{{ accountCard.label }}</p>
+                    <div v-if="accountCard.balance !== undefined">({{ accountCard.balance }} บาท)</div>
                     <Button
                         v-if="!accountCard.isOpen"
+                        :disabled="index === 1 || index === 2"
                         class=""
                         icon="pi pi-plus"
                         size="small"
@@ -208,4 +227,5 @@ init()
             </div>
         </form>
     </Dialog> -->
-</div></template>
+    </div>
+</template>

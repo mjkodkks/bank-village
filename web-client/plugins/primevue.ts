@@ -16,6 +16,8 @@ import Breadcrumb from 'primevue/breadcrumb';
 import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmDialog from 'primevue/confirmdialog';
 import InputNumber from 'primevue/inputnumber';
+import InputMask from 'primevue/inputmask';
+import Skeleton from 'primevue/skeleton';
 
 export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.use(PrimeVue, { ripple: true } as PrimeVueConfiguration);
@@ -35,6 +37,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.component('Breadcrumb', Breadcrumb);
     nuxtApp.vueApp.component('ConfirmDialog', ConfirmDialog);
     nuxtApp.vueApp.component('InputNumber', InputNumber);
+    nuxtApp.vueApp.component('InputMask', InputMask);
+    nuxtApp.vueApp.component('Skeleton', Skeleton);
     
     //other components that you need
 });

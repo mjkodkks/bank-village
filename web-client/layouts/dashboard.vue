@@ -23,7 +23,7 @@ function logout() {
 
 
 <template>
-  <div class="grid md:grid-cols-[280px_1fr] h-full">
+  <div class="grid md:grid-cols-[230px_1fr] 2xl:grid-cols-[280px_1fr] h-full">
     <aside class="shadow-lg h-[100vh] relative hidden md:flex flex-col gap-1">
       <Sidebar v-model:visible="mainStore.isSidebarOpen">
         <h1 class="text-center flex-none">ธนาคารหมู่บ้าน</h1>
@@ -35,7 +35,8 @@ function logout() {
             <Button @click="logout" class="w-full" outlined>ออกจากระบบ</Button>
       </div>
     </aside>
-    <main class="overflow-auto" id="main">
+    <main class="overflow-hidden" id="main">
+      <Navbar></Navbar>
       <slot />
     </main>
   </div>

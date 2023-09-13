@@ -3,7 +3,7 @@ useHead({
   title: 'ธนาคารหมู่บ้าน',
   link: [
     {
-      rel: 'icon', type: 'image/png', href: '/nuxt.png',
+      rel: 'icon', type: 'image/x-icon', href: '/favicon.ico',
     },
     {
       rel: 'preconnect', href: 'https://fonts.googleapis.com'

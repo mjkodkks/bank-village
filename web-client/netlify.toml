@@ -2,10 +2,6 @@
   NPM_FLAGS = "--version"
   NODE_VERSION = "18"
 
-[build]
-  publish = ".output/public"
-  command = "pnpm run build"
-
 [[redirects]]
   from = "/*"
   to = "/index.html"

@@ -34,11 +34,10 @@ const { errors, handleSubmit, defineComponentBinds } = useForm({
 const authStore = useAuthStore()
 const loading = ref(false)
 const onSubmit = handleSubmit(async (values) => {
-  console.log(JSON.stringify(values, null, 2));
+  // console.log(JSON.stringify(values, null, 2));
   loading.value = true;
   const { isSuccess, data, error } = await loginByUsernameService(values.username, values.password);
   if (isSuccess && data) {
-    console.log(data)
     authStore.$patch({
       accessToken: data.access_token,
       isAuthenticated: true,

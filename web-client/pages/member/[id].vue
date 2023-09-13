@@ -25,7 +25,7 @@ const profile = ref()
 async function getUserProfile() {
     const { isSuccess, data, error } = await getUserProfileByIdService(+id)
     if (isSuccess && data) {
-        console.log(data)
+        // console.log(data)
         breadcrumbItems.value = [
             { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
             { label: `${data.username} (${id})` },
@@ -73,7 +73,7 @@ const accounts = ref<{
 async function getAccountTypes() {
     const { isSuccess, data, error } = await getAccountTypesService()
     if (isSuccess && data) {
-        console.log(data)
+        // console.log(data)
         accounts.value = data.map((type: AccountType) => {
             return {
                 type,
@@ -109,7 +109,7 @@ async function createAccount(user_id: number, type: string) {
         accept: async () => {
             const { isSuccess, data, error } = await createAccountService(user_id, type)
             if (isSuccess && data) {
-                console.log(data)
+                // console.log(data)
                 toast.add({ severity: 'success', summary: 'สร้างบัญชี', detail: 'สร้างบัญชีสำเร็จ', life: 3000 });
                 getUserProfile()
             }

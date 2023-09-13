@@ -17,10 +17,13 @@ const router = useRouter()
 const dayjs = useDayjs()
 
 function rowClick({ data }: any) {
-    console.log(data)
-    const { id } = data
+    // console.log(data)
+    const { id, userId } = data
     router.push({
-        path: `/member/${id}`
+        path: `/account/${id}`,
+        query: {
+            userId: userId
+        }
     })
 }
 
@@ -38,11 +41,25 @@ const filters = ref({
 const accounts = ref<any>()
 const accountLoading = ref(false)
 async function fetchAccounts() {
+    accountLoading.value = true;
     const { isSuccess, data, error } = await getAccountListService()
     if (isSuccess && data) {
-        console.log(data)
-        accounts.value = data
+        // console.log(data)
+        accounts.value = data.map(m => {
+            return {
+                ...m,
+                firstname: m.owner?.firstname,
+                username: m.owner?.username,
+                surname: m.owner?.surname,
+                createdAt: dayjs(m.createdAt).format('DD/MM/YYYY HH:mm'),
+            }
+        })
+        // console.log(accounts.value);
+        
     }
+    setTimeout(() => {
+        accountLoading.value = false
+    }, 500);
 }
 
 const accountCount = computed(() => accounts && accounts.value.length)
@@ -83,7 +100,7 @@ init()
             v-if="accounts"
             class="mt-4"
         >
-            จำนวนสมาชิก ({{ accountCount }})
+            จำนวนบัญชี ({{ accountCount }})
         </div>
         <div
             class="table-wrapper mt-4 flex-1 overflow-hidden"
@@ -96,13 +113,13 @@ init()
                     class="p-datatable-sm text-sm"
                     tableStyle="min-width: 50rem"
                     v-model:filters="filters"
-                    :globalFilterFields="['name', 'id', 'username', 'role']"
+                    :globalFilterFields="['name', 'id', 'type', 'balance', 'interest', 'username', 'firstname', 'surname']"
                     @row-click="rowClick"
                     selectionMode="single"
                 >
                     <Column
                         field="id"
-                        header="รหัสสมาชิก"
+                        header="เลขที่บัญชี"
                     ></Column>
                     <Column
                         field="type"
@@ -110,20 +127,20 @@ init()
                     ></Column>
                     <Column
                         field="balance"
-                        header="ชื่อ นามสกุล"
+                        header="ยอดสุทธิ (บาท)"
                     ></Column>
                     <Column
-                        field="address"
-                        header="ที่อยู่"
+                        field="interest"
+                        header="ดอกเบี้ย (บาท)"
                     ></Column>
                     <Column
-                        field="citizenId"
-                        header="เลขบัตรประจำตัวประชาชน"
-                    ></Column>
-                    <Column
-                        field="role"
-                        header="ตำแหน่ง"
-                    ></Column>
+                        field="owner"
+                        header="เจ้าของบัญชี"
+                    >
+                        <template #body="{ data }">
+                            {{ data.owner?.username ? `(${data.owner?.username}) ` : '' }} {{ data.owner?.firstname || '' }} {{ data.owner?.surname || '' }}
+                        </template>
+                    </Column>
                     <Column
                         field="createdAt"
                         header="เริ่มใช้งาน"

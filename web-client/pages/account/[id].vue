@@ -23,7 +23,7 @@ const userId = route.query.userId
 
 const breadcrumbItems = ref<MenuItem[]>([
     { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
-    { label: 'บัญชี', to: `/member/${userId}`, icon: 'pi pi-wallet', class: '[&_.p-menuitem-text]:ml-2' },
+    { label: 'โปรไฟล์สมาชิก', to: `/member/${userId}`, icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
 ]);
 
 const { handleSubmit } = useForm();
@@ -46,7 +46,7 @@ const { value: note, errorMessage: noteErrorMessage, resetField: resetFieldNote 
 
 
 const onSubmit = handleSubmit(async (values) => {
-    console.log(values)
+    // console.log(values)
     const { amount, staff, note } = values
     const userId = staff?.id
     confirm.require({
@@ -100,15 +100,14 @@ const profile = ref()
 async function getAccountProfile(id: number) {
     const { isSuccess, data, error } = await getAccountProfileService(id)
     if (isSuccess && data) {
-        console.log(data)
+        // console.log(data)
         profile.value = {
             ...data,
             type: mapAccoutType(data.type).th,
             createdAt: dayjs(data.createdAt).format('ddd DD MMMM YYYY เวลา HH:mm:ss')
         }
-        breadcrumbItems.value[2] || breadcrumbItems.value.push({ label: `${data.type} (${id})` }) 
+        breadcrumbItems.value[2] || breadcrumbItems.value.push({ label: `บัญชี ${data.type} (${id})`, icon: 'pi pi-wallet', class: '[&_.p-menuitem-text]:ml-2' })
     }
-
     return data
 }
 
@@ -116,7 +115,7 @@ const transactions = ref([])
 async function getTransactions(id: number) {
     const { isSuccess, data, error } = await getTransactionsServier(id)
     if (isSuccess && data) {
-        console.log(data)
+        // console.log(data)
         transactions.value = data.map(m => {
             return {
                 ...m,
@@ -133,7 +132,7 @@ const adminList = ref<AdminList>([])
 async function getAdminList() {
     const { isSuccess, data, error } = await getAdminListService()
     if (isSuccess && data) {
-        console.log(data)
+        // console.log(data)
         adminList.value = data
     }
 
@@ -267,6 +266,7 @@ init()
                     <Column
                         field="previousBalance"
                         header="ยอดยกมา (บาท)"
+                        header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
                             <div class="text-right">
@@ -277,6 +277,7 @@ init()
                     <Column
                         field="amounts"
                         header="จำนวน (บาท)"
+                        header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
                             <div class="text-right">
@@ -287,6 +288,7 @@ init()
                     <Column
                         field="changeBalance"
                         header="ยอดคงเหลือ (บาท)"
+                        header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
                             <div class="text-right">
@@ -297,6 +299,7 @@ init()
                     <Column
                         field="interest"
                         header="ดอกเบี้ย (บาท)"
+                        header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
                             <div class="text-right">
@@ -366,7 +369,8 @@ init()
                         </template>
                         <template #option="slotProps">
                             <i class="pi pi-user mr-1"></i>
-                            ({{ slotProps.option.username }}) {{ slotProps.option.firstname }} {{ slotProps.option.surname }}
+                            ({{ slotProps.option.username }}) {{ slotProps.option.firstname }} {{ slotProps.option.surname
+                            }}
                         </template>
                     </Dropdown>
                     <small
@@ -397,6 +401,7 @@ init()
                         :loading="loadingTransaction"
                     ></Button>
                 </div>
-        </form>
-    </Dialog>
-</div></template>
+            </form>
+        </Dialog>
+    </div>
+</template>

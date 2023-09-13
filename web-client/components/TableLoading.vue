@@ -23,8 +23,6 @@ onMounted(() => {
         product.push(template)
     }
     mockData.value = product
-    console.log(mockData.value);
-    
 })
 
 </script>

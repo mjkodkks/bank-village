@@ -16,7 +16,7 @@ const router = useRouter()
 const dayjs = useDayjs()
 
 function rowClick({ data }: any) {
-    console.log(data)
+    // console.log(data)
     const { id } = data
     router.push({
         path: `/member/${id}`
@@ -70,10 +70,9 @@ function validateFieldPassword(value: any) {
 
     return true;
 }
-console.log(role.value)
 
 const onSubmit = handleSubmit(async (values) => {
-    console.log(values)
+    // console.log(values)
     const { username, citizenId, role, password, firstname, surname, address } = values as {
         username: string
         citizenId: string
@@ -86,7 +85,7 @@ const onSubmit = handleSubmit(async (values) => {
     const isAdmin = role === 'ADMIN'
     const { isSuccess, data, error } = await createUserService({ username, password: isAdmin ? password : undefined, citizenId, isAdmin: isAdmin, address, firstname, surname })
     if (isSuccess) {
-        console.log(data)
+        // console.log(data)
         toast.add({ severity: 'success', summary: 'สร้างสมาชิก', detail: 'สร้างสมาชิกสำเร็จ', life: 3000 });
         fetctUser()
     } else {
@@ -107,7 +106,7 @@ async function fetctUser() {
     userLoading.value = true
     const { isSuccess, data, error } = await getlistUserService()
     if (isSuccess && data) {
-        console.log(isSuccess)
+        // console.log(isSuccess)
         users.value = data.map(m => {
             return {
                 ...m,
@@ -119,7 +118,7 @@ async function fetctUser() {
     }
     setTimeout(() => {
         userLoading.value = false
-    }, 1000);
+    }, 500);
     return data
 }
 

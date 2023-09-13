@@ -33,7 +33,7 @@ const stats = ref([
 async function getStat() {
     const { isSuccess, data, error } = await getStatService()
     if (isSuccess && data) {
-        console.log(data)
+        // console.log(data)
         stats.value[0].score = data.usersCount
         stats.value[1].score = data.transactionDeposit
         stats.value[2].score = data.transactionWithdraw

@@ -20,7 +20,7 @@ model User {
   address     String?
   nickName    String?
   citizenId   String?
-  brithday    DateTime?
+  brithday    String?
   createdAt   DateTime?     @default(now())
   firstname   String?
   surname     String?

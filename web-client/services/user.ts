@@ -1,5 +1,5 @@
 import { requestAPI } from "~/composables/request"
-import { AdminList, createUser, User } from "~/utils/user"
+import { AdminList, CreateUser, User } from "~/utils/user"
 
 export async function getlistUserService() {
     const { requestAuth } = await requestAPI()
@@ -19,7 +19,7 @@ export async function getlistUserService() {
     }
 }
 
-export async function createUserService({ username, password, citizenId, isAdmin, firstname, surname, address }: createUser) {
+export async function createUserService({ username, password, citizenId, isAdmin, firstname, surname, address }: CreateUser) {
     const { requestAuth } = await requestAPI()
     try {
         let body = {} as {[x:string]: string | boolean}
@@ -58,7 +58,7 @@ export async function createUserService({ username, password, citizenId, isAdmin
 export async function getUserProfileByIdService(id: number) {
     const { requestAuth } = await requestAPI()
     try {
-        const data = await requestAuth(`/users/${id}`, {
+        const data = await requestAuth<User>(`/users/${id}`, {
             method: 'GET',
         })
         return {
@@ -78,6 +78,25 @@ export async function getAdminListService() {
     try {
         const data = await requestAuth<AdminList>(`/users/adminList`, {
             method: 'GET',
+        })
+        return {
+            isSuccess: true,
+            data,
+        }
+    } catch (error) {
+        return {
+            isSuccess: false,
+            error,
+        }
+    }
+}
+
+export async function updateUserService(id: number, updateData: UpdateUser) {
+    const { requestAuth } = await requestAPI()
+    try {
+        const data = await requestAuth<AdminList>(`/users/${id}`, {
+            method: 'PATCH',
+            body: updateData
         })
         return {
             isSuccess: true,

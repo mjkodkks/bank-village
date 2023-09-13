@@ -73,6 +73,9 @@ export class UsersService {
         lastLogin: true,
         createdAt: true,
       },
+      orderBy: {
+        id: 'asc',
+      },
     });
     return alluser;
   }
@@ -150,9 +153,9 @@ export class UsersService {
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    const { address, nickName, citizenId, brithday, firstname, surname } =
+    const { address, nickName, citizenId, brithday, firstname, surname, role } =
       updateUserDto;
-    this.prisma.user.update({
+    const userUpdate = this.prisma.user.update({
       data: {
         address,
         nickName,
@@ -160,12 +163,13 @@ export class UsersService {
         brithday,
         firstname,
         surname,
+        role,
       },
       where: {
         id: id,
       },
     });
-    return `This action updates a #${id} user`;
+    return userUpdate;
   }
 
   remove(id: number) {

@@ -1,3 +1,15 @@
+export type AccountType = 'SAVING' | 'STOCK' | 'LOAN'
+
+export type Account = {
+    id: number
+    balance: string
+    interest: string
+    createdAt: string
+    userId: number
+    type: AccountType
+}
+
+
 export function mapAccoutType(type: string) {
     const template = {
         'SAVING': {
@@ -24,8 +36,6 @@ export function mapAccoutType(type: string) {
     }
     return template[type]
 }
-
-export type AccountType = 'SAVING' | 'STOCK' | 'LOAN'
 
 export function mapTransactionType(type: string) {
     const template = {

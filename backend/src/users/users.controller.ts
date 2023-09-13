@@ -64,13 +64,18 @@ export class UsersController {
     return this.usersService.findOneByUsername(username);
   }
 
-  @ApiOperation({ summary: 'get user profile by id (ค้นหาข้อมูลสมาชิกจาก id)' })
+  @ApiOperation({
+    summary: 'get user profile by id (ค้นหาข้อมูลสมาชิกจาก user id)',
+  })
   @UseGuards(JwtAuthGuard)
   @Get(':id')
   findOneById(@Param('id') id: number) {
     return this.usersService.findOneByIdNoPassword(id);
   }
 
+  @ApiOperation({
+    summary: 'update user profile by id (แก้ไขข้อมูลสมาชิกจาก user id)',
+  })
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {

@@ -1,4 +1,4 @@
-export type createUser = {
+export type CreateUser = {
     username: string;
     password?: string;
     citizenId: string;
@@ -6,6 +6,17 @@ export type createUser = {
     surname?: string;
     address?: string;
     isAdmin: boolean;
+}
+
+export type UpdateUser = {
+    username?: string;
+    citizenId?: string;
+    firstname?: string;
+    surname?: string;
+    address?: string;
+    isAdmin?: boolean;
+    role?: ROLE
+    brithday?: string
 }
 
 export type User = {
@@ -20,6 +31,7 @@ export type User = {
     address: null | string;
     lastLogin: null | string;
     createdAt: string;
+    accountId?: Account[] 
 }
 
 export type AdminList = {

@@ -30,8 +30,8 @@ const { handleSubmit } = useForm();
 
 const { value: amount, errorMessage: amountErrorMessage, resetField: resetFieldAmount } = useField<number>('amount', toTypedSchema(z.number().nonnegative({
     message: 'ไม่สามารถใส่ค่าที่เป็นลบได้'
-}).safe().min(1, {
-    message: 'กรุณาใส่เงินที่มากกว่าหรือเท่ากับ 1 บาท เป็นอย่างน้อย'
+}).safe().min(0.01, {
+    message: 'กรุณาใส่เงินที่มากกว่าหรือเท่ากับ 0.01 บาท เป็นอย่างน้อย'
 })), {
     initialValue: 0
 });
@@ -322,8 +322,7 @@ init()
             v-model:visible="isDialogVisible"
             modal
             :header="headerDialog"
-            :style="{ width: '30vw' }"
-            :breakpoints="{ '960px': '40vw', '641px': '100vw' }"
+            :breakpoints="{ '960px': '60vw', '641px': '100vw' }"
         >
             <form
                 @submit.prevent="onSubmit"

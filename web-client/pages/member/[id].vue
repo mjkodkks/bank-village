@@ -22,6 +22,7 @@ const dayjs = useDayjs();
 const route = useRoute()
 const router = useRouter();
 const id = route.params.id
+const { strToCurrency } = useNumber()
 
 const breadcrumbItems = ref<MenuItem[]>([]);
 const profile = ref()
@@ -413,7 +414,7 @@ init()
                     }"
                 >
                     <p class="text-xl m-0">{{ accountCard.label }}</p>
-                    <div v-if="accountCard.balance !== undefined">({{ accountCard.balance }} บาท)</div>
+                    <div v-if="accountCard.balance !== undefined">({{ strToCurrency(accountCard.balance) }} บาท)</div>
                     <Button
                         v-if="!accountCard.isOpen"
                         class=""

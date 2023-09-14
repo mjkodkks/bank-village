@@ -15,6 +15,7 @@ definePageMeta({
 const toast = useToast()
 const router = useRouter()
 const dayjs = useDayjs()
+const { strToCurrency } = useNumber()
 
 function rowClick({ data }: any) {
     // console.log(data)
@@ -128,7 +129,11 @@ init()
                     <Column
                         field="balance"
                         header="ยอดสุทธิ (บาท)"
-                    ></Column>
+                    >
+                    <template #body="{ data }">
+                      {{ strToCurrency(data.balance) || '0' }}
+                    </template>
+                </Column>
                     <Column
                         field="interest"
                         header="ดอกเบี้ย (บาท)"

@@ -20,6 +20,7 @@ const route = useRoute()
 const router = useRouter();
 const id = route.params.id
 const userId = route.query.userId
+const { strToCurrency } = useNumber()
 
 const breadcrumbItems = ref<MenuItem[]>([
     { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
@@ -191,7 +192,7 @@ init()
         >
             <div>
                 <label for="">จำนวนเงิน</label>
-                <div class="font-extralight">{{ profile.balance || '' }}</div>
+                <div class="font-extralight">{{ strToCurrency(profile.balance) || '' }}</div>
             </div>
             <div>
                 <label for="">ประเภทบัญชี</label>
@@ -270,7 +271,7 @@ init()
                     >
                         <template #body="{ data }">
                             <div class="text-right">
-                                {{ data.previousBalance || '-' }}
+                                {{ strToCurrency(data.previousBalance) || '-' }}
                             </div>
                         </template>
                     </Column>
@@ -281,7 +282,7 @@ init()
                     >
                         <template #body="{ data }">
                             <div class="text-right">
-                                {{ data.amounts || '-' }}
+                                {{ strToCurrency(data.amounts) || '-' }}
                             </div>
                         </template>
                     </Column>
@@ -292,7 +293,7 @@ init()
                     >
                         <template #body="{ data }">
                             <div class="text-right">
-                                {{ data.changeBalance || '-' }}
+                                {{ strToCurrency(data.changeBalance) || '-' }}
                             </div>
                         </template>
                     </Column>
@@ -303,7 +304,7 @@ init()
                     >
                         <template #body="{ data }">
                             <div class="text-right">
-                                {{ data.interest || '-' }}
+                                {{ strToCurrency(data.interest) || '-' }}
                             </div>
                         </template>
                     </Column>

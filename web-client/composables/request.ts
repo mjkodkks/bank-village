@@ -11,11 +11,11 @@ export async function requestAPI() {
         },
         async onRequest({ request, options }) {
             // Log request
-            console.log("[fetch request]", request, options);
+            // console.log("[fetch request]", request, options);
         },
         async onResponse({ request, response, options }) {
             // Log response
-            console.log("[fetch response]", request, response.status, response.body);
+            // console.log("[fetch response]", request, response.status, response.body);
           },
     })
 
@@ -27,11 +27,11 @@ export async function requestAPI() {
         },
         async onRequest({ request, options }) {
             // Log request
-            console.log("[fetch request]", request, options);
+            // console.log("[fetch request]", request, options);
         },
         async onResponse({ request, response, options }) {
             // Log response
-            console.log("[fetch response]", request, response.status, response.body);
+            // console.log("[fetch response]", request, response.status, response.body);
           },
     })
 

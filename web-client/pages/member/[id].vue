@@ -10,7 +10,7 @@ import { useConfirm } from "primevue/useconfirm";
 import { mapRole } from '~/utils/roles';
 import { toTypedSchema } from '@vee-validate/zod';
 import { z } from 'zod'
-import { mapMonthNo } from '~/utils/brithdate';
+import { mapMonthToNo, mapNoToMonth } from '~/utils/brithdate';
 
 definePageMeta({
     layout: 'dashboard',
@@ -29,7 +29,6 @@ const profile = ref()
 async function getUserProfile() {
     const { isSuccess, data, error } = await getUserProfileByIdService(+id)
     if (isSuccess && data) {
-        // console.log(data)
         breadcrumbItems.value = [
             { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
             { label: `${data.username} (${id})` },
@@ -41,7 +40,7 @@ async function getUserProfile() {
         if (data.brithday) {
             const [d, m, y] = data.brithday.split('/')
             days.value = +d || null
-            month.value = m === 'null' ? null : m
+            month.value = m === 'null' ? null : mapNoToMonth(+m, 'th')
             year.value = y ? +y : null
             profile.value.brithday = data.brithday.replaceAll('null', 'ไม่พบข้อมูล')
         }
@@ -67,7 +66,7 @@ const onSubmit = handleSubmit(async (values: any) => {
     updateLoading.value = true
     const template: UpdateUser = {}
     if (values.citizenId) {
-        template.citizenId = values.citizenId
+        template.citizenId = values.citizenId.replaceAll("-","")
     }
     if (values.role) {
         template.role = values.role
@@ -82,7 +81,7 @@ const onSubmit = handleSubmit(async (values: any) => {
         template.address = values.address
     }
     if (values.days || values.month || values.year) {
-        template.brithday = `${values.days || null}/${mapMonthNo(values.month, 'th') || null}/${values.year || null}`
+        template.brithday = `${values.days || null}/${mapMonthToNo(values.month, 'th') || null}/${values.year || null}`
     }
 
     const { isSuccess, data, error } = await updateUserService(+id, template)
@@ -167,9 +166,7 @@ function onEdit() {
         address.value = profile.value.address || ''
     }
 }
-const { value: citizenId, errorMessage: citizenIdErrorMessage } = useField('citizenId', toTypedSchema(z.string().nonempty({
-    message: 'ต้องใส่เลขบัตรประจำตัวประชาชน'
-})), {
+const { value: citizenId, errorMessage: citizenIdErrorMessage } = useField<string | undefined>('citizenId', toTypedSchema(z.string().nullish()), {
     initialValue: ''
 });
 const { value: role, errorMessage: roleErrorMessage } = useField('role', toTypedSchema(z.string().nonempty({

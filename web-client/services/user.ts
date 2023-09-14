@@ -19,22 +19,21 @@ export async function getlistUserService() {
     }
 }
 
-export async function createUserService({ username, password, citizenId, isAdmin, firstname, surname, address }: CreateUser) {
+export async function createUserService({ username, password, citizenId, role, firstname, surname, address }: CreateUser) {
     const { requestAuth } = await requestAPI()
     try {
-        let body = {} as {[x:string]: string | boolean}
-        if (isAdmin) {
-            body['username'] = username
-            body['password'] = password ? password : ''
-            body['citizenId'] = citizenId.replaceAll("-","")
-            body['isAdmin'] = true
+        let body = {} as {[x:string]: string | boolean | undefined}
+        if (role === 'ADMIN') {
+            body['username'] = username ? username : undefined
+            body['password'] = password ? password : undefined
+            body['citizenId'] = citizenId ? citizenId.replaceAll("-","") : undefined
+            body['role'] = role ? role : undefined
             body['firstname'] = firstname ? firstname : ''
             body['surname'] = surname ? surname : ''
             body['address'] = address ? address : ''
         } else {
-            body['username'] = username 
-            body['citizenId'] = citizenId.replaceAll("-","")
-            body['isAdmin'] = false
+            body['citizenId'] = citizenId ? citizenId.replaceAll("-","") : undefined
+            body['role'] = role ? role : undefined
             body['firstname'] = firstname ? firstname : ''
             body['surname'] = surname ? surname : ''
             body['address'] = address ? address : ''

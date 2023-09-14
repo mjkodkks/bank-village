@@ -1,11 +1,11 @@
 export type CreateUser = {
-    username: string;
+    username?: string;
     password?: string;
-    citizenId: string;
+    citizenId?: string;
     firstname?: string;
     surname?: string;
     address?: string;
-    isAdmin: boolean;
+    role: ROLE;
 }
 
 export type UpdateUser = {

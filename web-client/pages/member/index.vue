@@ -27,14 +27,7 @@ const rolesList = ref(roles)
 
 const { handleSubmit } = useForm();
 
-const { value: username, errorMessage: usernameErrorMessage } = useField('username', toTypedSchema(z.string().nonempty({
-    message: 'ต้องใส่ชื่อผู้ใช้งาน'
-})), {
-    initialValue: ''
-});
-const { value: citizenId, errorMessage: citizenIdErrorMessage } = useField('citizenId', toTypedSchema(z.string().nonempty({
-    message: 'ต้องใส่เลขบัตรประจำตัวประชาชน'
-})), {
+const { value: citizenId, errorMessage: citizenIdErrorMessage } = useField<string | undefined>('citizenId', toTypedSchema(z.string().nullish()), {
     initialValue: ''
 });
 const { value: firstname, errorMessage: firstnameErrorMessage } = useField('firstname', toTypedSchema(z.string().nonempty({
@@ -57,10 +50,24 @@ const { value: role, errorMessage: roleErrorMessage } = useField('role', toTyped
 })), {
     initialValue: 'USER'
 });
+
+const { value: username, errorMessage: usernameErrorMessage } = useField('username', validateFieldUsername, {
+    initialValue: ''
+});
+
 const { value: password, errorMessage: passwordErrorMessage, resetField } = useField('password', validateFieldPassword, {
     initialValue: ''
 });
 
+function validateFieldUsername(value: any) {
+    if (role.value === 'ADMIN') {
+        if (!value) {
+            return 'กรุณาใส่ชื่อ Username';
+        }
+    }
+
+    return true;
+}
 function validateFieldPassword(value: any) {
     if (role.value === 'ADMIN') {
         if (!value) {
@@ -71,6 +78,7 @@ function validateFieldPassword(value: any) {
     return true;
 }
 
+const loadingCreateUser = ref(false)
 const onSubmit = handleSubmit(async (values) => {
     // console.log(values)
     const { username, citizenId, role, password, firstname, surname, address } = values as {
@@ -82,9 +90,10 @@ const onSubmit = handleSubmit(async (values) => {
         surname: string
         address: string
     }
+    loadingCreateUser.value = true
     const isAdmin = role === 'ADMIN'
-    const { isSuccess, data, error } = await createUserService({ username, password: isAdmin ? password : undefined, citizenId, isAdmin: isAdmin, address, firstname, surname })
-    if (isSuccess) {
+    const { isSuccess, data, error } = await createUserService({ username: isAdmin ? username : undefined, password: isAdmin ? password : undefined, citizenId, role, address, firstname, surname })
+    if (isSuccess && data) {
         // console.log(data)
         toast.add({ severity: 'success', summary: 'สร้างสมาชิก', detail: 'สร้างสมาชิกสำเร็จ', life: 3000 });
         fetctUser()
@@ -92,6 +101,7 @@ const onSubmit = handleSubmit(async (values) => {
         console.error(error)
     }
     isCreateUserDialogVisible.value = false
+    loadingCreateUser.value = false
 });
 
 const isCreateUserDialogVisible = ref(false)
@@ -133,7 +143,7 @@ init()
 </script>
 
 <template>
-    <div class="h-full px-2 md:px-6 xl:px-8 py-8 flex flex-col">
+    <div class="h-[calc(100%_-_60px)] px-2 md:px-6 xl:px-8 py-8 flex flex-col">
         <h1 class="mt-0">สมาชิก / ค้นหาสมาชิก</h1>
         <div>
             <hr class="border-gray-200 border border-solid" />
@@ -162,14 +172,13 @@ init()
         >
             จำนวนสมาชิก ({{ usersCount }})
         </div>
-        <div
-            class="table-wrapper mt-4 flex-1 overflow-hidden"
-        >
+        <div class="table-wrapper mt-4 flex-1 overflow-hidden">
             <template v-if="!userLoading">
                 <DataTable
                     :value="users"
                     stripedRows
-                    scrollable scrollHeight="flex"
+                    scrollable
+                    scrollHeight="flex"
                     class="p-datatable-sm text-sm"
                     tableStyle="min-width: 50rem"
                     v-model:filters="filters"
@@ -184,7 +193,11 @@ init()
                     <Column
                         field="username"
                         header="ชื่อผู้ใช้งาน"
-                    ></Column>
+                    >
+                        <template #body="{ data }">
+                            {{ data.username || '-' }}
+                        </template>
+                    </Column>
                     <Column
                         field="name"
                         header="ชื่อ นามสกุล"
@@ -196,7 +209,11 @@ init()
                     <Column
                         field="citizenId"
                         header="เลขบัตรประจำตัวประชาชน"
-                    ></Column>
+                    >
+                        <template #body="{ data }">
+                            {{ data.citizenId || '-' }}
+                        </template>
+                    </Column>
                     <Column
                         field="role"
                         header="ตำแหน่ง"
@@ -225,21 +242,55 @@ init()
                 @submit.prevent="onSubmit"
                 class="lg:max-w-xl mx-auto lg:px-8 px-0 pt-7 w-full bg-white"
             >
-                <div>
+                <div class="grid lg:grid-cols-2 gap-4">
+                    <div class="mt-6">
+                        <div class="p-float-label">
+                            <InputText
+                                id="firstname"
+                                v-model="firstname"
+                                :class="{ 'p-invalid': firstnameErrorMessage }"
+                                placeholder="กรุณาใส่ชื่อจริง"
+                                class="w-full"
+                            />
+                            <label for="firstname">ชื่อจริง*</label>
+                        </div>
+                        <small
+                            class="text-pink-500 font-extralight mt-2 p-error"
+                            v-if="firstnameErrorMessage"
+                        >{{ firstnameErrorMessage }}</small>
+                    </div>
+                    <div class="mt-6">
+                        <div class="p-float-label">
+                            <InputText
+                                id="surname"
+                                v-model="surname"
+                                :class="{ 'p-invalid': surnameErrorMessage }"
+                                placeholder="กรุณาใส่นามสกุล"
+                                class="w-full"
+                            />
+                            <label for="surname">นามสกุล*</label>
+                        </div>
+                        <small
+                            class="text-pink-500 font-extralight mt-2 p-error"
+                            v-if="surnameErrorMessage"
+                        >{{ surnameErrorMessage }}</small>
+                    </div>
+                </div>
+                <div class="mt-6">
                     <div class="p-float-label">
                         <InputText
-                            id="username"
-                            v-model="username"
-                            :class="{ 'p-invalid': usernameErrorMessage }"
-                            placeholder="กรุณาใส่ชื่อผู้ใช้งาน ชื่อจริง.(จุด) ตามด้วยนามสกุล เช่น teradech.wong"
+                            id="address"
+                            v-model="address"
+                            :class="{ 'p-invalid': addressErrorMessage }"
+                            placeholder="กรุณาใส่ที่อยู่"
                             class="w-full"
                         />
-                        <label for="username">ชื่อผู้ใช้ (ภาษาอังกฤษ)</label>
+                        <label for="address">ที่อยู่ปัจจุบัน*</label>
                     </div>
                     <small
                         class="text-pink-500 font-extralight mt-2 p-error"
-                        v-if="usernameErrorMessage"
-                    >{{ usernameErrorMessage }}</small>
+                        v-if="addressErrorMessage"
+                    >{{ addressErrorMessage }}</small>
                 </div>
                 <div class="mt-6">
                     <div class="p-float-label">
@@ -258,56 +309,6 @@ init()
                         v-if="citizenIdErrorMessage"
                     >{{ citizenIdErrorMessage }}</small>
                 </div>
-                <div class="grid lg:grid-cols-2 gap-4">
-                    <div class="mt-6">
-                        <div class="p-float-label">
-                            <InputText
-                                id="firstname"
-                                v-model="firstname"
-                                :class="{ 'p-invalid': firstnameErrorMessage }"
-                                placeholder="กรุณาใส่ชื่อจริง"
-                                class="w-full"
-                            />
-                            <label for="firstname">ชื่อจริง</label>
-                        </div>
-                        <small
-                            class="text-pink-500 font-extralight mt-2 p-error"
-                            v-if="firstnameErrorMessage"
-                        >{{ firstnameErrorMessage }}</small>
-                    </div>
-                    <div class="mt-6">
-                        <div class="p-float-label">
-                            <InputText
-                                id="surname"
-                                v-model="surname"
-                                :class="{ 'p-invalid': surnameErrorMessage }"
-                                placeholder="กรุณาใส่นามสกุล"
-                                class="w-full"
-                            />
-                            <label for="surname">นามสกุล</label>
-                        </div>
-                        <small
-                            class="text-pink-500 font-extralight mt-2 p-error"
-                            v-if="surnameErrorMessage"
-                        >{{ surnameErrorMessage }}</small>
-                    </div>
-                </div>
-                <div class="mt-6">
-                    <div class="p-float-label">
-                        <InputText
-                            id="address"
-                            v-model="address"
-                            :class="{ 'p-invalid': addressErrorMessage }"
-                            placeholder="กรุณาใส่ที่อยู่"
-                            class="w-full"
-                        />
-                        <label for="address">ที่อยู่ตามบัตรประชาชน</label>
-                    </div>
-                    <small
-                        class="text-pink-500 font-extralight mt-2 p-error"
-                        v-if="addressErrorMessage"
-                    >{{ addressErrorMessage }}</small>
-                </div>
                 <div class="mt-6">
                     <div class="p-float-label">
                         <Dropdown
@@ -319,7 +320,7 @@ init()
                             class="w-full md:w-[200px]"
                             @change="() => resetField()"
                         />
-                        <label for="citizenId">สิทธิ์</label>
+                        <label for="role">สิทธิ์</label>
                     </div>
                     <small
                         class="text-pink-500 font-extralight mt-2 p-error"
@@ -328,17 +329,40 @@ init()
                 </div>
                 <div
                     v-show="role === 'ADMIN'"
+                    class="mt-8"
+                >
+                    <div class="p-float-label">
+                        <InputText
+                            id="username"
+                            v-model="username"
+                            :class="{ 'p-invalid': usernameErrorMessage }"
+                            placeholder="กรุณาใส่ชื่อผู้ใช้งาน เช่น A001"
+                            class="w-full"
+                        />
+                        <label for="username">ชื่อผู้ใช้* (ภาษาอังกฤษ หรือตัวเลข)</label>
+                    </div>
+                    <small
+                        class="text-pink-500 font-extralight mt-2 p-error"
+                        v-if="usernameErrorMessage"
+                    >{{ usernameErrorMessage }}</small>
+                </div>
+                <div
+                    v-show="role === 'ADMIN'"
                     :key="'passwordinput'"
                 >
                     <div class="p-float-label mt-6">
-                        <InputText
-                            id="oassword"
+                        <Password
+                            id="password"
                             v-model="password"
                             :class="{ 'p-invalid': passwordErrorMessage }"
-                            placeholder="กรุณาใส่รหัสผ่าน"
+                            placeholder="กรุณาใส่รหัสผ่าน เฉพาะเจ้าหน้าที่เข้าสู่ระบบ"
                             class="w-full"
+                            input-class="w-full"
+                            :feedback="false"
+                            toggleMask
+                            autocomplete="off"
                         />
-                        <label for="password">รหัสผ่าน (เฉพาะเจ้าหน้าที่)</label>
+                        <label for="password">รหัสผ่าน</label>
                     </div>
                     <small
                         class="text-pink-500 font-extralight mt-2 p-error"
@@ -350,6 +374,7 @@ init()
                         icon="pi pi-plus"
                         type="submit"
                         label="เพิ่มสมาชิก"
+                        :loading="loadingCreateUser"
                     ></Button>
                 </div>
             </form>

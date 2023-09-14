@@ -12,7 +12,7 @@ datasource db {
 
 model User {
   id          Int           @id @unique @default(autoincrement())
-  username    String        @unique
+  username    String?       @unique
   password    String?
   lastLogin   DateTime?
   role        Role          @default(USER)
@@ -43,7 +43,7 @@ model Transaction {
   action          TransactionAction
   previousBalance Decimal?          @db.Decimal(10, 2)
   changeBalance   Decimal?          @db.Decimal(10, 2)
-  amounts         Decimal?           @db.Decimal(10, 2)
+  amounts         Decimal?          @db.Decimal(10, 2)
   interest        Decimal?          @db.Decimal(10, 2)
   account         Account?          @relation(fields: [accountId], references: [id])
   accountId       Int?

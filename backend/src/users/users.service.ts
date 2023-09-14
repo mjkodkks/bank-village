@@ -8,17 +8,10 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
   async create(createUserDto: CreateUserDto) {
-    const {
-      username,
-      password,
-      citizenId,
-      isAdmin,
-      firstname,
-      surname,
-      address,
-    } = createUserDto;
+    const { username, password, citizenId, role, firstname, surname, address } =
+      createUserDto;
 
-    if (isAdmin) {
+    if (role === 'ADMIN') {
       const salt = await bcrypt.genSalt();
       const hashPassword = await bcrypt.hash(password, salt);
 
@@ -39,18 +32,13 @@ export class UsersService {
       });
       console.log(user);
     } else {
-      const user = await this.prisma.user.upsert({
-        create: {
-          username,
+      const user = await this.prisma.user.create({
+        data: {
           citizenId,
           role: 'USER',
           firstname,
           surname,
           address,
-        },
-        update: {},
-        where: {
-          username: username,
         },
       });
       console.log(user);

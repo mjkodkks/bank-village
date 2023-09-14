@@ -9,7 +9,8 @@ export const monthLists = {
     ]
   };
 
-  export const mapMonthNo = (month: string, lnag: 'th' | 'en') => +monthLists[lnag].indexOf(month) + 1
+  export const mapMonthToNo = (month: string, lang: 'th' | 'en') => +monthLists[lang].indexOf(month) + 1
+  export const mapNoToMonth = (no: number, lang: 'th' | 'en') => monthLists[lang][no - 1]
 
   export const getYear = (option?: { isBudda: boolean}) => {
       let currentYear = new Date().getFullYear();

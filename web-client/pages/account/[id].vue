@@ -177,7 +177,7 @@ init()
 </script>
 
 <template>
-    <div class="p-8 h-full md:flex md:flex-col">
+    <div class="p-8 h-[calc(100%_-_60px)] md:flex md:flex-col">
         <div class="max-w-lg">
             <Breadcrumb
                 :model="breadcrumbItems"

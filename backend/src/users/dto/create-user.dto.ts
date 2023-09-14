@@ -1,10 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Role } from '@prisma/client';
 import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreateUserDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  username: string;
+  @ApiPropertyOptional()
+  @IsOptional()
+  username?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
@@ -28,5 +29,5 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  isAdmin: boolean;
+  role: Role;
 }

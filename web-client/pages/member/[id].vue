@@ -32,7 +32,7 @@ async function getUserProfile() {
     if (isSuccess && data) {
         breadcrumbItems.value = [
             { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
-            { label: `${data.username} (${id})` },
+            { label: `${data.username ? '(' + data.username + ')' : ''} ${data.firstname || ''} (${id})` },
         ]
         profile.value = data
         profile.value.createdAt = dayjs(data.createdAt).format('ddd DD MMMM YYYY เวลา HH:mm:ss')
@@ -81,18 +81,21 @@ const onSubmit = handleSubmit(async (values: any) => {
     if (values.address) {
         template.address = values.address
     }
+    if (values.tel) {
+        template.tel = values.tel
+    }
     if (values.days || values.month || values.year) {
         template.brithday = `${values.days || null}/${mapMonthToNo(values.month, 'th') || null}/${values.year || null}`
     }
 
     const { isSuccess, data, error } = await updateUserService(+id, template)
     if (isSuccess && data) {
-        toast.add({ severity: 'success', summary: 'แก้ไขข้อมูล', detail: 'แก้ไขข้อมูลสมาชิกสำเร็จ', life: 3000 });
+        toast.add({ severity: 'success', summary: 'แก้ไขข้อมูล', detail: 'แก้ไขข้อมูลสมาชิกสำเร็จ', life: 5000 });
         getUserProfile()
         onEdit()
     } else {
         const err = (error as any).statusMessage
-        toast.add({ severity: 'warn', summary: 'แก้ไขข้อมูล', detail: `แก้ไขข้อมูลไม่สำเร็จ ${err}`, life: 3000 });
+        toast.add({ severity: 'warn', summary: 'แก้ไขข้อมูล', detail: `แก้ไขข้อมูลไม่สำเร็จ ${err}`, life: 5000 });
     }
     updateLoading.value = false
 });
@@ -146,7 +149,7 @@ async function createAccount(user_id: number, type: string) {
             const { isSuccess, data, error } = await createAccountService(user_id, type)
             if (isSuccess && data) {
                 // console.log(data)
-                toast.add({ severity: 'success', summary: 'สร้างบัญชี', detail: 'สร้างบัญชีสำเร็จ', life: 3000 });
+                toast.add({ severity: 'success', summary: 'สร้างบัญชี', detail: 'สร้างบัญชีสำเร็จ', life: 5000 });
                 getUserProfile()
             }
             return data
@@ -165,6 +168,7 @@ function onEdit() {
         firstname.value = profile.value.firstname || ''
         surname.value = profile.value.surname || ''
         address.value = profile.value.address || ''
+        tel.value = profile.value.tel || ''
     }
 }
 const { value: citizenId, errorMessage: citizenIdErrorMessage } = useField<string | undefined>('citizenId', toTypedSchema(z.string().nullish()), {
@@ -187,6 +191,11 @@ const { value: surname, errorMessage: surnameErrorMessage } = useField<string | 
     initialValue: ''
 });
 const { value: address, errorMessage: addressErrorMessage } = useField<string | undefined>('address', undefined, {
+    initialValue: ''
+});
+const { value: tel, errorMessage: telErrorMessage } = useField('tel', toTypedSchema(z.string({
+    description: ''
+}).max(16)), {
     initialValue: ''
 });
 
@@ -222,12 +231,12 @@ init()
             />
         </div>
         <h3 class="mt-8">ข้อมูลทั่วไป <i
-                class="pi pi-pencil cursor-pointer"
+                class="cursor-pointer pi pi-pencil"
                 @click="onEdit"
             ></i></h3>
         <form
             id="editForm"
-            class="grid sm:grid-cols-3 mt-4 gap-y-10"
+            class="grid mt-4 sm:grid-cols-3 gap-y-10"
             @submit.prevent="onSubmit"
             v-if="profile"
         >
@@ -250,7 +259,7 @@ init()
                         class="w-4/5 px-1 py-0"
                     />
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error block"
+                        class="block mt-2 text-pink-500 font-extralight p-error"
                         v-if="citizenIdErrorMessage"
                     >{{ citizenIdErrorMessage }}</small>
                 </div>
@@ -278,7 +287,7 @@ init()
                         class="w-full md:w-[200px] [&_.p-dropdown-label]:px-1 [&_.p-dropdown-label]:py-0"
                     />
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error block"
+                        class="block mt-2 text-pink-500 font-extralight p-error"
                         v-if="roleErrorMessage"
                     >{{ roleErrorMessage }}</small>
                 </div>
@@ -291,7 +300,7 @@ init()
                 >{{ (profile.firstname + ' ' + profile.surname) || '' }}</div>
                 <div
                     v-else
-                    class="grid grid-cols-2 gap-4 mt-2 w-5/6"
+                    class="grid w-5/6 grid-cols-2 gap-4 mt-2"
                 >
                     <div>
                         <InputText
@@ -302,7 +311,7 @@ init()
                             class="w-full px-1 py-0"
                         />
                         <small
-                            class="text-pink-500 font-extralight mt-2 p-error block"
+                            class="block mt-2 text-pink-500 font-extralight p-error"
                             v-if="firstnameErrorMessage"
                         >{{ firstnameErrorMessage }}</small>
                     </div>
@@ -315,7 +324,7 @@ init()
                             class="w-full px-1 py-0"
                         />
                         <small
-                            class="text-pink-500 font-extralight mt-2 p-error block"
+                            class="block mt-2 text-pink-500 font-extralight p-error"
                             v-if="surnameErrorMessage"
                         >{{ surnameErrorMessage }}</small>
                     </div>
@@ -326,7 +335,7 @@ init()
                 <div v-if="!isEdit" class="font-extralight">{{ profile.brithday || '' }}</div>
                 <div
                     v-else
-                    class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2 w-4/5 mt-2"
+                    class="grid w-4/5 grid-cols-1 gap-2 mt-2 md:grid-cols-2 2xl:grid-cols-3"
                 >
                     <Dropdown
                         v-model="days"
@@ -369,9 +378,32 @@ init()
                         class="w-4/5 px-1 py-0"
                     />
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error block"
+                        class="block mt-2 text-pink-500 font-extralight p-error"
                         v-if="addressErrorMessage"
                     >{{ addressErrorMessage }}</small>
+                </div>
+            </div>
+            <div>
+                <label for="">เบอร์ติดต่อ</label>
+                <div
+                    v-if="!isEdit"
+                    class="font-extralight"
+                >{{ profile.tel || '' }}</div>
+                <div
+                    v-else
+                    class="mt-2"
+                >
+                    <InputText
+                        id="address"
+                        v-model="tel"
+                        :class="{ 'p-invalid': telErrorMessage }"
+                        placeholder="กรุณาใส่เบอร์โทรศัพท์"
+                        class="w-4/5 px-1 py-0"
+                    />
+                    <small
+                        class="block mt-2 text-pink-500 font-extralight p-error"
+                        v-if="telErrorMessage"
+                    >{{ telErrorMessage }}</small>
                 </div>
             </div>
             <div>
@@ -413,7 +445,7 @@ init()
                         background: accountCard.color
                     }"
                 >
-                    <p class="text-xl m-0">{{ accountCard.label }}</p>
+                    <p class="m-0 text-xl">{{ accountCard.label }}</p>
                     <div v-if="accountCard.balance !== undefined">({{ strToCurrency(accountCard.balance) }} บาท)</div>
                     <Button
                         v-if="!accountCard.isOpen"
@@ -435,7 +467,7 @@ init()
         >
             <form
                 @submit.prevent="onSubmit"
-                class="lg:max-w-xl lg:px-8 px-4 pt-7 w-full bg-white"
+                class="w-full px-4 bg-white lg:max-w-xl lg:px-8 pt-7"
             >
                 <div class="p-float-label">
                     <InputText
@@ -448,7 +480,7 @@ init()
                     <label for="account">ประเภทบัญชี</label>
                 </div>
                 <small
-                class="text-pink-500 font-extralight mt-2 p-error"
+                class="mt-2 text-pink-500 font-extralight p-error"
                 v-if="accountErrorMessage"
             >{{ accountErrorMessage }}</small>
 

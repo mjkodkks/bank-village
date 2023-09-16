@@ -8,8 +8,16 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
   async create(createUserDto: CreateUserDto) {
-    const { username, password, citizenId, role, firstname, surname, address } =
-      createUserDto;
+    const {
+      username,
+      password,
+      citizenId,
+      role,
+      firstname,
+      surname,
+      address,
+      tel,
+    } = createUserDto;
 
     if (role === 'ADMIN') {
       const salt = await bcrypt.genSalt();
@@ -24,6 +32,7 @@ export class UsersService {
           firstname,
           surname,
           address,
+          tel,
         },
         update: {},
         where: {
@@ -39,6 +48,7 @@ export class UsersService {
           firstname,
           surname,
           address,
+          tel,
         },
       });
       console.log(user);
@@ -60,6 +70,7 @@ export class UsersService {
         address: true,
         lastLogin: true,
         createdAt: true,
+        tel: true,
       },
       orderBy: {
         id: 'asc',
@@ -110,6 +121,7 @@ export class UsersService {
         address: true,
         lastLogin: true,
         createdAt: true,
+        tel: true,
       },
     });
 
@@ -134,6 +146,7 @@ export class UsersService {
         lastLogin: true,
         createdAt: true,
         accountId: true,
+        tel: true,
       },
     });
 
@@ -141,18 +154,8 @@ export class UsersService {
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
-    const { address, nickName, citizenId, brithday, firstname, surname, role } =
-      updateUserDto;
     const userUpdate = this.prisma.user.update({
-      data: {
-        address,
-        nickName,
-        citizenId,
-        brithday,
-        firstname,
-        surname,
-        role,
-      },
+      data: updateUserDto,
       where: {
         id: id,
       },

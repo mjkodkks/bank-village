@@ -33,9 +33,11 @@ const { errors, handleSubmit, defineComponentBinds } = useForm({
 
 const authStore = useAuthStore()
 const loading = ref(false)
+const errorMsg = ref('')
 const onSubmit = handleSubmit(async (values) => {
   // console.log(JSON.stringify(values, null, 2));
   loading.value = true;
+  errorMsg.value = ''
   const { isSuccess, data, error } = await loginByUsernameService(values.username, values.password);
   if (isSuccess && data) {
     authStore.$patch({
@@ -50,11 +52,13 @@ const onSubmit = handleSubmit(async (values) => {
       sameSite: 'strict',
       expires: new Date(data.expire * 1000),
     })
-    toast.add({ severity: 'success', summary: 'เข้าสู่ระบบ', detail: 'การเข้าสู่ระบบสำเร็จ', life: 3000 });
+    toast.add({ severity: 'success', summary: 'เข้าสู่ระบบ', detail: 'การเข้าสู่ระบบสำเร็จ', life: 5000 });
     loading.value = false;
   } else {
     const err = (error as any).statusMessage
-    toast.add({ severity: 'warn', summary: 'เข้าสู่ระบบไม่สำเร็จ', detail: 'การเข้าสู่ระบบไม่สำเร็จ ชื่อผู้ใช้ / รหัสผ่าน ไม่ถูกต้อง\n' + 'system message : ' + err, life: 8000 });
+    const detailError = 'การเข้าสู่ระบบไม่สำเร็จ ชื่อผู้ใช้ / รหัสผ่าน ไม่ถูกต้อง กรุณาลองใหม่\n' + 'system message : ' + err
+    errorMsg.value = detailError
+    toast.add({ severity: 'warn', summary: 'เข้าสู่ระบบไม่สำเร็จ', detail: detailError, life: 8000 })
     loading.value = false;
   }
 
@@ -69,7 +73,7 @@ const password = defineComponentBinds('password')
 
 <template>
   <div class="flex h-full">
-    <div class="flex-1 bg-slate-200 overflow-hidden relative hidden lg:block aspect-square">
+    <div class="relative flex-1 hidden overflow-hidden bg-slate-200 lg:block aspect-square">
       <img
         src="/images/bg-login.jpg"
         class="w-full h-full"
@@ -79,16 +83,22 @@ const password = defineComponentBinds('password')
         class="absolute w-[600px] top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[60px] text-primary lg:text-4xl text-2xl text-center bg-white p-4 rounded-lg"
       >ธนาคารหมู่บ้านตามแนวพระราชดำริ <br> <span class="text-black font-extralight">(สาขา บ้านกุดโดน)</span> </h1>
     </div>
-    <div class="flex-none w-full xl:w-1/2 p-4 flex flex-col gap-2 lg:gap-6 justify-center items-center bg-slate-100">
+    <div class="flex flex-col items-center justify-center flex-none w-full gap-2 p-4 xl:w-1/2 lg:gap-6 bg-slate-100">
       <form
         @submit.prevent="onSubmit"
-        class="md:max-w-xl rounded-3xl shadow-lg py-10 lg:px-8 px-4 w-full border-solid border border-gray-300 bg-white"
+        class="w-full px-4 py-10 bg-white border border-gray-300 border-solid shadow-lg md:max-w-xl rounded-3xl lg:px-8"
       >
         <div>
-          <h1 class="text-center text-2xl m-0">เข้าสู่ระบบเจ้าหน้าที่</h1>
-          <h4 class="text-center text-lg m-0 mt-2 text-primary">ธนาคารหมู่บ้านตามแนวพระราชดำริ <br> <span class="text-black font-extralight">(สาขา บ้านกุดโดน)</span></h4>
+          <h1 class="m-0 text-2xl text-center">เข้าสู่ระบบเจ้าหน้าที่</h1>
+          <h4 class="m-0 mt-2 text-lg text-center text-primary">ธนาคารหมู่บ้านตามแนวพระราชดำริ <br> <span
+              class="text-black font-extralight"
+            >(สาขา บ้านกุดโดน)</span></h4>
         </div>
-        <div class="p-float-label mt-8">
+        <small
+          class="block mt-2 text-center text-pink-500 font-extralight p-error"
+          v-if="errorMsg"
+        >{{ errorMsg }} <i @click="errorMsg = ''" class="text-sm text-black cursor-pointer pi pi-times-circle"></i></small>
+        <div class="mt-8 p-float-label">
           <InputText
             id="username"
             name="username"
@@ -100,10 +110,10 @@ const password = defineComponentBinds('password')
           <label for="username">ชื่อผู้ใช้</label>
         </div>
         <small
-          class="text-pink-500 font-extralight mt-2 p-error"
+          class="mt-2 text-pink-500 font-extralight p-error"
           v-if="errors.username"
         >{{ errors.username }}</small>
-        <div class="p-float-label mt-8">
+        <div class="mt-8 p-float-label">
           <Password
             v-bind="password"
             inputClass="w-full"
@@ -117,16 +127,18 @@ const password = defineComponentBinds('password')
           <label for="password">รหัสผ่าน</label>
         </div>
         <small
-          class="text-pink-500 font-extralight mt-2 p-error"
+          class="mt-2 text-pink-500 font-extralight p-error"
           v-if="errors.password"
         >{{ errors.password }}</small>
         <div class="flex justify-center mt-4">
           <Button
             type="submit"
             :loading="loading"
-            class="w-full max-w-[200px] flex justify-center"
-          >เข้าสู่ระบบ</Button>
+            class="w-full max-w-[200px] flex justify-center px-[2.5rem]"
+            label="เข้าสู่ระบบ"
+          ></Button>
         </div>
       </form>
     </div>
-</div></template>
+  </div>
+</template>

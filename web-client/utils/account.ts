@@ -9,6 +9,22 @@ export type Account = {
     type: AccountType
 }
 
+export type Transaction = {
+    id: number
+    action: string
+    previousBalance: string
+    changeBalance: string
+    amounts: string
+    interest: any
+    note: string
+    createdAt: string
+    staff: {
+      username: string
+      firstname: string
+      surname: string
+    } | string
+}
+
 
 export function mapAccoutType(type: string) {
     const template = {

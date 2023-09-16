@@ -1,5 +1,5 @@
 import { requestAPI } from "~/composables/request"
-import { AccountType } from "~/utils/account"
+import { AccountType, Transaction } from "~/utils/account"
 
 export async function getAccountTypesService() {
     const { requestAuth } = await requestAPI()
@@ -76,10 +76,10 @@ export async function getAccountProfileService(account_id: number) {
     }
 }
 
-export async function getTransactionsServier(account_id: number) {
+export async function getTransactionsService(account_id: number) {
     const { requestAuth } = await requestAPI()
     try {
-        const data = await requestAuth(`/accounts/transactions/${account_id}`, {
+        const data = await requestAuth<Transaction[]>(`/accounts/transactions/${account_id}`, {
             method: 'GET',
         })
         return {

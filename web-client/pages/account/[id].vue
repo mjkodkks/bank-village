@@ -6,7 +6,7 @@ import { getAccountProfileService, transactionDepositService, transactionInteres
 import { useConfirm } from "primevue/useconfirm";
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
-import { mapTransactionType } from '~/utils/account';
+import { Transaction, mapTransactionType } from '~/utils/account';
 import { getAdminListService } from '~/services/user';
 
 definePageMeta({
@@ -53,6 +53,8 @@ const onSubmit = handleSubmit(async (values) => {
     confirm.require({
         message: `ยืนยันการ (${headerDialog.value}) จำนวน ${amount} บาท`,
         header: 'ยืนยัน',
+        acceptLabel: 'ใช่, ยืนยัน',
+        rejectLabel: 'ไม่',
         icon: 'pi pi-exclamation-triangle',
         accept: async () => {
             transaction(+id, amount, dialogMode.value, userId, note)
@@ -64,7 +66,7 @@ const loadingTransaction = ref(false)
 async function transaction(accountId: number, amount: number, type: string, userId?: number, note?: string) {
     let transactionService;
     let successMessage;
-    let modeMessage
+    let modeMessage;
 
     if (type === 'withdraw') {
         transactionService = transactionWithdrawService;
@@ -84,7 +86,7 @@ async function transaction(accountId: number, amount: number, type: string, user
         loadingTransaction.value = true
         const { isSuccess, data, error } = await transactionService(accountId, amount, userId, note);
         if (isSuccess && data) {
-            toast.add({ severity: 'success', summary: type, detail: successMessage, life: 3000 });
+            toast.add({ severity: 'success', summary: type, detail: successMessage, life: 5000 });
             console.info(data);
             init()
             isDialogVisible.value = false;
@@ -112,15 +114,15 @@ async function getAccountProfile(id: number) {
     return data
 }
 
-const transactions = ref([])
+const transactions = ref<Transaction[]>([])
 async function getTransactions(id: number) {
-    const { isSuccess, data, error } = await getTransactionsServier(id)
+    const { isSuccess, data, error } = await getTransactionsService(id)
     if (isSuccess && data) {
         // console.log(data)
         transactions.value = data.map(m => {
             return {
                 ...m,
-                staff: `${m.staff?.username ? '(' + m.staff.username + ')' : ''} ${m.staff?.firstname || ''} ${m.staff?.surname || ''}`,
+                staff: typeof m.staff !== 'string' ? `${m.staff?.username ? '(' + m.staff.username + ')' : ''} ${m.staff?.firstname || ''} ${m.staff?.surname || ''}` : '',
                 createdAt: dayjs(m.createdAt).format('DD/MM/YYYY HH:mm:ss'),
             }
         })
@@ -187,7 +189,7 @@ init()
         </div>
         <h3 class="mt-8">ข้อมูลทั่วไป</h3>
         <div
-            class="max-w-6xl grid sm:grid-cols-3 gap-y-5 2xl:gap-y-10"
+            class="grid max-w-6xl sm:grid-cols-3 gap-y-5 2xl:gap-y-10"
             v-if="profile"
         >
             <div>
@@ -200,7 +202,7 @@ init()
             </div>
             <div>
                 <label for="">เจ้าของบัญชี</label>
-                <div class="font-extralight">{{ profile.owner?.username || '' }}</div>
+                <div class="font-extralight">{{ profile.owner?.username ? '('+profile.owner?.username+')': '' }} {{ profile.owner?.firstname || '' }} {{ profile.owner?.surname || '' }}</div>
             </div>
             <div>
                 <label for="">สร้างเมื่อ</label>
@@ -233,14 +235,14 @@ init()
             ></Button>
         </div>
         <h3>บันทึกรายการธุรกรรม</h3>
-        <div class="table-wrapper flex-1 overflow-hidden">
+        <div class="flex-1 overflow-hidden table-wrapper">
             <ClientOnly>
                 <DataTable
                     :value="transactions"
                     stripedRows
                     scrollable
                     scrollHeight="flex"
-                    class="p-datatable-sm text-sm"
+                    class="text-sm p-datatable-sm"
                     tableStyle="min-width: 50rem"
                     :globalFilterFields="['name', 'id', 'username', 'role']"
                     resizableColumns
@@ -327,7 +329,7 @@ init()
         >
             <form
                 @submit.prevent="onSubmit"
-                class="lg:max-w-xl lg:px-8 lg:ml-auto px-4 pt-7 w-full bg-white"
+                class="w-full px-4 bg-white lg:max-w-xl lg:px-8 lg:ml-auto pt-7"
             >
                 <div>
                     <label
@@ -344,7 +346,7 @@ init()
                         inputClass="text-right text-2xl"
                     />
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error"
+                        class="mt-2 text-pink-500 font-extralight p-error"
                         v-if="amountErrorMessage"
                     >{{ amountErrorMessage }}</small>
                 </div>
@@ -368,20 +370,20 @@ init()
                             }}
                         </template>
                         <template #option="slotProps">
-                            <i class="pi pi-user mr-1"></i>
+                            <i class="mr-1 pi pi-user"></i>
                             ({{ slotProps.option.username }}) {{ slotProps.option.firstname }} {{ slotProps.option.surname
                             }}
                         </template>
                     </Dropdown>
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error"
+                        class="mt-2 text-pink-500 font-extralight p-error"
                         v-if="staffErrorMessage"
                     >{{ staffErrorMessage }}</small>
                 </div>
                 <div class="mt-4">
                     <label
                         for="note"
-                        class="text-lg block"
+                        class="block text-lg"
                     >หมายเหตุ</label>
                     <Textarea
                         id="note"
@@ -392,7 +394,7 @@ init()
                     />
                 </div>
 
-                <div class="mt-8 flex justify-end">
+                <div class="flex justify-end mt-8">
                     <Button
                         type="submit"
                         label="ยืนยัน"

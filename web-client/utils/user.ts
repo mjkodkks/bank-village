@@ -5,6 +5,7 @@ export type CreateUser = {
     firstname?: string;
     surname?: string;
     address?: string;
+    tel: string;
     role: ROLE;
 }
 
@@ -14,6 +15,7 @@ export type UpdateUser = {
     firstname?: string;
     surname?: string;
     address?: string;
+    tel?: string;
     isAdmin?: boolean;
     role?: ROLE
     brithday?: string
@@ -31,6 +33,7 @@ export type User = {
     address: null | string;
     lastLogin: null | string;
     createdAt: string;
+    tel: null | string;
     accountId?: Account[] 
 }
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod';
 import { FilterMatchMode } from 'primevue/api';
+import { useConfirm } from 'primevue/useconfirm';
 import { useToast } from 'primevue/usetoast';
 import { useField, useForm } from 'vee-validate';
 import { z } from 'zod'
@@ -14,6 +15,7 @@ definePageMeta({
 const toast = useToast()
 const router = useRouter()
 const dayjs = useDayjs()
+const confirm = useConfirm()
 
 function rowClick({ data }: any) {
     // console.log(data)
@@ -25,28 +27,33 @@ function rowClick({ data }: any) {
 
 const rolesList = ref(roles)
 
-const { handleSubmit } = useForm();
+const { handleSubmit, resetForm } = useForm();
 
 const { value: citizenId, errorMessage: citizenIdErrorMessage } = useField<string | undefined>('citizenId', toTypedSchema(z.string().nullish()), {
     initialValue: ''
 });
-const { value: firstname, errorMessage: firstnameErrorMessage } = useField('firstname', toTypedSchema(z.string().nonempty({
-    message: 'ต้องใส่ชื่อจริง'
+const { value: firstname, errorMessage: firstnameErrorMessage, resetField: firstnameResetField } = useField('firstname', toTypedSchema(z.string().nonempty({
+    message: 'กรุณาใส่ชื่อจริง'
 })), {
     initialValue: ''
 });
 const { value: surname, errorMessage: surnameErrorMessage } = useField('surname', toTypedSchema(z.string().nonempty({
-    message: 'ต้องใส่นามสกุล'
+    message: 'กรุณาใส่นามสกุล'
 })), {
     initialValue: ''
 });
-const { value: address, errorMessage: addressErrorMessage } = useField('address', toTypedSchema(z.string().nonempty({
-    message: 'ต้องใส่ที่อยู่'
+const { value: address, errorMessage: addressErrorMessage, resetField: addressResetField } = useField('address', toTypedSchema(z.string().nonempty({
+    message: 'กรุณาใส่ที่อยู่'
 })), {
+    initialValue: ''
+});
+const { value: tel, errorMessage: telErrorMessage } = useField('tel', toTypedSchema(z.string({
+    description: ''
+}).max(16)), {
     initialValue: ''
 });
 const { value: role, errorMessage: roleErrorMessage } = useField('role', toTypedSchema(z.string().nonempty({
-    message: 'ต้องใส่ตำแหน่ง'
+    message: 'กรุณาใส่ตำแหน่ง'
 })), {
     initialValue: 'USER'
 });
@@ -81,7 +88,7 @@ function validateFieldPassword(value: any) {
 const loadingCreateUser = ref(false)
 const onSubmit = handleSubmit(async (values) => {
     // console.log(values)
-    const { username, citizenId, role, password, firstname, surname, address } = values as {
+    const { username, citizenId, role, password, firstname, surname, address, tel } = values as {
         username: string
         citizenId: string
         role: ROLE
@@ -89,19 +96,43 @@ const onSubmit = handleSubmit(async (values) => {
         firstname: string
         surname: string
         address: string
+        tel: string
     }
+
     loadingCreateUser.value = true
     const isAdmin = role === 'ADMIN'
-    const { isSuccess, data, error } = await createUserService({ username: isAdmin ? username : undefined, password: isAdmin ? password : undefined, citizenId, role, address, firstname, surname })
-    if (isSuccess && data) {
-        // console.log(data)
-        toast.add({ severity: 'success', summary: 'สร้างสมาชิก', detail: 'สร้างสมาชิกสำเร็จ', life: 3000 });
-        fetctUser()
-    } else {
-        console.error(error)
-    }
-    isCreateUserDialogVisible.value = false
-    loadingCreateUser.value = false
+    const confirmCreateUser = confirm
+    confirm.require({
+        message: `ยืนยันการสร้าง${isAdmin ? 'เจ้าหน้าที่' : 'สมาชิก'}`,
+        header: 'ยืนยัน',
+        acceptLabel: 'ใช่, ยืนยัน',
+        rejectLabel: 'ไม่',
+        icon: 'pi pi-exclamation-triangle',
+        accept: async () => {
+            const { isSuccess, data, error } = await createUserService(
+                {
+                    username: isAdmin ? username : undefined,
+                    password: isAdmin ? password : undefined,
+                    citizenId, role, address, firstname, surname, tel
+                })
+            if (isSuccess && data) {
+                // console.log(data)
+                toast.add({ severity: 'success', summary: 'สร้างสมาชิก', detail: 'สร้างสมาชิกสำเร็จ', life: 5000 });
+                fetctUser()
+            } else {
+                console.error(error)
+                toast.add({ severity: 'warn', summary: 'สร้างสมาชิก', detail: 'สร้างสมาชิกไม่สำเร็จ', life: 10000 });
+            }
+            isCreateUserDialogVisible.value = false
+            loadingCreateUser.value = false
+        },
+        onHide() {
+            loadingCreateUser.value = false
+        },
+        reject: () => {
+            loadingCreateUser.value = false
+        }
+    });
 });
 
 const isCreateUserDialogVisible = ref(false)
@@ -146,9 +177,9 @@ init()
     <div class="h-[calc(100%_-_60px)] px-2 md:px-6 xl:px-8 py-8 flex flex-col">
         <h1 class="mt-0">สมาชิก / ค้นหาสมาชิก</h1>
         <div>
-            <hr class="border-gray-200 border border-solid" />
+            <hr class="border border-gray-200 border-solid" />
         </div>
-        <div class="header flex gap-2 mt-8">
+        <div class="flex gap-2 mt-8 header">
             <div class="flex justify-content-end">
                 <span class="p-input-icon-left">
                     <i class="pi pi-search" />
@@ -172,14 +203,14 @@ init()
         >
             จำนวนสมาชิก ({{ usersCount }})
         </div>
-        <div class="table-wrapper mt-4 flex-1 overflow-hidden">
+        <div class="flex-1 mt-4 overflow-hidden table-wrapper">
             <template v-if="!userLoading">
                 <DataTable
                     :value="users"
                     stripedRows
                     scrollable
                     scrollHeight="flex"
-                    class="p-datatable-sm text-sm"
+                    class="text-sm p-datatable-sm"
                     tableStyle="min-width: 50rem"
                     v-model:filters="filters"
                     :globalFilterFields="['name', 'id', 'username', 'role']"
@@ -206,6 +237,14 @@ init()
                         field="address"
                         header="ที่อยู่"
                     ></Column>
+                    <Column
+                        field="tel"
+                        header="เบอร์โทรศํพท์"
+                    >
+                        <template #body="{ data }">
+                            {{ data.tel || '-' }}
+                        </template>
+                    </Column>
                     <Column
                         field="citizenId"
                         header="เลขบัตรประจำตัวประชาชน"
@@ -234,15 +273,16 @@ init()
         <Dialog
             v-model:visible="isCreateUserDialogVisible"
             modal
+            @hide="resetForm()"
             header="เพิ่มสมาชิก"
             :style="{ width: '40vw' }"
             :breakpoints="{ '960px': '40vw', '641px': '100vw' }"
         >
             <form
                 @submit.prevent="onSubmit"
-                class="lg:max-w-xl mx-auto lg:px-8 px-0 pt-7 w-full bg-white"
+                class="w-full px-0 mx-auto bg-white lg:max-w-xl lg:px-8 pt-7"
             >
-                <div class="grid lg:grid-cols-2 gap-4">
+                <div class="grid gap-4 lg:grid-cols-2">
                     <div class="mt-6">
                         <div class="p-float-label">
                             <InputText
@@ -255,7 +295,7 @@ init()
                             <label for="firstname">ชื่อจริง*</label>
                         </div>
                         <small
-                            class="text-pink-500 font-extralight mt-2 p-error"
+                            class="mt-2 text-pink-500 font-extralight p-error"
                             v-if="firstnameErrorMessage"
                         >{{ firstnameErrorMessage }}</small>
                     </div>
@@ -271,7 +311,7 @@ init()
                             <label for="surname">นามสกุล*</label>
                         </div>
                         <small
-                            class="text-pink-500 font-extralight mt-2 p-error"
+                            class="mt-2 text-pink-500 font-extralight p-error"
                             v-if="surnameErrorMessage"
                         >{{ surnameErrorMessage }}</small>
                     </div>
@@ -288,9 +328,25 @@ init()
                         <label for="address">ที่อยู่ปัจจุบัน*</label>
                     </div>
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error"
+                        class="mt-2 text-pink-500 font-extralight p-error"
                         v-if="addressErrorMessage"
                     >{{ addressErrorMessage }}</small>
+                </div>
+                <div class="mt-6">
+                    <div class="p-float-label">
+                        <InputText
+                            id="tel"
+                            v-model="tel"
+                            :class="{ 'p-invalid': telErrorMessage }"
+                            placeholder="กรุณาใส่เบอร์ติดต่อ"
+                            class="w-full"
+                        />
+                        <label for="address">เบอร์ติดต่อ</label>
+                    </div>
+                    <small
+                        class="mt-2 text-pink-500 font-extralight p-error"
+                        v-if="telErrorMessage"
+                    >{{ telErrorMessage }}</small>
                 </div>
                 <div class="mt-6">
                     <div class="p-float-label">
@@ -305,7 +361,7 @@ init()
                         <label for="citizenId">เลขบัตรประจำตัวประชาชน</label>
                     </div>
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error"
+                        class="mt-2 text-pink-500 font-extralight p-error"
                         v-if="citizenIdErrorMessage"
                     >{{ citizenIdErrorMessage }}</small>
                 </div>
@@ -323,7 +379,7 @@ init()
                         <label for="role">สิทธิ์</label>
                     </div>
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error"
+                        class="mt-2 text-pink-500 font-extralight p-error"
                         v-if="roleErrorMessage"
                     >{{ roleErrorMessage }}</small>
                 </div>
@@ -342,7 +398,7 @@ init()
                         <label for="username">ชื่อผู้ใช้* (ภาษาอังกฤษ หรือตัวเลข)</label>
                     </div>
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error"
+                        class="mt-2 text-pink-500 font-extralight p-error"
                         v-if="usernameErrorMessage"
                     >{{ usernameErrorMessage }}</small>
                 </div>
@@ -350,7 +406,7 @@ init()
                     v-show="role === 'ADMIN'"
                     :key="'passwordinput'"
                 >
-                    <div class="p-float-label mt-6">
+                    <div class="mt-6 p-float-label">
                         <Password
                             id="password"
                             v-model="password"
@@ -365,11 +421,11 @@ init()
                         <label for="password">รหัสผ่าน</label>
                     </div>
                     <small
-                        class="text-pink-500 font-extralight mt-2 p-error"
+                        class="mt-2 text-pink-500 font-extralight p-error"
                         v-if="passwordErrorMessage"
                     >{{ passwordErrorMessage }}</small>
                 </div>
-                <div class="mt-8 flex justify-end">
+                <div class="flex justify-end mt-8">
                     <Button
                         icon="pi pi-plus"
                         type="submit"

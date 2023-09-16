@@ -3,10 +3,14 @@ import { acceptHMRUpdate } from 'pinia'
 export const useMainStore = defineStore('main', {
   state: () => {
     return {
-      isSidebarOpen: false
+      isSidebarOpen: false as boolean,
+      username: '' as string | null,
+      firstname: '' as string | null,
+      surname: '' as string | null,
     }
   },
   getters: {
+    fullname: (state) => state.firstname + ' ' + state.surname
   },
   actions: {
   },

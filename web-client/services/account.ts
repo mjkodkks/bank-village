@@ -189,3 +189,25 @@ export async function transactionInterestService(account_id: number, amount: num
         }
     }
 }
+
+export async function rollbackTransactionService(account_id: number) {
+    const { requestAuth } = await requestAPI()
+    const template = {
+        account_id,
+    }
+    try {
+        const data = await requestAuth(`/accounts/rollback`, {
+            method: 'POST',
+            body: template
+        })
+        return {
+            isSuccess: true,
+            data,
+        }
+    } catch (error) {
+        return {
+            isSuccess: false,
+            error,
+        }
+    }
+}

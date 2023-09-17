@@ -3,6 +3,7 @@ import {
   CreateAccountDto,
   CreateDepositTransactionDto,
   CreateWithdrawTransactionDto,
+  RollbackTransactionDto,
 } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -163,6 +164,71 @@ export class AccountsService {
       },
     });
 
+    return result;
+  }
+
+  async rollback(rollbackTransactionDto: RollbackTransactionDto) {
+    const { account_id } = rollbackTransactionDto;
+    const findLastTransaction = await this.prisma.account.findFirst({
+      select: {
+        transactions: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
+        },
+      },
+      where: {
+        id: account_id,
+      },
+    });
+
+    // check if no any transaction in account
+    if (
+      findLastTransaction &&
+      Array.isArray(findLastTransaction.transactions) &&
+      findLastTransaction.transactions.length === 0
+    ) {
+      return 'No any transactions to rollback';
+    }
+
+    // check if not found acount and transaction
+    const lastTransaction =
+      findLastTransaction && findLastTransaction.transactions
+        ? findLastTransaction.transactions[0]
+        : null;
+
+    if (!lastTransaction) {
+      return 'not found account id';
+    }
+
+    const { action, previousBalance, id: id_last } = lastTransaction;
+
+    let updateRecord;
+    let deleteTransaction;
+    const transactions = [];
+    if (action === 'DEPOSIT' || action === 'WITHDRAWAL') {
+      updateRecord = this.prisma.account.update({
+        where: {
+          id: account_id,
+        },
+        data: {
+          balance: previousBalance,
+        },
+      });
+      transactions.push(updateRecord);
+    }
+
+    // eslint-disable-next-line prefer-const
+    deleteTransaction = this.prisma.transaction.delete({
+      where: {
+        id: id_last,
+      },
+    });
+
+    transactions.push(deleteTransaction);
+
+    const result = await this.prisma.$transaction(transactions);
     return result;
   }
 

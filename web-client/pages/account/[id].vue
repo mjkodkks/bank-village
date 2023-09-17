@@ -2,7 +2,7 @@
 import { MenuItem } from 'primevue/menuitem';
 import { useField, useForm } from 'vee-validate';
 import { useToast } from 'primevue/usetoast';
-import { getAccountProfileService, transactionDepositService, transactionInterestService, transactionWithdrawService } from '~/services/account';
+import { getAccountProfileService, rollbackTransactionService, transactionDepositService, transactionInterestService, transactionWithdrawService } from '~/services/account';
 import { useConfirm } from "primevue/useconfirm";
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
@@ -66,20 +66,24 @@ const loadingTransaction = ref(false)
 async function transaction(accountId: number, amount: number, type: string, userId?: number, note?: string) {
     let transactionService;
     let successMessage;
+    let errMessage;
     let modeMessage;
 
     if (type === 'withdraw') {
         transactionService = transactionWithdrawService;
         modeMessage = 'การถอน'
         successMessage = 'การถอนสำเร็จ';
+        errMessage = 'การถอนไม่สำเร็จ';
     } else if (type === 'deposit') {
         transactionService = transactionDepositService;
         modeMessage = 'การฝาก'
         successMessage = 'การฝากสำเร็จ';
+        errMessage = 'การฝากไม่สำเร็จ';
     } else if (type === 'interest') {
         transactionService = transactionInterestService;
         modeMessage = 'การฝากดอกเบี้ย'
-        successMessage = 'การฝากสำเร็จ';
+        successMessage = 'การฝากดอกเบี้ยสำเร็จ';
+        errMessage = 'การฝากดอกเบี้ยไม่สำเร็จ';
     }
 
     if (transactionService) {
@@ -93,7 +97,7 @@ async function transaction(accountId: number, amount: number, type: string, user
             loadingTransaction.value = false;
         } else {
             const err = (error as any).statusMessage
-            toast.add({ severity: 'warn', summary: 'เข้าสู่ระบบไม่สำเร็จ', detail: 'การเข้าสู่ระบบไม่สำเร็จ ชื่อผู้ใช้ / รหัสผ่าน ไม่ถูกต้อง\n' + 'system message : ' + err, life: 8000 });
+            toast.add({ severity: 'warn', summary: type, detail: `${errMessage}  system message: ${err}`, life: 8000 });
             loadingTransaction.value = false;
         }
     }
@@ -170,6 +174,28 @@ function openDialogTransaction(type: string) {
     }
 }
 
+async function rollback() {
+    confirm.require({
+        message: `ยืนยันการ (ย้อนรายการล่าสุด)\nเมื่อย้อนแล้วข้อมูลจะไม่สามารถกู้กลับมาได้อีก`,
+        header: 'ยืนยัน',
+        acceptLabel: 'ใช่, ยืนยัน',
+        rejectLabel: 'ไม่',
+        acceptClass: 'p-button-danger',
+        icon: 'pi pi-exclamation-triangle',
+        accept: async () => {
+            const { isSuccess, data, error } = await rollbackTransactionService(+id)
+            if (isSuccess && data) {
+                toast.add({ severity: 'success', summary: 'การย้อนรายการ', detail: 'การย้อนรายการสำเร็จ', life: 5000 });
+                console.info(data);
+                init()
+            } else {
+                const err = (error as any).data.message
+                toast.add({ severity: 'warn', summary: 'การย้อนรายการ', detail: 'การย้อนรายการไม่สำเร็จ \n' + 'system message : ' + err, life: 8000 });
+            }
+        },
+    });
+}
+
 async function init() {
     await getAccountProfile(+id)
     await getTransactions(+id)
@@ -202,7 +228,8 @@ init()
             </div>
             <div>
                 <label for="">เจ้าของบัญชี</label>
-                <div class="font-extralight">{{ profile.owner?.username ? '('+profile.owner?.username+')': '' }} {{ profile.owner?.firstname || '' }} {{ profile.owner?.surname || '' }}</div>
+                <div class="font-extralight">{{ profile.owner?.username ? '(' + profile.owner?.username + ')' : '' }} {{
+                    profile.owner?.firstname || '' }} {{ profile.owner?.surname || '' }}</div>
             </div>
             <div>
                 <label for="">สร้างเมื่อ</label>
@@ -234,7 +261,18 @@ init()
                 label="ดอกเบี้ย"
             ></Button>
         </div>
-        <h3>บันทึกรายการธุรกรรม</h3>
+        <div class="flex">
+            <h3>บันทึกรายการธุรกรรม</h3>
+            <div class="ml-auto">
+                <Button
+                    @click="rollback"
+                    severity="danger"
+                    icon="pi pi-refresh"
+                    size="small"
+                    label="ย้อนรายการ"
+                ></Button>
+            </div>
+        </div>
         <div class="flex-1 overflow-hidden table-wrapper">
             <ClientOnly>
                 <DataTable

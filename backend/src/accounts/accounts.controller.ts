@@ -16,6 +16,7 @@ import {
   CreateDepositTransactionDto,
   CreateInterestTransactionDto,
   CreateWithdrawTransactionDto,
+  RollbackTransactionDto,
 } from './dto/create-account.dto';
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
@@ -77,6 +78,19 @@ export class AccountsController {
     if (result === null) {
       throw new HttpException('Not Found Account!', HttpStatus.NOT_FOUND);
     }
+    if (typeof result === 'string') {
+      throw new HttpException(result, HttpStatus.BAD_REQUEST);
+    }
+    return result;
+  }
+
+  @ApiOperation({
+    summary: 'Rollback transaction (ย้อนข้อมูลล่าสุดในบัญชีไป 1 ครั้ง)',
+  })
+  @UseGuards(JwtAuthGuard)
+  @Post('rollback')
+  async rollback(@Body() rollbackTransactionDto: RollbackTransactionDto) {
+    const result = await this.accountsService.rollback(rollbackTransactionDto);
     if (typeof result === 'string') {
       throw new HttpException(result, HttpStatus.BAD_REQUEST);
     }

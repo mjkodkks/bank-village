@@ -64,3 +64,9 @@ export class CreateInterestTransactionDto {
   @ApiPropertyOptional()
   note?: string;
 }
+
+export class RollbackTransactionDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  account_id: number;
+}

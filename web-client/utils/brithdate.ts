@@ -23,7 +23,6 @@ export const monthLists = {
       for (let i = currentYear - yearsRange; i < currentYear; i++) {
         yearList.push(i + '');
       }
-      console.log(yearList)
       return yearList.reverse();
   }
 

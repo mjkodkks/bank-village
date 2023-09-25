@@ -1,3 +1,4 @@
+import { LOAN_INTEREST, STOCK_INTEREST } from './../utils/interest';
 import { Injectable } from '@nestjs/common';
 import {
   CreateAccountDto,
@@ -8,6 +9,8 @@ import {
 import { UpdateAccountDto } from './dto/update-account.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AccountType, Prisma } from '@prisma/client';
+import { dayjs } from '@/utils/dayjs';
+import { SAVING_INTEREST } from '@/utils/interest';
 
 @Injectable()
 export class AccountsService {
@@ -310,6 +313,143 @@ export class AccountsService {
       },
     });
     return transactions;
+  }
+
+  async calculateInterest(option?: { isDry: boolean }) {
+    // Get the start date of the current month
+    // const startDate = dayjs().startOf('month').format('YYYY-MM-DD');
+    // Get the end date of the current month
+    // const endDate = dayjs().endOf('month').format('YYYY-MM-DD');
+    const isExited = (interest) => {
+      return interest !== undefined && interest !== null;
+    };
+
+    if (
+      !isExited(SAVING_INTEREST) ||
+      !isExited(LOAN_INTEREST) ||
+      !isExited(STOCK_INTEREST)
+    ) {
+      return null;
+    }
+
+    const savingInterestMultipy = new Prisma.Decimal(
+      +SAVING_INTEREST / 100 / 12,
+    );
+    const stockInterestMultipy = new Prisma.Decimal(+STOCK_INTEREST / 100 / 12);
+
+    const allAccounts = await this.prisma.account.findMany();
+    console.log(allAccounts);
+    const updateInterest = allAccounts.map((account) => {
+      if (account.type === 'SAVING') {
+        return {
+          id: account.id,
+          interest: account.balance.mul(savingInterestMultipy),
+          type: account.type,
+          beforeBalance: account.balance,
+        };
+      } else if (account.type === 'STOCK') {
+        return {
+          id: account.id,
+          interest: account.balance.mul(stockInterestMultipy),
+          type: account.type,
+          beforeBalance: account.balance,
+        };
+      } else {
+        return {
+          id: account.id,
+          interest: account.balance.mul(savingInterestMultipy),
+          type: account.type,
+          beforeBalance: account.balance,
+        };
+      }
+    });
+    console.log(updateInterest);
+    if (option && option.isDry) {
+      return updateInterest;
+    }
+
+    // update interest to account
+    const transaction = await this.prisma.$transaction(
+      updateInterest.map((acc) => {
+        return this.prisma.account.update({
+          where: {
+            id: acc.id,
+          },
+          data: {
+            transactions: {
+              create: {
+                previousBalance: acc.beforeBalance,
+                action: 'INTEREST',
+                interest: acc.interest,
+                note: '*** ระบบคำนวณ ***',
+              },
+            },
+          },
+        });
+      }),
+    );
+
+    return transaction;
+  }
+
+  async sumInterest(option?: { isDry: boolean }) {
+    const allInterestTransaction = await this.prisma.transaction.findMany({
+      where: {
+        action: 'INTEREST',
+      },
+      select: {
+        id: true,
+        action: true,
+        previousBalance: true,
+        interest: true,
+        createdAt: true,
+        account: {
+          select: {
+            id: true,
+            type: true,
+            balance: true,
+          },
+        },
+      },
+    });
+    // console.log(allInterestTransaction);
+    const isSameYear = (date) => dayjs().isSame(date, 'year');
+    const transactionInYear = allInterestTransaction.filter((f) =>
+      isSameYear(f.createdAt),
+    );
+    // console.log(transactionInYear);
+    const mapInterest = new Map<number, Prisma.Decimal>();
+    for (const transaction of transactionInYear) {
+      const key = transaction.account.id;
+      const interestFromMap = mapInterest.get(key);
+      if (interestFromMap) {
+        mapInterest.set(key, interestFromMap.add(transaction.interest));
+      } else {
+        mapInterest.set(key, transaction.interest);
+      }
+    }
+    // update interest to account
+    const tran = [];
+    for (const [key, value] of mapInterest.entries()) {
+      tran.push(
+        this.prisma.account.update({
+          where: {
+            id: key,
+          },
+          data: {
+            interest: value,
+          },
+        }),
+      );
+    }
+
+    if (option && option.isDry) {
+      console.log(mapInterest);
+      return mapInterest;
+    }
+    // console.log(tran);
+    const accountUpdated = await this.prisma.$transaction(tran);
+    return accountUpdated;
   }
 
   update(id: number, updateAccountDto: UpdateAccountDto) {

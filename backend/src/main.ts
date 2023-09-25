@@ -12,7 +12,11 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
   });
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    }),
+  );
 
   const config = new DocumentBuilder()
     .setTitle('Bank Village')

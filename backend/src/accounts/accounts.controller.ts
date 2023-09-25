@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpException,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import {
@@ -18,7 +19,7 @@ import {
   CreateWithdrawTransactionDto,
   RollbackTransactionDto,
 } from './dto/create-account.dto';
-import { UpdateAccountDto } from './dto/update-account.dto';
+import { UpdateAccountDto, UpdateInterestDto } from './dto/update-account.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/auth/jwt/jwt-auth.guard';
 
@@ -102,6 +103,19 @@ export class AccountsController {
   @UseGuards(JwtAuthGuard)
   findAccountTypeAll() {
     return this.accountsService.findAllAccountType();
+  }
+
+  @Get('/calculate-interest')
+  @ApiOperation({ summary: 'calculate Interest' })
+  calucateInterest(@Query() query: UpdateInterestDto) {
+    return this.accountsService.calculateInterest(query);
+  }
+
+  @Get('/sum-interest')
+  @ApiOperation({ summary: 'sum interest' })
+  sumInterest(@Query() query: UpdateInterestDto) {
+    console.log(query);
+    return this.accountsService.sumInterest(query);
   }
 
   @Get()

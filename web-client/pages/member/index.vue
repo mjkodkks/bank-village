@@ -210,7 +210,7 @@ init()
                     stripedRows
                     scrollable
                     scrollHeight="flex"
-                    class="text-sm p-datatable-sm"
+                    class="text-sm p-datatable-sm row-selected"
                     tableStyle="min-width: 50rem"
                     v-model:filters="filters"
                     :globalFilterFields="['name', 'id', 'username', 'role']"
@@ -232,7 +232,11 @@ init()
                     <Column
                         field="name"
                         header="ชื่อ นามสกุล"
-                    ></Column>
+                    >
+                        <template #body="{ data }">
+                           <a href="#" class="text-primary hover:text-pink-600">{{ data.name || '-' }}</a>
+                        </template>
+                    </Column>
                     <Column
                         field="address"
                         header="ที่อยู่"

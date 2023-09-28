@@ -121,7 +121,10 @@ init()
                     <Column
                         field="id"
                         header="เลขที่บัญชี"
-                    ></Column>
+                    >
+                    <template #body="{ data }">
+                           <a href="#" class="text-primary hover:text-pink-600">{{ data.id || '-' }}</a>
+                        </template></Column>
                     <Column
                         field="type"
                         header="ประเภท"

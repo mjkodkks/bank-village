@@ -52,6 +52,7 @@ async function fetchAccounts() {
                 firstname: m.owner?.firstname,
                 username: m.owner?.username,
                 surname: m.owner?.surname,
+                typeTH: mapAccoutType(m.type).th,
                 createdAt: dayjs(m.createdAt).format('DD/MM/YYYY HH:mm'),
             }
         })
@@ -113,7 +114,7 @@ init()
                     class="p-datatable-sm text-sm"
                     tableStyle="min-width: 50rem"
                     v-model:filters="filters"
-                    :globalFilterFields="['name', 'id', 'type', 'balance', 'interest', 'username', 'firstname', 'surname']"
+                    :globalFilterFields="['name', 'id', 'type','typeTH', 'balance', 'interest', 'username', 'firstname', 'surname']"
                     @row-click="rowClick"
                     selectionMode="single"
                 >
@@ -126,7 +127,7 @@ init()
                         </template>
                     </Column>
                     <Column
-                        field="type"
+                        field="typeTH"
                         header="ประเภท"
                     ></Column>
                     <Column

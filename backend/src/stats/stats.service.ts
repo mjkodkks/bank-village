@@ -1,3 +1,4 @@
+import { AccountType, Prisma } from '@prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 import { Injectable } from '@nestjs/common';
 
@@ -18,7 +19,29 @@ export class StatsService {
       },
     });
 
+    const accountTypes = Object.values(AccountType);
+    const sumBalance = {};
+    for (const accType of accountTypes) {
+      const template = await this.prisma.account.findMany({
+        where: {
+          type: accType,
+        },
+        select: {
+          balance: true,
+        },
+      });
+      const balances = template
+        .map((m) => m.balance)
+        .reduce((acc, cur) => {
+          const sum = new Prisma.Decimal(acc);
+          const current = new Prisma.Decimal(cur);
+          return sum.add(current);
+        }, new Prisma.Decimal(0));
+      sumBalance[accType] = balances;
+    }
+
     const template = {
+      sumBalance,
       usersCount,
       accountsCount,
       transactionDeposit,

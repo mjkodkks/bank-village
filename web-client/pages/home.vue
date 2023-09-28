@@ -6,27 +6,47 @@ definePageMeta({
     middleware: ["auth"]
 })
 const router = useRouter()
+const { strToCurrency } = useNumber()
 
-const stats = ref([
+const stats = ref<{
+    title: string,
+    score: string | number,
+    color: string
+}[]>([
     {
         title: 'จำนวนสมาชิกทั้งหมด',
         score: 0,
-        color: '#F8F0E5'
+        color: '#793FDF'
     },
     {
         title: 'จำนวนการขอฝาก',
         score: 0,
-        color: '#AED2FF'
+        color: '#9D44C0'
     },
     {
         title: 'จำนวนการขอถอน',
         score: 0,
-        color: '#DAC0A3'
+        color: '#EC53B0'
     },
     {
         title: 'บัญชีทั้งหมด',
         score: 0,
-        color: '#FFC7EA'
+        color: '#0E21A0'
+    },
+    {
+        title: 'เงินฝากออมทรัพย์ทั้งหมด (บาท)',
+        score: 0,
+        color: mapAccoutType('SAVING').color
+    },
+    {
+        title: 'เงินฝากหุ้นทั้งหมด (บาท)',
+        score: 0,
+        color: mapAccoutType('STOCK').color
+    },
+    {
+        title: 'เงินกู้ทั้งหมด (บาท)',
+        score: 0,
+        color: mapAccoutType('LOAN').color
     },
 ])
 
@@ -38,6 +58,9 @@ async function getStat() {
         stats.value[1].score = data.transactionDeposit
         stats.value[2].score = data.transactionWithdraw
         stats.value[3].score = data.accountsCount
+        stats.value[4].score = data.sumBalance.SAVING ?? 0
+        stats.value[5].score = data.sumBalance.STOCK ?? 0
+        stats.value[6].score = data.sumBalance.LOAN ?? 0 
     }
 }
 
@@ -56,7 +79,7 @@ init()
         <h1>สถิติ (stat)</h1>
         <hr class="border-gray-200 border border-solid" />
         <div class="grid grid-cols-1 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-8 justify-center mt-8">
-            <HomeCardStat v-for="stat in stats" :color="stat.color" :title="stat.title" :score="stat.score" ></HomeCardStat>
+            <HomeCardStat v-for="stat in stats" :color="stat.color" :title="stat.title" :score="strToCurrency(stat.score + '')" ></HomeCardStat>
         </div>
         <hr class="border-gray-200 border border-solid mt-8" />
         <div class="flex justify-center mt-8">

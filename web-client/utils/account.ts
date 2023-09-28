@@ -31,17 +31,17 @@ export function mapAccoutType(type: string) {
         'SAVING': {
             en: 'SAVING Account',
             th: 'บัญชีฝากออมทรัพย์',
-            color: '#FBA1B7'
+            color: '#EA1179'
         },
         'STOCK': {
             en: 'STOCK Account',
             th: 'บัญชีฝากลงหุ้น',
-            color: '#F4D160'
+            color: '#FFC436'
         },
         'LOAN': {
             en: 'LOAN Account',
             th: 'บัญชีเงินกู้',
-            color: '#1D5D9B'
+            color: '#0B666A'
         }
     } as {
         [x:string]: {

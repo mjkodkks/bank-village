@@ -234,7 +234,7 @@ init()
                         header="ชื่อ นามสกุล"
                     >
                         <template #body="{ data }">
-                           <a href="#" class="text-primary hover:text-pink-600">{{ data.name || '-' }}</a>
+                           <span class="underline text-primary hover:text-pink-600">{{ data.name || '-' }}</span>
                         </template>
                     </Column>
                     <Column

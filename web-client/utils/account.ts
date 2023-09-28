@@ -25,6 +25,21 @@ export type Transaction = {
     } | string
 }
 
+export type AccountDetails = {
+    id: number
+    balance: string
+    createdAt: string
+    userId: number
+    type: AccountType
+    typeTH?: string
+    owner: {
+      username: string
+      role: ROLE
+      firstname: string
+      surname: string
+    }
+}
+
 
 export function mapAccoutType(type: string) {
     const template = {

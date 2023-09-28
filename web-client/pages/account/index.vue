@@ -56,7 +56,7 @@ async function fetchAccounts() {
             }
         })
         // console.log(accounts.value);
-        
+
     }
     setTimeout(() => {
         accountLoading.value = false
@@ -103,14 +103,13 @@ init()
         >
             จำนวนบัญชี ({{ accountCount }})
         </div>
-        <div
-            class="table-wrapper mt-4 flex-1 overflow-hidden"
-        >
+        <div class="table-wrapper mt-4 flex-1 overflow-hidden">
             <template v-if="!accountLoading">
                 <DataTable
                     :value="accounts"
                     stripedRows
-                    scrollable scrollHeight="flex"
+                    scrollable
+                    scrollHeight="flex"
                     class="p-datatable-sm text-sm"
                     tableStyle="min-width: 50rem"
                     v-model:filters="filters"
@@ -122,9 +121,10 @@ init()
                         field="id"
                         header="เลขที่บัญชี"
                     >
-                    <template #body="{ data }">
-                           <a href="#" class="text-primary hover:text-pink-600">{{ data.id || '-' }}</a>
-                        </template></Column>
+                        <template #body="{ data }">
+                            <span class="underline text-primary hover:text-pink-600">{{ data.id || '-' }}</span>
+                        </template>
+                    </Column>
                     <Column
                         field="type"
                         header="ประเภท"
@@ -133,10 +133,10 @@ init()
                         field="balance"
                         header="ยอดสุทธิ (บาท)"
                     >
-                    <template #body="{ data }">
-                      {{ strToCurrency(data.balance) || '0' }}
-                    </template>
-                </Column>
+                        <template #body="{ data }">
+                            {{ strToCurrency(data.balance) || '0' }}
+                        </template>
+                    </Column>
                     <Column
                         field="interest"
                         header="ดอกเบี้ย (บาท)"
@@ -146,7 +146,8 @@ init()
                         header="เจ้าของบัญชี"
                     >
                         <template #body="{ data }">
-                            {{ data.owner?.username ? `(${data.owner?.username}) ` : '' }} {{ data.owner?.firstname || '' }} {{ data.owner?.surname || '' }}
+                            {{ data.owner?.username ? `(${data.owner?.username}) ` : '' }} {{ data.owner?.firstname || '' }}
+                            {{ data.owner?.surname || '' }}
                         </template>
                     </Column>
                     <Column

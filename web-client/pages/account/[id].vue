@@ -103,20 +103,21 @@ async function transaction(accountId: number, amount: number, type: string, user
     }
 }
 
-const profile = ref()
+const profile = ref<AccountDetails>()
 async function getAccountProfile(id: number) {
     const { isSuccess, data, error } = await getAccountProfileService(id)
     if (isSuccess && data) {
         // console.log(data)
         profile.value = {
             ...data,
-            type: mapAccoutType(data.type).th,
+            typeTH: mapAccoutType(data.type).th,
             createdAt: dayjs(data.createdAt).format('ddd DD MMMM YYYY เวลา HH:mm:ss')
         }
         breadcrumbItems.value[2] || breadcrumbItems.value.push({ label: `บัญชี ${data.type} (${id})`, icon: 'pi pi-wallet', class: '[&_.p-menuitem-text]:ml-2' })
     }
     return data
 }
+const isLoan = computed(() => profile.value ? profile.value.type === 'LOAN' : false)
 
 const transactions = ref<Transaction[]>([])
 async function getTransactions(id: number) {
@@ -211,7 +212,18 @@ init()
             <Breadcrumb
                 :model="breadcrumbItems"
                 class="text-xl"
-            />
+            >
+                <template #item="{ label, item, props }">
+                    <NuxtLink v-if="item.to" :to="item.to" class="text-primary underline decoration-1 hover:text-pink-600">
+                        <span v-bind="props.icon" />
+                        <span v-bind="props.label">{{ label }}</span>
+                    </NuxtLink>
+                    <template v-else>
+                        <span v-bind="props.icon" />
+                        <span v-bind="props.label">{{ label }}</span>
+                    </template>
+                </template>
+            </Breadcrumb>
         </div>
         <h3 class="mt-8">ข้อมูลทั่วไป</h3>
         <div
@@ -224,7 +236,7 @@ init()
             </div>
             <div>
                 <label for="">ประเภทบัญชี</label>
-                <div class="font-extralight">{{ profile.type || '' }}</div>
+                <div class="font-extralight">{{ profile?.typeTH || '' }}</div>
             </div>
             <div>
                 <label for="">เจ้าของบัญชี</label>
@@ -306,7 +318,7 @@ init()
                     </Column>
                     <Column
                         field="previousBalance"
-                        header="ยอดยกมา (บาท)"
+                        :header="isLoan ? 'เงินกู้ยกมา (บาท)' : 'ยอดยกมา (บาท)'"
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
@@ -317,7 +329,7 @@ init()
                     </Column>
                     <Column
                         field="amounts"
-                        header="จำนวน (บาท)"
+                        :header="isLoan ? 'จำนวนเงินกู้ (บาท)' : 'จำนวน (บาท)'"
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
@@ -328,7 +340,7 @@ init()
                     </Column>
                     <Column
                         field="changeBalance"
-                        header="ยอดคงเหลือ (บาท)"
+                        :header="isLoan ? 'เงินกู้คงเหลือ (บาท)' : 'ยอดคงเหลือ (บาท)'"
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
@@ -438,10 +450,9 @@ init()
                         label="ยืนยัน"
                         icon="pi pi-check"
                         severity="success"
-                        :loading="loadingTransaction"
-                    ></Button>
-                </div>
-            </form>
-        </Dialog>
-    </div>
-</template>
+                    :loading="loadingTransaction"
+                ></Button>
+            </div>
+        </form>
+    </Dialog>
+</div></template>

@@ -228,7 +228,18 @@ init()
             <Breadcrumb
                 :model="breadcrumbItems"
                 class="text-xl"
-            />
+            >
+                <template #item="{ label, item, props }">
+                    <NuxtLink v-if="item.to" :to="item.to" class="text-primary underline decoration-1 hover:text-pink-600">
+                        <span v-bind="props.icon" />
+                        <span v-bind="props.label">{{ label }}</span>
+                    </NuxtLink>
+                    <template v-else>
+                        <span v-bind="props.icon" />
+                        <span v-bind="props.label">{{ label }}</span>
+                    </template>
+                </template>
+            </Breadcrumb>
         </div>
         <h3 class="mt-8">ข้อมูลทั่วไป <i
                 class="cursor-pointer pi pi-pencil"

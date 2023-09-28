@@ -82,7 +82,11 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @ApiOperation({
+    summary: 'delete user (ลบ user ออกจากระบบจาก id)',
+  })
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }

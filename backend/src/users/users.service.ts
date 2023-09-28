@@ -163,7 +163,46 @@ export class UsersService {
     return userUpdate;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const removeUser = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.findFirst({
+        where: {
+          id,
+        },
+        select: {
+          accountId: true,
+        },
+      });
+
+      if (!user) {
+        return null;
+      }
+      const deleteTransaction = {};
+      for (const acc of user.accountId) {
+        const count = await tx.transaction.deleteMany({
+          where: {
+            accountId: acc.id,
+          },
+        });
+        deleteTransaction[acc.id] = count;
+      }
+
+      const deleteAccount = await tx.account.deleteMany({
+        where: {
+          userId: +id,
+        },
+      });
+
+      const deleteUser = await tx.user.delete({
+        where: {
+          id,
+        },
+      });
+
+      console.log(deleteAccount);
+
+      return [deleteUser, deleteAccount, deleteTransaction];
+    });
+    return removeUser;
   }
 }

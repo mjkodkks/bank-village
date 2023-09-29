@@ -31,7 +31,7 @@ defineExpose({
       <NuxtPage />
     </NuxtLayout>
     <Toast></Toast>
-    <ConfirmDialog></ConfirmDialog>
+    <ConfirmDialog style="white-space: pre;"></ConfirmDialog>
   </div>
 </template>
 

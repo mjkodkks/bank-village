@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MenuItem } from 'primevue/menuitem';
-import { getUserProfileByIdService, updateUserService } from '~/services/user';
+import { deleteUserService, getUserProfileByIdService, updateUserService } from '~/services/user';
 import { useField, useForm } from 'vee-validate';
 import { useToast } from 'primevue/usetoast';
 import { createAccountService, getAccountTypesService } from '~/services/account';
@@ -67,7 +67,7 @@ const onSubmit = handleSubmit(async (values: any) => {
     updateLoading.value = true
     const template: UpdateUser = {}
     if (values.citizenId) {
-        template.citizenId = values.citizenId.replaceAll("-","")
+        template.citizenId = values.citizenId.replaceAll("-", "")
     }
     if (values.role) {
         template.role = values.role
@@ -213,6 +213,26 @@ const { value: year, errorMessage: yearErrorMessage } = useField<number | null>(
     initialValue: null
 });
 
+function deleteUser(user_id: number) {
+    confirm.require({
+        header: 'ยืนยัน',
+        message: '##### ยืนยันการลบสมาชิก ##### \n- ข้อมูลทั่วไป \n- ข้อมูลบัญชี \n- ประวัติการฝาก-ถอน \nจะถูกลบทั้งหมด',
+        icon: 'pi pi-exclamation-triangle',
+        acceptLabel: 'ใช่, ยืนยัน',
+        rejectLabel: 'ไม่',
+        acceptClass: 'p-button-danger',
+        accept: async () => {
+            const { isSuccess, data, error } = await deleteUserService(user_id)
+            if (isSuccess && data) {
+                // console.log(data)
+                toast.add({ severity: 'success', summary: 'ลบสมาชิก', detail: 'ลบสมาชิกสำเร็จ', life: 5000 });
+                router.replace('/member')
+            }
+            return data
+        },
+    });
+}
+
 
 async function init() {
     await getAccountTypes()
@@ -230,7 +250,11 @@ init()
                 class="text-xl"
             >
                 <template #item="{ label, item, props }">
-                    <NuxtLink v-if="item.to" :to="item.to" class="text-primary underline decoration-1 hover:text-pink-600">
+                    <NuxtLink
+                        v-if="item.to"
+                        :to="item.to"
+                        class="text-primary underline decoration-1 hover:text-pink-600"
+                    >
                         <span v-bind="props.icon" />
                         <span v-bind="props.label">{{ label }}</span>
                     </NuxtLink>
@@ -241,10 +265,17 @@ init()
                 </template>
             </Breadcrumb>
         </div>
-        <h3 class="mt-8">ข้อมูลทั่วไป <i
+        <h3 class="mt-8 flex gap-2 items-center">ข้อมูลทั่วไป <i
                 class="cursor-pointer pi pi-pencil"
                 @click="onEdit"
-            ></i></h3>
+            ></i>
+            <IconsBin
+                v-if="isEdit"
+                class="cursor-pointer w-6 h-6 ml-auto text-red-500"
+                @click="() => deleteUser(+id)"
+            ></IconsBin>
+        </h3>
+
         <form
             id="editForm"
             class="grid mt-4 sm:grid-cols-3 gap-y-10"
@@ -343,7 +374,10 @@ init()
             </div>
             <div>
                 <label for="">วันเกิด <span class="font-extralight">(วัน/เดือน/ปี พ.ศ.)</span></label>
-                <div v-if="!isEdit" class="font-extralight">{{ profile.brithday || '' }}</div>
+                <div
+                    v-if="!isEdit"
+                    class="font-extralight"
+                >{{ profile.brithday || '' }}</div>
                 <div
                     v-else
                     class="grid w-4/5 grid-cols-1 gap-2 mt-2 md:grid-cols-2 2xl:grid-cols-3"
@@ -503,11 +537,8 @@ init()
             </div>
         </form>
     </Dialog> -->
-    </div>
-</template>
+</div></template>
 
-<style>
-.input-control>.p-inputtext {
+<style>.input-control>.p-inputtext {
     padding: 4px 2px;
-}
-</style>
+}</style>

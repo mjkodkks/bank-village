@@ -127,3 +127,21 @@ export async function updateUserService(id: number, updateData: UpdateUser) {
         }
     }
 }
+
+export async function deleteUserService(id: number) {
+    const { requestAuth } = await requestAPI()
+    try {
+        const data = await requestAuth<AdminList>(`/users/${id}`, {
+            method: 'DELETE',
+        })
+        return {
+            isSuccess: true,
+            data,
+        }
+    } catch (error) {
+        return {
+            isSuccess: false,
+            error,
+        }
+    }
+}

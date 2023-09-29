@@ -27,7 +27,7 @@ const breadcrumbItems = ref<MenuItem[]>([
     { label: 'โปรไฟล์สมาชิก', to: `/member/${userId}`, icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
 ]);
 
-const { handleSubmit } = useForm();
+const { handleSubmit, resetForm } = useForm();
 
 const { value: amount, errorMessage: amountErrorMessage, resetField: resetFieldAmount } = useField<number>('amount', toTypedSchema(z.number().nonnegative({
     message: 'ไม่สามารถใส่ค่าที่เป็นลบได้'
@@ -374,12 +374,13 @@ init()
         <Dialog
             v-model:visible="isDialogVisible"
             modal
+            @hide="resetForm()"
             :header="headerDialog"
-            :breakpoints="{ '960px': '60vw', '641px': '100vw' }"
+            :breakpoints="{ '960px': '500px', '641px': '100vw' }"
         >
             <form
                 @submit.prevent="onSubmit"
-                class="w-full px-4 bg-white lg:max-w-xl lg:px-8 lg:ml-auto pt-7"
+                class="w-full px-4 bg-white lg:w-[500px] lg:px-8 pt-7"
             >
                 <div>
                     <label
@@ -396,11 +397,11 @@ init()
                         inputClass="text-right text-2xl"
                     />
                     <small
-                        class="mt-2 text-pink-500 font-extralight p-error"
+                        class="mt-2 text-pink-500 font-extralight p-error block"
                         v-if="amountErrorMessage"
                     >{{ amountErrorMessage }}</small>
                 </div>
-                <div>
+                <div class="mt-2">
                     <label
                         for="staff"
                         class="text-lg"

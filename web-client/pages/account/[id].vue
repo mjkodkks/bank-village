@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { MenuItem } from 'primevue/menuitem';
+import type { MenuItem } from 'primevue/menuitem';
 import { useField, useForm } from 'vee-validate';
 import { useToast } from 'primevue/usetoast';
 import { getAccountProfileService, rollbackTransactionService, transactionDepositService, transactionInterestService, transactionWithdrawService } from '~/services/account';
 import { useConfirm } from "primevue/useconfirm";
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
-import { Transaction, mapTransactionType } from '~/utils/account';
+import { type Transaction, mapTransactionType } from '~/utils/account';
 import { getAdminListService } from '~/services/user';
 
 definePageMeta({
@@ -21,6 +21,7 @@ const router = useRouter();
 const id = route.params.id
 const userId = route.query.userId
 const { strToCurrency } = useNumber()
+const mainStore = useMainStore()
 
 const breadcrumbItems = ref<MenuItem[]>([
     { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
@@ -37,7 +38,9 @@ const { value: amount, errorMessage: amountErrorMessage, resetField: resetFieldA
     initialValue: 0
 });
 
-const { value: staff, errorMessage: staffErrorMessage, resetField: resetFieldStaff } = useField<{ id: number } | undefined>('staff', undefined, {
+const { value: staff, errorMessage: staffErrorMessage, resetField: resetFieldStaff } = useField<number | undefined>('staff', toTypedSchema(z.number().min(1, {
+    message: 'กรุณาใส่ผู้ดำเนินการ'
+})), {
     initialValue: undefined
 });
 
@@ -49,7 +52,7 @@ const { value: note, errorMessage: noteErrorMessage, resetField: resetFieldNote 
 const onSubmit = handleSubmit(async (values) => {
     // console.log(values)
     const { amount, staff, note } = values
-    const userId = staff?.id
+    const userId = staff
     confirm.require({
         message: `ยืนยันการ (${headerDialog.value}) จำนวน ${amount} บาท`,
         header: 'ยืนยัน',
@@ -128,7 +131,9 @@ async function getTransactions(id: number) {
             return {
                 ...m,
                 staff: typeof m.staff !== 'string' ? `${m.staff?.username ? '(' + m.staff.username + ')' : ''} ${m.staff?.firstname || ''} ${m.staff?.surname || ''}` : '',
-                createdAt: dayjs(m.createdAt).format('DD/MM/YYYY HH:mm:ss'),
+                createdAt: dayjs(m.createdAt).format('DD MMM BBBB'),
+                createdTime: dayjs(m.createdAt).format('HH:mm:ss'),
+                actionTH: mapTransactionType(m.action).th 
             }
         })
     }
@@ -147,6 +152,13 @@ async function getAdminList() {
     return data
 }
 
+function findAdminById(id: number) {
+   return adminList.value.find(f => f.id == id)
+}
+
+const { calInterestByType } = useInterest()
+const isCalIntresSuccess = ref(true)
+
 const isDialogVisible = ref(false)
 const dialogMode = ref<'deposit' | 'withdraw' | 'interest'>('deposit')
 const headerDialog = computed(() => {
@@ -160,7 +172,7 @@ const headerDialog = computed(() => {
 function openDialogTransaction(type: string) {
     isDialogVisible.value = true
     amount.value = 0
-    staff.value = undefined
+    staff.value = mainStore.id
     note.value = undefined
     if (type === 'deposit') {
         dialogMode.value = 'deposit'
@@ -172,6 +184,13 @@ function openDialogTransaction(type: string) {
 
     if (type === 'interest') {
         dialogMode.value = 'interest'
+        isCalIntresSuccess.value = true
+        if(profile.value?.balance) {
+            amount.value = calInterestByType(+profile.value.balance, profile.value.type)
+            setTimeout(() => {
+                isCalIntresSuccess.value = false
+            }, 4000);
+        }
     }
 }
 
@@ -308,11 +327,18 @@ init()
                         header="ประเภทธุรกรรม"
                     >
                         <template #body="{ data }">
-                            <div :style="{ color: mapTransactionType(data.action).color }">{{ data.action }}</div>
+                            <div class="text-center font-bold text-lg" :style="{ color: mapTransactionType(data.action).color }">
+                                {{ data.actionTH }}
+                            </div>
                         </template>
                     </Column>
                     <Column
                         field="createdAt"
+                        header="วันที่"
+                    >
+                    </Column>
+                    <Column
+                        field="createdTime"
                         header="เวลา"
                     >
                     </Column>
@@ -380,8 +406,11 @@ init()
         >
             <form
                 @submit.prevent="onSubmit"
-                class="w-full px-4 bg-white lg:w-[500px] lg:px-8 pt-7"
+                class="w-full px-4 bg-white lg:w-[500px] lg:px-8"
             >
+                <Transition name="bounce" appear>
+                    <div v-if="isCalIntresSuccess" class="text-green-500 text-right">คำนวนดอกเบี้ยเดือนนี้สำเร็จ</div>
+                </Transition>
                 <div>
                     <label
                         for="amount"
@@ -392,9 +421,9 @@ init()
                         v-model="amount"
                         :maxFractionDigits="2"
                         :class="{ 'p-invalid': amountErrorMessage }"
+                        :input-class="`text-right text-2xl ${isCalIntresSuccess ? 'border-2 border-green-400': ''}`"
                         placeholder="ระบุจำนวนเงิน เช่น 200"
                         class="w-full mt-4"
-                        inputClass="text-right text-2xl"
                     />
                     <small
                         class="mt-2 text-pink-500 font-extralight p-error block"
@@ -405,11 +434,12 @@ init()
                     <label
                         for="staff"
                         class="text-lg"
-                    >ระบุเจ้าหน้าที่ ที่ทำรายการ*</label>
+                >ระบุเจ้าหน้าที่ ที่ทำรายการ*</label>
                     <Dropdown
                         inputId="staff"
                         v-model="staff"
                         :options="adminList"
+                        option-value="id"
                         option-label="staff"
                         :class="{ 'p-invalid': staffErrorMessage }"
                         placeholder="เลือกเจ้าหน้าที่"
@@ -417,7 +447,7 @@ init()
                         inputClass="text-right l"
                     >
                         <template #value="{ value, placeholder }">
-                            {{ value ? `(${value.username}) ${value.firstname || ''} ${value.surname || ''}` : placeholder
+                            {{ value !== undefined ? `(${findAdminById(value).username}) ${findAdminById(value).firstname || ''} ${findAdminById(value).surname || ''}` : placeholder
                             }}
                         </template>
                         <template #option="slotProps">

@@ -1,5 +1,5 @@
 import { requestAPI } from "~/composables/request"
-import { AccountDetails, AccountType, Transaction } from "~/utils/account"
+import type { AccountDetails, AccountType, Transaction } from "~/utils/account"
 
 export async function getAccountTypesService() {
     const { requestAuth } = await requestAPI()

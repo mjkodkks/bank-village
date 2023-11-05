@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { MenuItem } from 'primevue/menuitem';
+import type { MenuItem } from 'primevue/menuitem';
 import { deleteUserService, getUserProfileByIdService, updateUserService } from '~/services/user';
 import { useField, useForm } from 'vee-validate';
 import { useToast } from 'primevue/usetoast';
 import { createAccountService, getAccountTypesService } from '~/services/account';
-import { AccountType, mapAccoutType } from '~/utils/account';
-import { UpdateUser } from '~/utils/user';
+import { type AccountType, mapAccoutType } from '~/utils/account';
+import type { UpdateUser } from '~/utils/user';
 import { useConfirm } from "primevue/useconfirm";
 import { mapRole } from '~/utils/roles';
 import { toTypedSchema } from '@vee-validate/zod';

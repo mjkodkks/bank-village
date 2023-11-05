@@ -34,13 +34,6 @@ export default defineNuxtConfig({
     'dayjs-nuxt'
   ],
 
-  pinia: {
-    autoImports: [
-      // automatically imports `defineStore`
-      'defineStore', // import { defineStore } from 'pinia'
-    ],
-  },
-
   build: {
 		transpile: ["primevue"]
 	},
@@ -52,9 +45,9 @@ export default defineNuxtConfig({
 
   dayjs: {
     locales: ['en', 'th'],
-    plugins: ['relativeTime', 'utc', 'timezone'],
-    defaultLocale: 'en',
-    defaultTimezone: '	Asia/Bangkok',
+    plugins: ['relativeTime', 'utc', 'timezone', 'buddhistEra'],
+    defaultLocale: 'th',
+    defaultTimezone: 'Asia/Bangkok',
   },
 
   css: [ "primevue/resources/themes/lara-light-blue/theme.css", 'primevue/resources/primevue.min.css', '~/assets/css/main.css', 'primeicons/primeicons.css'],

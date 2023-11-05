@@ -75,7 +75,8 @@ const password = defineComponentBinds('password')
   <div class="flex h-full">
     <div class="relative flex-1 hidden overflow-hidden bg-slate-200 lg:block aspect-square">
       <img
-        src="/images/bg-login.jpg"
+        loading="lazy"
+        src="/images/bg-login.webp"
         class="w-full h-full"
         alt="bg"
       >

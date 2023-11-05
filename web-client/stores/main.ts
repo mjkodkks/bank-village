@@ -7,6 +7,7 @@ export const useMainStore = defineStore('main', {
       username: '' as string | null,
       firstname: '' as string | null,
       surname: '' as string | null,
+      id: undefined as number | undefined,
     }
   },
   getters: {

@@ -51,7 +51,7 @@ export function mapAccoutType(type: string) {
         'STOCK': {
             en: 'STOCK Account',
             th: 'บัญชีฝากลงหุ้น',
-            color: '#FFC436'
+            color: '#FD7800'
         },
         'LOAN': {
             en: 'LOAN Account',

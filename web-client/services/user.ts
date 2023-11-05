@@ -1,5 +1,5 @@
 import { requestAPI } from "~/composables/request"
-import { AdminList, CreateUser, User } from "~/utils/user"
+import type { AdminList, CreateUser, User } from "~/utils/user"
 
 export async function getProfileService() {
     const { requestAuth } = await requestAPI()

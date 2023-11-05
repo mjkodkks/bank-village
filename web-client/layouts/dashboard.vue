@@ -27,6 +27,7 @@ if (isSuccess && data) {
     username: data.username,
     firstname: data.firstname,
     surname: data.surname,
+    id: data.id
   })
 }
 

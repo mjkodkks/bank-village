@@ -174,12 +174,12 @@ init()
 </script>
 
 <template>
-    <div class="h-[calc(100%_-_60px)] px-2 md:px-6 xl:px-8 py-8 flex flex-col">
-        <h1 class="mt-0">สมาชิก / ค้นหาสมาชิก</h1>
+    <div class="h-[calc(100%_-_60px)] px-2 md:px-6 xl:px-8 py-4 flex flex-col">
+        <h1 class="my-0">สมาชิก / ค้นหาสมาชิก</h1>
         <div>
             <hr class="border border-gray-200 border-solid" />
         </div>
-        <div class="flex gap-2 mt-8 header">
+        <div class="flex gap-2 mt-4 header">
             <div class="flex justify-content-end">
                 <span class="p-input-icon-left">
                     <i class="pi pi-search" />

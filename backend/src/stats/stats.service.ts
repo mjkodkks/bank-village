@@ -40,8 +40,13 @@ export class StatsService {
       sumBalance[accType] = balances;
     }
 
+    const sumSavingAndStock = new Prisma.Decimal(sumBalance['SAVING']).add(
+      new Prisma.Decimal(sumBalance['STOCK']),
+    );
+
     const template = {
       sumBalance,
+      sumSavingAndStock,
       usersCount,
       accountsCount,
       transactionDeposit,

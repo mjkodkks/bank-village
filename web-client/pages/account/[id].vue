@@ -8,6 +8,8 @@ import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
 import { type Transaction, mapTransactionType } from '~/utils/account';
 import { getAdminListService } from '~/services/user';
+import type { AdminList } from "~/utils/user"
+import type { SatisfiesExpression } from 'typescript';
 
 definePageMeta({
     layout: 'dashboard',
@@ -157,7 +159,7 @@ function findAdminById(id: number) {
 }
 
 const { calInterestByType } = useInterest()
-const isCalIntresSuccess = ref(true)
+const isCalIntresSuccess = ref(false)
 
 const isDialogVisible = ref(false)
 const dialogMode = ref<'deposit' | 'withdraw' | 'interest'>('deposit')
@@ -176,13 +178,9 @@ function openDialogTransaction(type: string) {
     note.value = undefined
     if (type === 'deposit') {
         dialogMode.value = 'deposit'
-    }
-
-    if (type === 'withdraw') {
+    } else if (type === 'withdraw') {
         dialogMode.value = 'withdraw'
-    }
-
-    if (type === 'interest') {
+    } else  if (type === 'interest') {
         dialogMode.value = 'interest'
         isCalIntresSuccess.value = true
         if(profile.value?.balance) {
@@ -226,7 +224,7 @@ init()
 </script>
 
 <template>
-    <div class="p-8 h-[calc(100%_-_60px)] md:flex md:flex-col">
+    <div class="px-8 py-4 h-[calc(100%_-_60px)] md:flex md:flex-col">
         <div class="max-w-lg">
             <Breadcrumb
                 :model="breadcrumbItems"
@@ -244,9 +242,9 @@ init()
                 </template>
             </Breadcrumb>
         </div>
-        <h3 class="mt-8">ข้อมูลทั่วไป</h3>
+        <h3 class="mt-4">ข้อมูลทั่วไป</h3>
         <div
-            class="grid max-w-6xl sm:grid-cols-3 gap-y-5 2xl:gap-y-10"
+            class="grid max-w-6xl sm:grid-cols-3 gap-y-5 2xl:gap-y-4"
             v-if="profile"
         >
             <div>
@@ -311,12 +309,13 @@ init()
                     stripedRows
                     scrollable
                     scrollHeight="flex"
-                    class="text-sm p-datatable-sm"
+                    class="text-sm p-datatable-sm p-datatable-stripe"
                     tableStyle="min-width: 50rem"
                     :globalFilterFields="['name', 'id', 'username', 'role']"
                     resizableColumns
                     columnResizeMode="fit"
                     showGridlines
+                    selectionMode="single"
                 >
                     <Column
                         field="id"
@@ -447,7 +446,7 @@ init()
                         inputClass="text-right l"
                     >
                         <template #value="{ value, placeholder }">
-                            {{ value !== undefined ? `(${findAdminById(value).username}) ${findAdminById(value).firstname || ''} ${findAdminById(value).surname || ''}` : placeholder
+                            {{ value !== undefined ? `(${findAdminById(value)?.username}) ${findAdminById(value)?.firstname || ''} ${findAdminById(value)?.surname || ''}` : placeholder
                             }}
                         </template>
                         <template #option="slotProps">

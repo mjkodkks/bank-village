@@ -20,7 +20,7 @@ import { usePrimeVue } from "primevue/config";
 
 const $primevue = usePrimeVue();
 defineExpose({
-     $primevue
+  $primevue
 })
 </script>
 
@@ -63,51 +63,65 @@ body,
 .nuxt-wrapper {
   height: 100%;
 }
+
 .p-component {
   font-family: var(--font-family);
 }
+
 .p-inputtext {
   font-weight: 200;
 }
-.p-button {
-}
+
+.p-button {}
 
 .p-datatable.p-datatable-hoverable-rows .p-datatable-tbody>tr:not(.p-highlight):hover {
-    transform: translateY(-1px);
-    background: #e9ecef;
-    box-shadow: 5px 5px 5px 0px #f3f3f3;
-    transition: all 0.5s;
+  transform: translateY(-1px);
+  background: #e9ecef;
+  box-shadow: 5px 5px 5px 0px #f3f3f3;
+  transition: all 0.5s;
+}
+
+.p-datatable-stripe.p-datatable.p-datatable-hoverable-rows .p-datatable-tbody>tr:not(.p-highlight):hover {
+  transform: translateY(0);
+  background: #e9ecef;
+  box-shadow: none;
 }
 
 .tracking-in-expand {
-	-webkit-animation: tracking-in-expand 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
-	        animation: tracking-in-expand 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+  -webkit-animation: tracking-in-expand 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
+  animation: tracking-in-expand 1s cubic-bezier(0.215, 0.610, 0.355, 1.000) both;
 }
+
 /**
  * ----------------------------------------
  * animation tracking-in-expand
  * ----------------------------------------
  */
- @-webkit-keyframes tracking-in-expand {
+@-webkit-keyframes tracking-in-expand {
   0% {
     letter-spacing: -0.5em;
     opacity: 0;
   }
+
   40% {
     opacity: 0.6;
   }
+
   100% {
     opacity: 1;
   }
 }
+
 @keyframes tracking-in-expand {
   0% {
     letter-spacing: -0.5em;
     opacity: 0;
   }
+
   40% {
     opacity: 0.6;
   }
+
   100% {
     opacity: 1;
   }
@@ -116,19 +130,21 @@ body,
 .bounce-enter-active {
   animation: bounce-in 0.5s;
 }
+
 .bounce-leave-active {
   animation: bounce-in 0.5s reverse;
 }
+
 @keyframes bounce-in {
   0% {
     transform: scale(0);
   }
+
   50% {
     transform: scale(1.25);
   }
+
   100% {
     transform: scale(1);
   }
-}
-
-</style>
+}</style>

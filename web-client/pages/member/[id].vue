@@ -243,7 +243,7 @@ init()
 </script>
 
 <template>
-    <div class="p-8">
+    <div class="px-8 py-4">
         <div class="">
             <Breadcrumb
                 :model="breadcrumbItems"

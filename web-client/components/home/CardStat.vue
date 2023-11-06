@@ -1,7 +1,7 @@
 <script setup lang="ts">
 type Props = {
     title: string;
-    score: number;
+    score: string;
     color: string;
 }
 

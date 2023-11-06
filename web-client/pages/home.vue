@@ -48,6 +48,11 @@ const stats = ref<{
         score: 0,
         color: mapAccoutType('LOAN').color
     },
+    {
+        title: 'รวมเงินฝากและหุ้น (บาท)',
+        score: 0,
+        color: '#6eac2c'
+    },
 ])
 
 async function getStat() {
@@ -61,6 +66,7 @@ async function getStat() {
         stats.value[4].score = data.sumBalance.SAVING ?? 0
         stats.value[5].score = data.sumBalance.STOCK ?? 0
         stats.value[6].score = data.sumBalance.LOAN ?? 0 
+        stats.value[7].score = data.sumSavingAndStock?? 0 
     }
 }
 
@@ -73,7 +79,7 @@ init()
 </script>
 
 <template>
-    <div class="h-full px-2 md:px-6 xl:px-8 py-8">
+    <div class="h-[calc(100vh_-_50px)] overflow-auto px-2 md:px-6 xl:px-8 py-8">
         <h1 class="text-center mb-0">ยินดีต้อนรับ</h1>
         <h3 class="font-light text-center m-0">ธนาคารหมู่บ้านตามแนวพระราชดำริ (สาขา บ้านกุดโดน)</h3>
         <h1>สถิติ (stat)</h1>

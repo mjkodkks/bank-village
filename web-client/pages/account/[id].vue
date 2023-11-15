@@ -8,8 +8,10 @@ import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
 import { type Transaction, mapTransactionType } from '~/utils/account';
 import { getAdminListService } from '~/services/user';
+import IconsDeposit from '~/components/icons/Deposit.vue';
+import IconsWithdraw from '~/components/icons/Withdraw.vue';
+import IconsInterset from '~/components/icons/Interest.vue';
 import type { AdminList } from "~/utils/user"
-import type { SatisfiesExpression } from 'typescript';
 
 definePageMeta({
     layout: 'dashboard',
@@ -132,10 +134,11 @@ async function getTransactions(id: number) {
         transactions.value = data.map(m => {
             return {
                 ...m,
-                staff: typeof m.staff !== 'string' ? `${m.staff?.username ? '(' + m.staff.username + ')' : ''} ${m.staff?.firstname || ''} ${m.staff?.surname || ''}` : '',
+                staff: typeof m.staff !== 'string' ? `${m.staff?.username ? '(' + m.staff.username + ')' : ''}` : '',
                 createdAt: dayjs(m.createdAt).format('DD MMM BBBB'),
                 createdTime: dayjs(m.createdAt).format('HH:mm:ss'),
-                actionTH: mapTransactionType(m.action).th 
+                actionTH: mapTransactionType(m.action).th,
+                icon: m.action === 'DEPOSIT' ? markRaw(IconsDeposit) : m.action === 'WITHDRAWAL' ? markRaw(IconsWithdraw) : m.action === 'INTEREST' ? markRaw(IconsInterset) : null
             }
         })
     }
@@ -275,20 +278,31 @@ init()
                 severity="success"
                 icon="pi pi-angle-double-up"
                 label="ฝาก"
-            ></Button>
+            >
+            <template #icon> 
+                <IconsDeposit class="mr-2"></IconsDeposit>
+            </template>
+        </Button>
             <Button
                 @click="() => openDialogTransaction('withdraw')"
                 size="large"
                 icon="pi pi-angle-double-down"
                 label="ถอน"
-            ></Button>
+            >
+            <template #icon> 
+                <IconsWithdraw class="mr-2"></IconsWithdraw>
+            </template>
+        </Button>
             <Button
                 @click="() => openDialogTransaction('interest')"
                 severity="warning"
                 icon="pi pi-star"
                 size="large"
                 label="ดอกเบี้ย"
-            ></Button>
+            >
+            <template #icon> 
+                <IconsInterest class="mr-2"></IconsInterest>
+            </template></Button>
         </div>
         <div class="flex">
             <h3>บันทึกรายการธุรกรรม</h3>
@@ -322,18 +336,12 @@ init()
                         header="เลขที่"
                     ></Column>
                     <Column
-                        field="action"
-                        header="ประเภทธุรกรรม"
-                    >
-                        <template #body="{ data }">
-                            <div class="text-center font-bold text-lg" :style="{ color: mapTransactionType(data.action).color }">
-                                {{ data.actionTH }}
-                            </div>
-                        </template>
-                    </Column>
+                        field="staff"
+                        header="ผู้ดำเนินการ"
+                    ></Column>
                     <Column
                         field="createdAt"
-                        header="วันที่"
+                        header="วันที่บันทึก"
                     >
                     </Column>
                     <Column
@@ -386,9 +394,16 @@ init()
                         </template>
                     </Column>
                     <Column
-                        field="staff"
-                        header="ผู้ดำเนินการ"
-                    ></Column>
+                        field="action"
+                        header="ประเภทธุรกรรม"
+                        header-class="[&_.p-column-header-content]:justify-center"
+                    >
+                        <template #body="{ data }">
+                            <div class="flex items-center justify-center gap-2 font-bold text-lg" :style="{ color: mapTransactionType(data.action).color }">
+                             <component :is="data.icon"></component> {{ data.actionTH }}
+                            </div>
+                        </template>
+                    </Column>
                     <Column
                         field="note"
                         header="หมายเหตุ"

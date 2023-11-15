@@ -142,6 +142,16 @@ export class AccountsController {
     return this.accountsService.findTransactioonAll(+id);
   }
 
+  @Get('/transactions/interest/:id')
+  @ApiOperation({
+    summary:
+      'Get interest by account id (คำนวณ Interest ทั้งหมดของ account จาก id)',
+  })
+  @UseGuards(JwtAuthGuard)
+  findInterestPerYear(@Param('id') id: string) {
+    return this.accountsService.findInterestInYearFromAccountId(+id);
+  }
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
     return this.accountsService.update(+id, updateAccountDto);

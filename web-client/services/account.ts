@@ -211,3 +211,22 @@ export async function rollbackTransactionService(account_id: number) {
         }
     }
 }
+
+export async function interestPerYearService(account_id: number) {
+    const { requestAuth } = await requestAPI()
+
+    try {
+        const data = await requestAuth(`/accounts/transactions/interest/${account_id}`, {
+            method: 'GET',
+        })
+        return {
+            isSuccess: true,
+            data,
+        }
+    } catch (error) {
+        return {
+            isSuccess: false,
+            error,
+        }
+    }
+}

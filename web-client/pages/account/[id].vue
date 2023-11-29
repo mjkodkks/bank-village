@@ -2,7 +2,7 @@
 import type { MenuItem } from 'primevue/menuitem';
 import { useField, useForm } from 'vee-validate';
 import { useToast } from 'primevue/usetoast';
-import { getAccountProfileService, rollbackTransactionService, transactionDepositService, transactionInterestService, transactionWithdrawService } from '~/services/account';
+import { getAccountProfileService, interestPerYearService, rollbackTransactionService, transactionDepositService, transactionInterestService, transactionWithdrawService } from '~/services/account';
 import { useConfirm } from "primevue/useconfirm";
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
@@ -146,11 +146,21 @@ async function getTransactions(id: number) {
     return data
 }
 
+const sumOfInterests = ref('')
+async function getInterestPerYear(id: number) {
+    const { isSuccess, data, error } = await interestPerYearService(id)
+    if (isSuccess && data) {
+        const { sumOfInterest, transactions } = data
+        sumOfInterests.value = sumOfInterest
+    }
+
+    return data
+}
+
 const adminList = ref<AdminList>([])
 async function getAdminList() {
     const { isSuccess, data, error } = await getAdminListService()
     if (isSuccess && data) {
-        // console.log(data)
         adminList.value = data
     }
 
@@ -220,6 +230,7 @@ async function rollback() {
 async function init() {
     await getAccountProfile(+id)
     await getTransactions(+id)
+    await getInterestPerYear(+id)
     getAdminList()
 }
 
@@ -231,7 +242,7 @@ init()
         <div class="max-w-lg">
             <Breadcrumb
                 :model="breadcrumbItems"
-                class="text-xl"
+                class="p-2"
             >
                 <template #item="{ label, item, props }">
                     <NuxtLink v-if="item.to" :to="item.to" class="text-primary underline decoration-1 hover:text-pink-600">
@@ -274,7 +285,6 @@ init()
         >
             <Button
                 @click="() => openDialogTransaction('deposit')"
-                size="large"
                 severity="success"
                 icon="pi pi-angle-double-up"
                 label="ฝาก"
@@ -285,7 +295,6 @@ init()
         </Button>
             <Button
                 @click="() => openDialogTransaction('withdraw')"
-                size="large"
                 icon="pi pi-angle-double-down"
                 label="ถอน"
             >
@@ -297,7 +306,6 @@ init()
                 @click="() => openDialogTransaction('interest')"
                 severity="warning"
                 icon="pi pi-star"
-                size="large"
                 label="ดอกเบี้ย"
             >
             <template #icon> 
@@ -306,14 +314,19 @@ init()
         </div>
         <div class="flex">
             <h3>บันทึกรายการธุรกรรม</h3>
-            <div class="ml-auto">
-                <Button
-                    @click="rollback"
-                    severity="danger"
-                    icon="pi pi-refresh"
-                    size="small"
-                    label="ย้อนรายการ"
-                ></Button>
+            <div class="ml-auto flex items-center gap-2">
+                <div v-if="sumOfInterests" class="border-[#655DBB] border-solid p-2 rounded-lg font-light">
+                    <i class="pi pi-star text-yellow-400"></i>
+                    ดอกเบี้ยปีนี้ {{ sumOfInterests }} (บาท)</div>
+                <div>
+                    <Button
+                        @click="rollback"
+                        severity="danger"
+                        icon="pi pi-refresh"
+                        size="small"
+                        label="ย้อนรายการ"
+                    ></Button>
+                </div>
             </div>
         </div>
         <div class="flex-1 overflow-hidden table-wrapper">

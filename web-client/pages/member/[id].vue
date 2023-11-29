@@ -247,7 +247,7 @@ init()
         <div class="">
             <Breadcrumb
                 :model="breadcrumbItems"
-                class="text-xl"
+                class="p-2"
             >
                 <template #item="{ label, item, props }">
                     <NuxtLink

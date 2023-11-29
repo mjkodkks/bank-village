@@ -49,7 +49,7 @@ const stats = ref<{
         color: mapAccoutType('LOAN').color
     },
     {
-        title: 'รวมเงินฝากและหุ้น (บาท)',
+        title: 'รวมเงินออมและหุ้น (บาท)',
         score: 0,
         color: '#6eac2c'
     },

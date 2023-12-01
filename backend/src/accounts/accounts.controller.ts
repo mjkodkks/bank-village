@@ -132,16 +132,6 @@ export class AccountsController {
     return this.accountsService.findOne(+id);
   }
 
-  @Get('/transactions/:id')
-  @ApiOperation({
-    summary:
-      'Get all transaction by account id (Transaction ทั้งหมดของ account จาก id)',
-  })
-  @UseGuards(JwtAuthGuard)
-  findTransactions(@Param('id') id: string) {
-    return this.accountsService.findTransactioonAll(+id);
-  }
-
   @Get('/transactions/interest/:id')
   @ApiOperation({
     summary:
@@ -150,6 +140,16 @@ export class AccountsController {
   @UseGuards(JwtAuthGuard)
   findInterestPerYear(@Param('id') id: string) {
     return this.accountsService.findInterestInYearFromAccountId(+id);
+  }
+
+  @Get('/transactions/:id')
+  @ApiOperation({
+    summary:
+      'Get all transaction by account id (Transaction ทั้งหมดของ account จาก id)',
+  })
+  @UseGuards(JwtAuthGuard)
+  findTransactions(@Param('id') id: string) {
+    return this.accountsService.findTransactioonAll(+id);
   }
 
   @Patch(':id')

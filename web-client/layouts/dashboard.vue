@@ -40,10 +40,10 @@ if (isSuccess && data) {
 
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-[230px_1fr] h-full">
-    <Sidebar v-model:visible="mainStore.isSidebarOpen">
+    <Sidebar v-model:visible="mainStore.isSidebarOpen" class="relative">
       <h1 class="flex-none text-center">ธนาคารหมู่บ้าน</h1>
       <SidebarMenu></SidebarMenu>
-      <div class="bottom-1.5 w-full p-2 absolute">
+      <div class="bottom-1.5 w-full p-2 absolute left-0">
         <Button
           @click="logout"
           class="w-full"

@@ -9,9 +9,11 @@ const props = defineProps<Props>()
 <template>
     <header class="h-[50px] bg-white border-solid border-x-0 border-t-0 border-b-gray-100 flex">
         <div class="flex items-center">
-            <button class="lg:!hidden ml-4 cursor-pointer px-[10px] py-[2px] border-solid rounded-md border-2">
+            <button
+                class="lg:!hidden ml-4 cursor-pointer px-[10px] py-[2px] border-solid rounded-md border-2"
+                @click="$emit('toggleSidebar')"
+            >
                 <i
-                    @click="$emit('toggleSidebar')"
                     aria-label="toggle sidebar"
                     class="pi pi-bars text-xl"
                 ></i>

@@ -3,6 +3,10 @@ import { useToast } from 'primevue/usetoast';
 import { getProfileService } from '~/services/user';
 import { useAuthStore } from '~/stores/auth';
 import { useMainStore } from '~/stores/main';
+// import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+
+// const breakpoints = useBreakpoints(breakpointsTailwind)
+// const isMobile = breakpoints.smallerOrEqual('sm')
 
 const router = useRouter()
 const toast = useToast()
@@ -35,21 +39,38 @@ if (isSuccess && data) {
 
 
 <template>
-  <div class="grid md:grid-cols-[230px_1fr] 2xl:grid-cols-[280px_1fr] h-full">
-    <aside class="shadow-lg h-[100vh] relative hidden md:flex flex-col gap-1">
-      <Sidebar v-model:visible="mainStore.isSidebarOpen">
-        <h1 class="flex-none text-center">ธนาคารหมู่บ้าน</h1>
-         <SidebarMenu></SidebarMenu>
-      </Sidebar>
+  <div class="grid grid-cols-1 lg:grid-cols-[230px_1fr] h-full">
+    <Sidebar v-model:visible="mainStore.isSidebarOpen">
       <h1 class="flex-none text-center">ธนาคารหมู่บ้าน</h1>
       <SidebarMenu></SidebarMenu>
-      <div class=" bottom-1.5 w-full p-2 flex-none mt-auto">
-            <Button @click="logout" class="w-full" outlined>ออกจากระบบ</Button>
+      <div class="bottom-1.5 w-full p-2 absolute">
+        <Button
+          @click="logout"
+          class="w-full"
+          outlined
+        >ออกจากระบบ</Button>
+      </div>
+    </Sidebar>
+    <aside class="shadow-lg h-[100vh] relative hidden lg:flex flex-col gap-1">
+      <h1 class="flex-none text-center">ธนาคารหมู่บ้าน</h1>
+      <SidebarMenu></SidebarMenu>
+      <div class="bottom-1.5 left-0 w-full p-2 flex-none mt-auto">
+        <Button
+          @click="logout"
+          class="w-full"
+          outlined
+        >ออกจากระบบ</Button>
       </div>
     </aside>
-    <main class="overflow-hidden" id="main">
-      <Navbar :username="mainStore.username" :fullname="mainStore.fullname"></Navbar>
-      <slot />
-    </main>
-  </div>
-</template>
+    <main
+      class="overflow-hidden"
+      id="main"
+    >
+    <Navbar
+      :username="mainStore.username"
+      :fullname="mainStore.fullname"
+      @toggleSidebar="mainStore.isSidebarOpen = !mainStore.isSidebarOpen"
+    ></Navbar>
+    <slot />
+  </main>
+</div></template>

@@ -263,7 +263,7 @@ init()
         >
             <div>
                 <label for="">จำนวนเงิน</label>
-                <div class="font-extralight">{{ strToCurrency(profile.balance) || '' }}</div>
+                <div class="tracking-[1.2px] font-bold">{{ strToCurrency(profile.balance) || '' }}</div>
             </div>
             <div>
                 <label for="">ประเภทบัญชี</label>
@@ -317,7 +317,7 @@ init()
             <div class="ml-auto flex items-center gap-2">
                 <div v-if="sumOfInterests" class="border-[#655DBB] border-solid p-2 rounded-lg font-light">
                     <i class="pi pi-star text-yellow-400"></i>
-                    ดอกเบี้ยปีนี้ {{ sumOfInterests }} (บาท)</div>
+                    ดอกเบี้ยปีนี้ <span class="tracking-[1.2px] font-bold">{{ sumOfInterests }}</span> (บาท)</div>
                 <div>
                     <Button
                         @click="rollback"

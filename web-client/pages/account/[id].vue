@@ -368,7 +368,7 @@ init()
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
-                            <div class="text-right">
+                            <div class="text-right tracking-[1.2px] font-bold">
                                 {{ strToCurrency(data.previousBalance) || '-' }}
                             </div>
                         </template>
@@ -379,7 +379,7 @@ init()
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
-                            <div class="text-right">
+                            <div class="text-right tracking-[1.2px] font-bold">
                                 {{ strToCurrency(data.amounts) || '-' }}
                             </div>
                         </template>
@@ -390,7 +390,7 @@ init()
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
-                            <div class="text-right">
+                            <div class="text-right tracking-[1.2px] font-bold">
                                 {{ strToCurrency(data.changeBalance) || '-' }}
                             </div>
                         </template>
@@ -401,7 +401,7 @@ init()
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
-                            <div class="text-right">
+                            <div class="text-right tracking-[1.2px] font-bold">
                                 {{ strToCurrency(data.interest) || '-' }}
                             </div>
                         </template>

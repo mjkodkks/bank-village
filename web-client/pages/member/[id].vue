@@ -243,7 +243,7 @@ init()
 </script>
 
 <template>
-    <div class="px-8 py-4">
+    <div class="px-8 py-4 h-[calc(100%_-_60px)] overflow-auto">
         <div class="">
             <Breadcrumb
                 :model="breadcrumbItems"
@@ -479,13 +479,13 @@ init()
                 <!-- <Button @click="isCreateAccountDialogVisible = true" class="" icon="pi pi-plus" size="small" label="เปิดบัญชี"></Button> -->
             </div>
             <div
-                class="mt-4 grid lg:grid-cols-[260px_260px_260px] gap-8"
+                class="mt-4 grid md:grid-cols-[260px_260px]  lg:grid-cols-[260px_260px_260px] gap-8"
                 v-if="profile"
             >
                 <div
                     v-for="(accountCard, index) in accounts"
                     @click="() => onAccountClick(accountCard.id, accountCard.type, accountCard.isOpen)"
-                    class="w-[260px] text-white h-[150px] shadow-md rounded-md flex items-center justify-center flex-col gap-2 cursor-pointer hover:scale-105 transition-all duration-300"
+                    class="w-full text-white h-[100px] md:h-[150px] shadow-md rounded-md flex items-center justify-center flex-col gap-2 cursor-pointer hover:scale-105 transition-all duration-300"
                     :style="{
                         background: accountCard.color
                     }"

@@ -3,12 +3,9 @@ import { useToast } from 'primevue/usetoast';
 import { getProfileService } from '~/services/user';
 import { useAuthStore } from '~/stores/auth';
 import { useMainStore } from '~/stores/main';
-// import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
-
-// const breakpoints = useBreakpoints(breakpointsTailwind)
-// const isMobile = breakpoints.smallerOrEqual('sm')
 
 const router = useRouter()
+const route = useRoute()
 const toast = useToast()
 
 const mainStore = useMainStore()
@@ -35,12 +32,25 @@ if (isSuccess && data) {
   })
 }
 
+const unwatch = watch(() => route.path,
+  () => {
+    mainStore.isSidebarOpen = false
+  }
+)
+
+onUnmounted(()=> {
+  unwatch();
+})
+
 </script>
 
 
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-[230px_1fr] h-full">
-    <Sidebar v-model:visible="mainStore.isSidebarOpen" class="relative">
+    <Sidebar
+      v-model:visible="mainStore.isSidebarOpen"
+      class="relative"
+    >
       <h1 class="flex-none text-center">ธนาคารหมู่บ้าน</h1>
       <SidebarMenu></SidebarMenu>
       <div class="bottom-1.5 w-full p-2 absolute left-0">
@@ -66,11 +76,11 @@ if (isSuccess && data) {
       class="overflow-hidden"
       id="main"
     >
-    <Navbar
-      :username="mainStore.username"
-      :fullname="mainStore.fullname"
-      @toggleSidebar="mainStore.isSidebarOpen = !mainStore.isSidebarOpen"
-    ></Navbar>
-    <slot />
-  </main>
+      <Navbar
+        :username="mainStore.username"
+        :fullname="mainStore.fullname"
+        @toggleSidebar="mainStore.isSidebarOpen = !mainStore.isSidebarOpen"
+      ></Navbar>
+      <slot />
+    </main>
 </div></template>

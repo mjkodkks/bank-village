@@ -17,6 +17,10 @@ useHead({
   ],
 })
 import { usePrimeVue } from "primevue/config";
+// import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
+
+// const breakpoints = useBreakpoints(breakpointsTailwind)
+// const isMobile = breakpoints.smallerOrEqual('sm')
 
 const $primevue = usePrimeVue();
 defineExpose({
@@ -40,6 +44,10 @@ defineExpose({
   --font-family: 'Kanit', sans-serif;
   --font-base: 16px;
   --primary-color: #007bff;
+
+  @media screen and (max-width: 1024px) {
+    --font-base: 12px;
+  }
 }
 
 html {
@@ -147,4 +155,5 @@ body,
   100% {
     transform: scale(1);
   }
-}</style>
+}
+</style>

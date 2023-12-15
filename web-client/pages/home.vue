@@ -79,7 +79,7 @@ init()
 </script>
 
 <template>
-    <div class="h-[calc(100vh_-_50px)] overflow-auto px-2 md:px-6 xl:px-8 py-8">
+    <div class="h-[calc(100dvh_-_50px)] overflow-auto px-2 md:px-6 xl:px-8 py-8">
         <h1 class="text-center mb-0">ยินดีต้อนรับ</h1>
         <h3 class="font-light text-center m-0">ธนาคารหมู่บ้านตามแนวพระราชดำริ (สาขา บ้านกุดโดน)</h3>
         <h1>สถิติ (stat)</h1>

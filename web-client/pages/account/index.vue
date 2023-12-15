@@ -75,7 +75,7 @@ init()
 </script>
 
 <template>
-    <div class="h-[calc(100%_-_60px)] px-2 md:px-6 xl:px-8 py-4 flex flex-col">
+    <div class="h-[calc(100dvh_-_60px)] px-2 md:px-6 xl:px-8 py-4 flex flex-col">
         <h1 class="my-0">บัญชี / รวมบัญชีทั้งหมด</h1>
         <div>
             <hr class="border-gray-200 border border-solid" />

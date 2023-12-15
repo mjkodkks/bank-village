@@ -429,11 +429,11 @@ init()
             modal
             @hide="resetForm()"
             :header="headerDialog"
-            :breakpoints="{ '960px': '500px', '641px': '100vw' }"
+            :breakpoints="{ '1440px': '40vw', '1024px': '60vw', '820px': '80vw', '400px': '90vw' }"
         >
             <form
                 @submit.prevent="onSubmit"
-                class="w-full px-4 bg-white lg:w-[500px] lg:px-8"
+                class="w-full px-4 bg-white lg:w-[500px] lg:px-8 mx-auto"
             >
                 <Transition name="bounce" appear>
                     <div v-if="isCalIntresSuccess" class="text-green-500 text-right">คำนวนดอกเบี้ยเดือนนี้สำเร็จ</div>

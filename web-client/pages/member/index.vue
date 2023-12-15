@@ -279,12 +279,11 @@ init()
             modal
             @hide="resetForm()"
             header="เพิ่มสมาชิก"
-            :style="{ width: '40vw' }"
-            :breakpoints="{ '960px': '40vw', '641px': '100vw' }"
+            :breakpoints="{ '1440px': '40vw', '1024px': '60vw', '820px': '80vw', '400px': '90vw' }"
         >
             <form
                 @submit.prevent="onSubmit"
-                class="w-full px-0 mx-auto bg-white lg:max-w-xl lg:px-8 pt-7"
+                class="w-full px-0 mx-auto bg-white lg:max-w-xl lg:px-8"
             >
                 <div class="grid gap-4 lg:grid-cols-2">
                     <div class="mt-6">

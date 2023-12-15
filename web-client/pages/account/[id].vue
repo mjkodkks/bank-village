@@ -6,7 +6,7 @@ import { getAccountProfileService, interestPerYearService, rollbackTransactionSe
 import { useConfirm } from "primevue/useconfirm";
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod';
-import { type Transaction, mapTransactionType } from '~/utils/account';
+import { type Transaction, mapTransactionType, mapMessageTransaction } from '~/utils/account';
 import { getAdminListService } from '~/services/user';
 import IconsDeposit from '~/components/icons/Deposit.vue';
 import IconsWithdraw from '~/components/icons/Withdraw.vue';
@@ -58,53 +58,48 @@ const onSubmit = handleSubmit(async (values) => {
     const { amount, staff, note } = values
     const userId = staff
     confirm.require({
-        message: `ยืนยันการ (${headerDialog.value}) จำนวน ${amount} บาท`,
+        message: `ยืนยันการ (${headerDialog.value.th}) จำนวน ${amount} บาท`,
         header: 'ยืนยัน',
         acceptLabel: 'ใช่, ยืนยัน',
         rejectLabel: 'ไม่',
         icon: 'pi pi-exclamation-triangle',
         accept: async () => {
-            transaction(+id, amount, dialogMode.value, userId, note)
+            transaction(+id, amount, dialogMode.value, userId, note, isLoan.value)
         },
     });
 });
 
 const loadingTransaction = ref(false)
-async function transaction(accountId: number, amount: number, type: string, userId?: number, note?: string) {
+async function transaction(accountId: number, amount: number, type: string, userId?: number, note?: string, isLoan?: boolean) {
     let transactionService;
     let successMessage;
     let errMessage;
     let modeMessage;
 
-    if (type === 'withdraw') {
+    if (type === 'WITHDRAWAL') {
         transactionService = transactionWithdrawService;
-        modeMessage = 'การถอน'
-        successMessage = 'การถอนสำเร็จ';
-        errMessage = 'การถอนไม่สำเร็จ';
-    } else if (type === 'deposit') {
+    } else if (type === 'DEPOSIT') {
         transactionService = transactionDepositService;
-        modeMessage = 'การฝาก'
-        successMessage = 'การฝากสำเร็จ';
-        errMessage = 'การฝากไม่สำเร็จ';
-    } else if (type === 'interest') {
+    } else if (type === 'INTEREST') {
         transactionService = transactionInterestService;
-        modeMessage = 'การฝากดอกเบี้ย'
-        successMessage = 'การฝากดอกเบี้ยสำเร็จ';
-        errMessage = 'การฝากดอกเบี้ยไม่สำเร็จ';
     }
 
     if (transactionService) {
+        modeMessage = mapTransactionType(type, { isLoan }).longTh
+        successMessage = mapMessageTransaction(type, { isLoan }).successMessage
+        errMessage = mapMessageTransaction(type, { isLoan }).errMessage
+
         loadingTransaction.value = true
         const { isSuccess, data, error } = await transactionService(accountId, amount, userId, note);
         if (isSuccess && data) {
-            toast.add({ severity: 'success', summary: type, detail: successMessage, life: 5000 });
+            toast.add({ severity: 'success', summary: modeMessage, detail: successMessage, life: 5000 });
             console.info(data);
             init()
             isDialogVisible.value = false;
             loadingTransaction.value = false;
         } else {
             const err = (error as any).statusMessage
-            toast.add({ severity: 'warn', summary: type, detail: `${errMessage}  system message: ${err}`, life: 8000 });
+            toast.add({ severity: 'warn', summary: modeMessage, detail: `${errMessage}  system message: ${err}`, life: 8000 });
             loadingTransaction.value = false;
         }
     }
@@ -114,7 +109,6 @@ const profile = ref<AccountDetails>()
 async function getAccountProfile(id: number) {
     const { isSuccess, data, error } = await getAccountProfileService(id)
     if (isSuccess && data) {
-        // console.log(data)
         profile.value = {
             ...data,
             typeTH: mapAccoutType(data.type).th,
@@ -137,8 +131,9 @@ async function getTransactions(id: number) {
                 staff: typeof m.staff !== 'string' ? `${m.staff?.username ? '(' + m.staff.username + ')' : ''}` : '',
                 createdAt: dayjs(m.createdAt).format('DD MMM BBBB'),
                 createdTime: dayjs(m.createdAt).format('HH:mm:ss'),
-                actionTH: mapTransactionType(m.action).th,
-                icon: m.action === 'DEPOSIT' ? markRaw(IconsDeposit) : m.action === 'WITHDRAWAL' ? markRaw(IconsWithdraw) : m.action === 'INTEREST' ? markRaw(IconsInterset) : null
+                actionTH: isLoan.value ? mapTransactionType(m.action, { isLoan: true }).th : mapTransactionType(m.action).th,
+                icon: m.action === 'DEPOSIT' ? markRaw(IconsDeposit) : m.action === 'WITHDRAWAL' ? markRaw(IconsWithdraw) : m.action === 'INTEREST' ? markRaw(IconsInterset) : null,
+                iconColor: isLoan.value ? mapTransactionType(m.action, { isLoan: true }).color : mapTransactionType(m.action).color,
             }
         })
     }
@@ -168,35 +163,31 @@ async function getAdminList() {
 }
 
 function findAdminById(id: number) {
-   return adminList.value.find(f => f.id == id)
+    return adminList.value.find(f => f.id == id)
 }
 
 const { calInterestByType } = useInterest()
 const isCalIntresSuccess = ref(false)
 
 const isDialogVisible = ref(false)
-const dialogMode = ref<'deposit' | 'withdraw' | 'interest'>('deposit')
+const dialogMode = ref<'DEPOSIT' | 'WITHDRAWAL' | 'INTEREST'>('DEPOSIT')
 const headerDialog = computed(() => {
-    const template = {
-        deposit: 'ฝากเงิน',
-        withdraw: 'ถอนเงิน',
-        interest: 'ฝากดอกเบี้ย',
-    }
-    return template[dialogMode.value]
+    return isLoan.value ? mapTransactionType(dialogMode.value, { isLoan: true }) : mapTransactionType(dialogMode.value)
 })
 function openDialogTransaction(type: string) {
     isDialogVisible.value = true
     amount.value = 0
     staff.value = mainStore.id
     note.value = undefined
-    if (type === 'deposit') {
-        dialogMode.value = 'deposit'
-    } else if (type === 'withdraw') {
-        dialogMode.value = 'withdraw'
-    } else  if (type === 'interest') {
-        dialogMode.value = 'interest'
+    console.log(type)
+    if (type === 'DEPOSIT') {
+        dialogMode.value = 'DEPOSIT'
+    } else if (type === 'WITHDRAWAL') {
+        dialogMode.value = 'WITHDRAWAL'
+    } else if (type === 'INTEREST') {
+        dialogMode.value = 'INTEREST'
         isCalIntresSuccess.value = true
-        if(profile.value?.balance) {
+        if (profile.value?.balance) {
             amount.value = calInterestByType(+profile.value.balance, profile.value.type)
             setTimeout(() => {
                 isCalIntresSuccess.value = false
@@ -245,7 +236,11 @@ init()
                 class="p-2"
             >
                 <template #item="{ label, item, props }">
-                    <NuxtLink v-if="item.to" :to="item.to" class="text-primary underline decoration-1 hover:text-pink-600">
+                    <NuxtLink
+                        v-if="item.to"
+                        :to="item.to"
+                        class="text-primary underline decoration-1 hover:text-pink-600"
+                    >
                         <span v-bind="props.icon" />
                         <span v-bind="props.label">{{ label }}</span>
                     </NuxtLink>
@@ -262,21 +257,33 @@ init()
             v-if="profile"
         >
             <div>
-                <label for="">จำนวนเงิน</label>
-                <div class="tracking-[1.2px] font-bold">{{ strToCurrency(profile.balance) || '' }}</div>
+                <label>จำนวนเงิน</label>
+                <div
+                    class="tracking-[1.2px] font-bold"
+                    id="detail_balance"
+                >{{ strToCurrency(profile.balance) || '' }}</div>
             </div>
             <div>
-                <label for="">ประเภทบัญชี</label>
-                <div class="font-extralight">{{ profile?.typeTH || '' }}</div>
+                <label>ประเภทบัญชี</label>
+                <div
+                    class="font-extralight"
+                    id="detail_type"
+                >{{ profile?.typeTH || '' }}</div>
             </div>
             <div>
-                <label for="">เจ้าของบัญชี</label>
-                <div class="font-extralight">{{ profile.owner?.username ? '(' + profile.owner?.username + ')' : '' }} {{
+                <label>เจ้าของบัญชี</label>
+                <div
+                    class="font-extralight"
+                    id="detail_owner"
+                >{{ profile.owner?.username ? '(' + profile.owner?.username + ')' : '' }} {{
                     profile.owner?.firstname || '' }} {{ profile.owner?.surname || '' }}</div>
             </div>
             <div>
-                <label for="">สร้างเมื่อ</label>
-                <div class="font-extralight">{{ profile.createdAt || '' }}</div>
+                <label>สร้างเมื่อ</label>
+                <div
+                    class="font-extralight"
+                    id="detail_created"
+                >{{ profile.createdAt || '' }}</div>
             </div>
         </div>
         <div
@@ -284,40 +291,44 @@ init()
             v-if="profile"
         >
             <Button
-                @click="() => openDialogTransaction('deposit')"
+                @click="() => openDialogTransaction('DEPOSIT')"
                 severity="success"
                 icon="pi pi-angle-double-up"
-                label="ฝาก"
+                :label="isLoan ? 'ขอกู้' : 'ฝาก'"
             >
-            <template #icon> 
-                <IconsDeposit class="mr-2"></IconsDeposit>
-            </template>
-        </Button>
+                <template #icon>
+                    <IconsDeposit class="mr-2"></IconsDeposit>
+                </template>
+            </Button>
             <Button
-                @click="() => openDialogTransaction('withdraw')"
+                @click="() => openDialogTransaction('WITHDRAWAL')"
                 icon="pi pi-angle-double-down"
-                label="ถอน"
+                :label="isLoan ? 'ชำระหนี้' : 'ถอน'"
             >
-            <template #icon> 
-                <IconsWithdraw class="mr-2"></IconsWithdraw>
-            </template>
-        </Button>
+                <template #icon>
+                    <IconsWithdraw class="mr-2"></IconsWithdraw>
+                </template>
+            </Button>
             <Button
-                @click="() => openDialogTransaction('interest')"
+                @click="() => openDialogTransaction('INTEREST')"
                 severity="warning"
                 icon="pi pi-star"
                 label="ดอกเบี้ย"
             >
-            <template #icon> 
-                <IconsInterest class="mr-2"></IconsInterest>
-            </template></Button>
+                <template #icon>
+                    <IconsInterest class="mr-2"></IconsInterest>
+                </template></Button>
         </div>
         <div class="flex flex-col md:flex-row">
             <h3>บันทึกรายการธุรกรรม</h3>
             <div class="ml-auto flex items-center gap-2 mb-2 md:mb-0">
-                <div v-if="sumOfInterests" class="border-[#655DBB] border-solid p-2 rounded-lg font-light">
+                <div
+                    v-if="sumOfInterests"
+                    class="border-[#655DBB] border-solid p-2 rounded-lg font-light"
+                >
                     <i class="pi pi-star text-yellow-400"></i>
-                    ดอกเบี้ยปีนี้ <span class="tracking-[1.2px] font-bold">{{ sumOfInterests }}</span> (บาท)</div>
+                    ดอกเบี้ยปีนี้ <span class="tracking-[1.2px] font-bold">{{ sumOfInterests }}</span> (บาท)
+                </div>
                 <div>
                     <Button
                         @click="rollback"
@@ -375,7 +386,7 @@ init()
                     </Column>
                     <Column
                         field="amounts"
-                        :header="isLoan ? 'จำนวนเงินกู้ (บาท)' : 'จำนวน (บาท)'"
+                        :header="isLoan ? 'เงินกู้ / ชำระ (บาท)' : 'จำนวน (บาท)'"
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
@@ -412,8 +423,11 @@ init()
                         header-class="[&_.p-column-header-content]:justify-center"
                     >
                         <template #body="{ data }">
-                            <div class="flex items-center justify-center gap-2 font-bold text-lg" :style="{ color: mapTransactionType(data.action).color }">
-                             <component :is="data.icon"></component> {{ data.actionTH }}
+                            <div
+                                class="flex items-center justify-center gap-2 font-bold text-lg"
+                                :style="{ color: data.iconColor }"
+                            >
+                                <component :is="data.icon"></component> {{ data.actionTH }}
                             </div>
                         </template>
                     </Column>
@@ -428,15 +442,21 @@ init()
             v-model:visible="isDialogVisible"
             modal
             @hide="resetForm()"
-            :header="headerDialog"
+            :header="headerDialog.longTh"
             :breakpoints="{ '1440px': '40vw', '1024px': '60vw', '820px': '80vw', '400px': '90vw' }"
         >
             <form
                 @submit.prevent="onSubmit"
                 class="w-full px-4 bg-white lg:w-[500px] lg:px-8 mx-auto"
             >
-                <Transition name="bounce" appear>
-                    <div v-if="isCalIntresSuccess" class="text-green-500 text-right">คำนวนดอกเบี้ยเดือนนี้สำเร็จ</div>
+                <Transition
+                    name="bounce"
+                    appear
+                >
+                    <div
+                        v-if="isCalIntresSuccess"
+                        class="text-green-500 text-right"
+                    >คำนวนดอกเบี้ยเดือนนี้สำเร็จ</div>
                 </Transition>
                 <div>
                     <label
@@ -448,7 +468,7 @@ init()
                         v-model="amount"
                         :maxFractionDigits="2"
                         :class="{ 'p-invalid': amountErrorMessage }"
-                        :input-class="`text-right text-2xl ${isCalIntresSuccess ? 'border-2 border-green-400': ''}`"
+                        :input-class="`text-right text-2xl ${isCalIntresSuccess ? 'border-2 border-green-400' : ''}`"
                         placeholder="ระบุจำนวนเงิน เช่น 200"
                         class="w-full mt-4"
                     />
@@ -461,7 +481,7 @@ init()
                     <label
                         for="staff"
                         class="text-lg"
-                >ระบุเจ้าหน้าที่ ที่ทำรายการ*</label>
+                    >ระบุเจ้าหน้าที่ ที่ทำรายการ*</label>
                     <Dropdown
                         inputId="staff"
                         v-model="staff"
@@ -474,7 +494,8 @@ init()
                         inputClass="text-right l"
                     >
                         <template #value="{ value, placeholder }">
-                            {{ value !== undefined ? `(${findAdminById(value)?.username}) ${findAdminById(value)?.firstname || ''} ${findAdminById(value)?.surname || ''}` : placeholder
+                            {{ value !== undefined ? `(${findAdminById(value)?.username}) ${findAdminById(value)?.firstname
+                                || ''} ${findAdminById(value)?.surname || ''}` : placeholder
                             }}
                         </template>
                         <template #option="slotProps">
@@ -508,9 +529,10 @@ init()
                         label="ยืนยัน"
                         icon="pi pi-check"
                         severity="success"
-                    :loading="loadingTransaction"
-                ></Button>
-            </div>
-        </form>
-    </Dialog>
-</div></template>
+                        :loading="loadingTransaction"
+                    ></Button>
+                </div>
+            </form>
+        </Dialog>
+    </div>
+</template>

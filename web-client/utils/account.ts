@@ -68,29 +68,95 @@ export function mapAccoutType(type: string) {
     return template[type]
 }
 
-export function mapTransactionType(type: string) {
-    const template = {
+export function mapTransactionType(type: string, option?: { isLoan?: boolean }) {
+    type MapTransactionType = {
+        [x:string]: {
+            en: string
+            th: string
+            longTh: string
+            color: string
+        }
+    }
+
+    const loanTemplate = {
         'DEPOSIT': {
             en: 'DEPOSIT',
-            th: 'ฝาก',
+            th: 'ขอกู้',
+            longTh: 'ขอกู้',
             color: '#7A9D54'
         },
         'WITHDRAWAL': {
             en: 'WITHDRAWAL',
-            th: 'ถอน',
+            th: 'ชำระหนี้',
+            longTh: 'ชำระหนี้',
             color: '#C23373'
         },
         'INTEREST': {
             en: 'INTEREST',
             th: 'ดอกเบี้ย',
+            longTh: 'คิดดอกเบี้ยเงินกู้',
             color: '#655DBB'
         }
-    } as {
+    } as MapTransactionType
+
+    const template = {
+        'DEPOSIT': {
+            en: 'DEPOSIT',
+            th: 'ฝาก',
+            longTh: 'การฝากเงิน',
+            color: '#7A9D54'
+        },
+        'WITHDRAWAL': {
+            en: 'WITHDRAWAL',
+            th: 'ถอน',
+            longTh: 'การถอนเงิน',
+            color: '#C23373'
+        },
+        'INTEREST': {
+            en: 'INTEREST',
+            th: 'ดอกเบี้ย',
+            longTh: 'คิดดอกเบี้ย',
+            color: '#655DBB'
+        }
+    } as MapTransactionType
+    return option?.isLoan ? loanTemplate[type] : template[type]
+}
+export function mapMessageTransaction(type: string, option?: { isLoan?: boolean }) {
+    type MapTransactionType = {
         [x:string]: {
-            en: string
-            th: string
-            color: string
+            successMessage: string
+            errMessage: string
         }
     }
-    return template[type]
+
+    const loanTemplate = {
+        'DEPOSIT': {
+            successMessage: 'ขอกู้สำเร็จ',
+            errMessage: 'ขอกู้ไม่สำเร็จ',
+        },
+        'WITHDRAWAL': {
+            successMessage: 'ชำระหนี้สำเร็จ',
+            errMessage: 'ชำระหนี้ไม่สำเร็จ',
+        },
+        'INTEREST': {
+            successMessage: 'คิดดอกเบี้ยสำเร็จ',
+            errMessage: 'คิดดอกเบี้ยไม่สำเร็จ',
+        }
+    } as MapTransactionType
+
+    const template = {
+        'DEPOSIT': {
+            successMessage: 'การฝากสำเร็จ',
+            errMessage: 'การฝากไม่สำเร็จ',
+        },
+        'WITHDRAWAL': {
+            successMessage: 'การถอนสำเร็จ',
+            errMessage: 'การถอนไม่สำเร็จ',
+        },
+        'INTEREST': {
+            successMessage: 'การฝากดอกเบี้ยสำเร็จ',
+            errMessage: 'การฝากดอกเบี้ยไม่สำเร็จ',
+        }
+    } as MapTransactionType
+    return option?.isLoan ? loanTemplate[type] : template[type]
 }

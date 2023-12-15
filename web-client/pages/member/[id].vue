@@ -278,7 +278,7 @@ init()
 
         <form
             id="editForm"
-            class="grid mt-4 sm:grid-cols-3 gap-y-10"
+            class="grid mt-4 sm:grid-cols-3 gap-y-2 sm:gap-y-4"
             @submit.prevent="onSubmit"
             v-if="profile"
         >
@@ -479,7 +479,7 @@ init()
                 <!-- <Button @click="isCreateAccountDialogVisible = true" class="" icon="pi pi-plus" size="small" label="เปิดบัญชี"></Button> -->
             </div>
             <div
-                class="mt-4 grid md:grid-cols-[260px_260px]  lg:grid-cols-[260px_260px_260px] gap-8"
+                class="mt-4 grid md:grid-cols-[210px_210px_210px] lg:grid-cols-[210px_210px_210px] xl:grid-cols-[260px_260px_260px] gap-8"
                 v-if="profile"
             >
                 <div

@@ -238,7 +238,7 @@ init()
 </script>
 
 <template>
-    <div class="px-8 py-4 h-[calc(100%_-_60px)] md:flex md:flex-col">
+    <div class="px-8 py-4 h-[calc(100dvh_-_60px)] md:flex md:flex-col overflow-auto">
         <div class="max-w-lg">
             <Breadcrumb
                 :model="breadcrumbItems"
@@ -258,7 +258,7 @@ init()
         </div>
         <h3 class="mt-4">ข้อมูลทั่วไป</h3>
         <div
-            class="grid max-w-6xl sm:grid-cols-3 gap-y-5 2xl:gap-y-4"
+            class="grid max-w-6xl sm:grid-cols-3 gap-y-2 xl:gap-y-4"
             v-if="profile"
         >
             <div>
@@ -312,9 +312,9 @@ init()
                 <IconsInterest class="mr-2"></IconsInterest>
             </template></Button>
         </div>
-        <div class="flex">
+        <div class="flex flex-col md:flex-row">
             <h3>บันทึกรายการธุรกรรม</h3>
-            <div class="ml-auto flex items-center gap-2">
+            <div class="ml-auto flex items-center gap-2 mb-2 md:mb-0">
                 <div v-if="sumOfInterests" class="border-[#655DBB] border-solid p-2 rounded-lg font-light">
                     <i class="pi pi-star text-yellow-400"></i>
                     ดอกเบี้ยปีนี้ <span class="tracking-[1.2px] font-bold">{{ sumOfInterests }}</span> (บาท)</div>

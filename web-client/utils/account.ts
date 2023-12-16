@@ -87,8 +87,8 @@ export function mapTransactionType(type: string, option?: { isLoan?: boolean }) 
         },
         'WITHDRAWAL': {
             en: 'WITHDRAWAL',
-            th: 'ชำระหนี้',
-            longTh: 'ชำระหนี้',
+            th: 'คืนต้น',
+            longTh: 'คืนต้น',
             color: '#C23373'
         },
         'INTEREST': {
@@ -135,8 +135,8 @@ export function mapMessageTransaction(type: string, option?: { isLoan?: boolean 
             errMessage: 'ขอกู้ไม่สำเร็จ',
         },
         'WITHDRAWAL': {
-            successMessage: 'ชำระหนี้สำเร็จ',
-            errMessage: 'ชำระหนี้ไม่สำเร็จ',
+            successMessage: 'คืนต้นสำเร็จ',
+            errMessage: 'คืนต้นไม่สำเร็จ',
         },
         'INTEREST': {
             successMessage: 'คิดดอกเบี้ยสำเร็จ',

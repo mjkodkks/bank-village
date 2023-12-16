@@ -1,6 +1,6 @@
 import Cookies from 'js-cookie'
 import { ofetch } from 'ofetch'
-export async function requestAPI() {
+export function requestAPI() {
     const runtimeConfig = useRuntimeConfig()
     const baseURL = runtimeConfig.public.API_URL
 

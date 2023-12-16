@@ -19,12 +19,14 @@ import InputNumber from 'primevue/inputnumber';
 import InputMask from 'primevue/inputmask';
 import Skeleton from 'primevue/skeleton';
 import Textarea from 'primevue/textarea';
+import Tooltip from 'primevue/tooltip';
 
 export default defineNuxtPlugin((nuxtApp) => {
     nuxtApp.vueApp.use(PrimeVue, { ripple: true } as PrimeVueConfiguration);
     nuxtApp.vueApp.use(ToastService)
     nuxtApp.vueApp.use(ConfirmationService)
     nuxtApp.vueApp.directive('ripple', Ripple);
+    nuxtApp.vueApp.directive('tooltip', Tooltip);
     nuxtApp.vueApp.component("Button", Button);
     nuxtApp.vueApp.component("InputText", InputText);
     nuxtApp.vueApp.component("Password", Password);

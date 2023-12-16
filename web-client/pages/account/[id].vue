@@ -174,15 +174,6 @@ const dialogMode = ref<'DEPOSIT' | 'WITHDRAWAL' | 'INTEREST'>('DEPOSIT')
 const headerDialog = computed(() => {
     return isLoan.value ? mapTransactionType(dialogMode.value, { isLoan: true }) : mapTransactionType(dialogMode.value)
 })
-const templateWordType = ref([
-    'ฝาก',
-    'ถอน',
-    'ดอกเบี้ย',
-    'ยกยอด',
-    'ขอกู้',
-    'คืนต้น'
-])
-const templateWordTypeSelected = ref('ฝาก')
 const templateWordMonth = ref(monthLists.thShort)
 const templateWordMonthSelected = ref(mapNoToMonth(dayjs().month() + 1, 'thShort'))
 const yearList = ref(getYear({ isBudda: true, limit: 20 }))
@@ -195,14 +186,11 @@ function openDialogTransaction(type: string) {
 
     if (type === 'DEPOSIT') {
         dialogMode.value = 'DEPOSIT'
-        templateWordTypeSelected.value = isLoan.value ? 'ขอกู้' : 'ฝาก'
     } else if (type === 'WITHDRAWAL') {
         dialogMode.value = 'WITHDRAWAL'
-        templateWordTypeSelected.value = isLoan.value ? 'คืนต้น' : 'ถอน'
     } else if (type === 'INTEREST') {
         dialogMode.value = 'INTEREST'
         isCalIntresSuccess.value = true
-        templateWordTypeSelected.value = 'ดอกเบี้ย'
         if (profile.value?.balance) {
             amount.value = calInterestByType(+profile.value.balance, profile.value.type)
             setTimeout(() => {
@@ -212,8 +200,8 @@ function openDialogTransaction(type: string) {
     }
 }
 
-function addTempalte(type: string, month: string, year: number) {
-    note.value += `${type} ${month} ${year}`
+function addTempalte(month: string, year: number) {
+    note.value += `${month} ${year}`
 }
 
 async function rollback() {
@@ -323,7 +311,7 @@ init()
             <Button
                 @click="() => openDialogTransaction('WITHDRAWAL')"
                 icon="pi pi-angle-double-down"
-                :label="isLoan ? 'คืนต้น' : 'ถอน'"
+                :label="isLoan ? 'ชำระ' : 'ถอน'"
             >
                 <template #icon>
                     <IconsWithdraw class="mr-2"></IconsWithdraw>
@@ -558,19 +546,6 @@ init()
                     >ข้อความอัตโนมัติ</label>
                     <div class="chip flex mt-1 border border-solid p-1 border-slate-200 w-fit">
                         <select
-                            name="select_type"
-                            aria-d
-                            class="inline-block p-inputtext p-component p-0 h-fit"
-                            style="appearance: auto;"
-                            v-model="templateWordTypeSelected"
-                        >
-                            <option
-                                v-for="wordType in templateWordType"
-                                :key="wordType"
-                                :value="wordType"
-                            >{{ wordType }}</option>
-                        </select>
-                        <select
                             name="select_month"
                             class="inline-block p-inputtext p-component p-0 h-fit"
                             style="appearance: auto;"
@@ -601,7 +576,7 @@ init()
                             severity="success"
                             size="small"
                             class="py-0 px-2 ml-1"
-                            @click="addTempalte(templateWordTypeSelected, templateWordMonthSelected, templateWordYearSelected)"
+                            @click="addTempalte(templateWordMonthSelected, templateWordYearSelected)"
                         ></Button>
                     </div>
                 </div>

@@ -19,7 +19,7 @@
       }
       body {
         margin: 0;
-        padding: 0;
+        padding: 1rem;
         width: 21cm;
       }
       h1,
@@ -50,6 +50,10 @@
       .header-detail {
         display: flex;
         margin: 1rem 0;
+        font-size: .875rem;
+      }
+      .bold {
+        font-weight: bold;
       }
       .header-detail table:nth-child(1) {
         width: 50%;
@@ -62,6 +66,8 @@
         border-spacing: 0;
         width: 100%;
         margin-top: 1rem;
+        font-size: .75rem;
+        font-weight: normal;
       }
 
       .table-transaction th,
@@ -86,6 +92,18 @@
       .table-transaction td {
         border-right: 1px solid var(--table-border-color);
         border-bottom: 1px solid var(--table-border-color);
+      }
+
+      .table-transaction tbody td:nth-child(3) {
+        text-align: right;
+      }
+
+      .table-transaction tbody td:nth-child(4) {
+        text-align: right;
+      }
+
+      .table-transaction tbody td:nth-child(5) {
+        text-align: right;
       }
 
       .table-transaction td:first-child {
@@ -122,21 +140,21 @@
     <header class="header-detail">
       <table>
         <tr>
-          <td>ชื่อบัญชี</td>
+          <td class="bold">ชื่อบัญชี</td>
           <td>นายธนนภัช สุโพธิ์</td>
         </tr>
         <tr>
-          <td>เลขที่บัญชี</td>
+          <td class="bold">เลขที่บัญชี</td>
           <td>1</td>
         </tr>
       </table>
       <table>
         <tr>
-          <td>วันที่</td>
+          <td class="bold">วันที่</td>
           <td>นายธนนภัช สุโพธิ์</td>
         </tr>
         <tr>
-          <td>สาขา</td>
+          <td class="bold">สาขา</td>
           <td>บ้านกุดโดน</td>
         </tr>
       </table>

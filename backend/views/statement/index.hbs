@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Statement ธนาคารหมู่บ้าน</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/modern-normalize@2.0.0/modern-normalize.min.css"
+    />
+    <style type="text/css">
+      :root {
+        --background-color: #eaeaed;
+        --table-border-color: #f4f4f4;
+      }
+      html {
+        font-size: 16px;
+        font-weight: lighter;
+      }
+      body {
+        margin: 0;
+        padding: 1rem;
+        width: 21cm;
+      }
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin: 0;
+        font-weight: lighter;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+      .header-title {
+        display: block;
+        margin: 0 auto;
+        background-color: var(--background-color);
+        padding: 1rem 0;
+      }
+      .header-title h1 {
+        text-align: center;
+      }
+      .header-logo-title {
+        font-size: 0.875rem;
+        margin: 0.5rem 0.5rem;
+      }
+      .header-detail {
+        display: flex;
+        margin: 1rem 0;
+        font-size: .875rem;
+      }
+      .bold {
+        font-weight: bold;
+      }
+      .header-detail table:nth-child(1) {
+        width: 50%;
+      }
+      .header-detail table:nth-child(2) {
+        width: 50%;
+      }
+      table.table-transaction {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        margin-top: 1rem;
+        font-size: .75rem;
+        font-weight: normal;
+      }
+
+      .table-transaction th,
+      .table-transaction td {
+        padding: 6px 15px;
+      }
+
+      .table-transaction th {
+        background: var(--background-color);
+        color: #000000;
+        text-align: left;
+      }
+
+      .table-transaction tr:first-child th:first-child {
+        border-top-left-radius: 6px;
+      }
+
+      .table-transaction tr:first-child th:last-child {
+        border-top-right-radius: 6px;
+      }
+
+      .table-transaction td {
+        border-right: 1px solid var(--table-border-color);
+        border-bottom: 1px solid var(--table-border-color);
+      }
+
+      .table-transaction tbody td:nth-child(3) {
+        text-align: right;
+      }
+
+      .table-transaction tbody td:nth-child(4) {
+        text-align: right;
+      }
+
+      .table-transaction tbody td:nth-child(5) {
+        text-align: right;
+      }
+
+      .table-transaction td:first-child {
+        border-left: 1px solid var(--table-border-color);
+      }
+
+      .table-transaction tr:nth-child(even) td {
+        background: var(--background-color);
+      }
+
+      .table-transaction tr:last-child td:first-child {
+        border-bottom-left-radius: 6px;
+      }
+
+      .table-transaction tr:last-child td:last-child {
+        border-bottom-right-radius: 6px;
+      }
+
+      @media print {
+        body {
+          width: 21cm;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <h1 class="header-logo-title">ธนาคารหมู่บ้าน สาขา บ้านกุดโดน</h1>
+    </nav>
+    <header class="header-title">
+      <h1>ข้อมูลรายการเดินบัญชี</h1>
+      <h1>Account e-Statement</h1>
+    </header>
+    <header class="header-detail">
+      <table>
+        <tr>
+          <td class="bold">ชื่อบัญชี</td>
+          <td>{{ name }}</td>
+        </tr>
+        <tr>
+          <td class="bold">เลขที่บัญชี</td>
+          <td>1</td>
+        </tr>
+      </table>
+      <table>
+        <tr>
+          <td class="bold">วันที่</td>
+          <td>นายธนนภัช สุโพธิ์</td>
+        </tr>
+        <tr>
+          <td class="bold">สาขา</td>
+          <td>บ้านกุดโดน</td>
+        </tr>
+      </table>
+    </header>
+    <main>
+      <table class="table-transaction">
+        <thead>
+          <tr>
+            <th>วันที่ทำรายการ</th>
+            <th>ประเภทธุรกรรม</th>
+            <th>ยอดยกมา</th>
+            <th>จำนวนเงิน</th>
+            <th>ยอดคงเหลือ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>01/01/23</td>
+            <td>ฝาก</td>
+            <td>1000</td>
+            <td>200</td>
+            <td>1200</td>
+          </tr>
+          <tr>
+            <td>01/01/23</td>
+            <td>ฝาก</td>
+            <td>1000</td>
+            <td>200</td>
+            <td>1200</td>
+          </tr>
+          <tr>
+            <td>01/01/23</td>
+            <td>ฝาก</td>
+            <td>1000</td>
+            <td>200</td>
+            <td>1200</td>
+          </tr>
+          <tr>
+            <td>01/01/23</td>
+            <td>ฝาก</td>
+            <td>1000</td>
+            <td>200</td>
+            <td>1200</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+  </body>
+</html>

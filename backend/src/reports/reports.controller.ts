@@ -16,7 +16,6 @@ export class ReportsController {
   @ApiOperation({
     summary: 'Create STATEMENT (สร้างรายการเดินบัญชี),)',
   })
-  @UseGuards(JwtAuthGuard)
   @Get('/statement')
   async createStatement(@Res({ passthrough: true }) res: Response) {
     // Call the createStatement() method of the reports service.

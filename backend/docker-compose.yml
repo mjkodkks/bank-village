@@ -1,3 +1,4 @@
+version: '3'
 services:
   api:
     container_name: bank-village-container
@@ -16,3 +17,21 @@ services:
       - .env
     ports:
       - 4000:4000
+    depends_on:
+      - db
+
+  db:
+    container_name: postgres
+    image: postgres:14.1-alpine
+    restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - '5432:5432'
+      
+volumes:
+  postgres-data:

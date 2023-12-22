@@ -28,14 +28,13 @@ export class ReportsService {
 
     const template = Handlebars.compile(filePath);
     const html = template({ name: 'Thanonphat Supho' });
-    console.log(html);
 
     return await this.createPdfbyHtml(html);
   }
 
   async createPdfbyHtml(html: string) {
     const browser = await puppeteer.launch({
-      headless: true,
+      headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 

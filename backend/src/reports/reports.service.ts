@@ -16,7 +16,6 @@ export class ReportsService {
 
     const template = Handlebars.compile(filePath);
     const html = template({ name: 'Thanonphat Supho' });
-    console.log(html);
 
     return await this.createPdfbyHtml(html);
   }

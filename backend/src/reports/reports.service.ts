@@ -36,6 +36,7 @@ export class ReportsService {
   async createPdfbyHtml(html: string) {
     const browser = await puppeteer.launch({
       headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 
     // create a new page
@@ -50,8 +51,13 @@ export class ReportsService {
     await page.emulateMediaType('screen');
 
     // or a .pdf file
-    return await page.pdf({
+    const pdfBuffer = await page.pdf({
       format: 'A4',
+      printBackground: true,
+      preferCSSPageSize: true,
     });
+    await browser.close();
+
+    return pdfBuffer;
   }
 }

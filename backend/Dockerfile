@@ -1,23 +1,22 @@
-FROM node:18-alpine AS base
+FROM node:18-slim AS base
 
-FROM base AS dependencies
+# install dependencies
+RUN apt-get update \
+    && apt-get install -y wget gnupg \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+    && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
+    && apt-get update \
+    && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
+      --no-install-recommends \
+    && apt-get update && \
+    apt-get install -y openssl \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY package.json yarn.lock ./
-RUN yarn install
 
-FROM base AS build
-
-WORKDIR /app
 COPY . .
-COPY --from=dependencies /app/node_modules ./node_modules
+RUN yarn install
 RUN yarn gen:prisma
 RUN yarn build
-
-FROM base AS deploy
-
-WORKDIR /app
-COPY --from=build /app/dist/ ./dist/
-COPY --from=build /app/node_modules ./node_modules
 
 CMD [ "node", "dist/main.js" ]

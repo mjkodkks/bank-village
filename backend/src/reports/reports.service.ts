@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { CreateStatementDto } from './dto/create-report.dto';
-import { UpdateReportDto } from './dto/update-report.dto';
 import Handlebars from 'handlebars';
 import { join, resolve } from 'path';
 import { readFileSync } from 'fs';
@@ -8,7 +6,7 @@ import puppeteer from 'puppeteer';
 
 @Injectable()
 export class ReportsService {
-  async createStatement() {
+  async createStatement(option?: { isHTML?: boolean }) {
     const filePath = readFileSync(
       join(process.cwd(), '/views/statement/index.hbs'),
       'utf8',
@@ -16,6 +14,10 @@ export class ReportsService {
 
     const template = Handlebars.compile(filePath);
     const html = template({ name: 'Thanonphat Supho' });
+
+    if (option && option.isHTML) {
+      return html;
+    }
 
     return await this.createPdfbyHtml(html);
   }
@@ -28,13 +30,18 @@ export class ReportsService {
     const template = Handlebars.compile(filePath);
     const html = template({ name: 'Thanonphat Supho' });
 
-    return await this.createPdfbyHtml(html);
+    return html;
   }
 
   async createPdfbyHtml(html: string) {
     const browser = await puppeteer.launch({
       headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      args: [
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--disable-setuid-sandbox',
+        '--no-sandbox',
+      ],
     });
 
     // create a new page
@@ -49,13 +56,8 @@ export class ReportsService {
     await page.emulateMediaType('screen');
 
     // or a .pdf file
-    const pdfBuffer = await page.pdf({
+    return await page.pdf({
       format: 'A4',
-      printBackground: true,
-      preferCSSPageSize: true,
     });
-    await browser.close();
-
-    return pdfBuffer;
   }
 }

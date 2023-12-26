@@ -1,6 +1,7 @@
 version: '3'
 services:
   api:
+    platform: linux/amd64
     container_name: bank-village-container
     image: bank-village-image
     restart: unless-stopped
@@ -8,11 +9,6 @@ services:
       context: .
       dockerfile: Dockerfile
     # Mount host directory to docker container to support watch mode
-    volumes:
-      - .:/app
-      # This ensures that the NestJS container manages the node_modules folder
-      # rather than synchronizes it with the host machine
-      - /app/node_modules
     env_file:
       - .env
     ports:

@@ -1,6 +1,7 @@
 import {
   Controller,
   Get,
+  Query,
   Res,
   StreamableFile,
   UseGuards,
@@ -17,20 +18,32 @@ export class ReportsController {
     summary: 'Create STATEMENT (สร้างรายการเดินบัญชี),)',
   })
   @Get('/statement')
-  async createStatement(@Res({ passthrough: true }) res: Response) {
+  async createStatement(
+    @Res({ passthrough: true }) res: Response,
+    @Query('isHTML') isHTML: boolean,
+  ) {
     // Call the createStatement() method of the reports service.
-    const statement = await this.reportsService.createStatement();
+    const statement = await this.reportsService.createStatement({ isHTML });
 
     const timestamp = Date.now();
     const filename = `statement_${timestamp}.pdf`;
 
     // Set the response headers to download the statement as a PDF file.
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-    });
+    const setHeader = {
+      'Content-Type': isHTML ? 'text/html' : 'application/pdf',
+    };
 
-    return new StreamableFile(statement);
+    res.set(setHeader);
+
+    if (isHTML) {
+      return statement;
+    } else {
+      setHeader['Content-Disposition'] = `attachment; filename="${filename}"`;
+    }
+
+    res.set(setHeader);
+
+    return new StreamableFile(statement as Buffer);
   }
 
   @ApiOperation({
@@ -51,6 +64,6 @@ export class ReportsController {
       'Content-Disposition': `attachment; filename="${filename}"`,
     });
 
-    return new StreamableFile(statement);
+    return 'test recipet';
   }
 }

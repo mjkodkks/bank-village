@@ -317,8 +317,21 @@ export class AccountsService {
 
   async findInterestInYearFromAccountId(id: number) {
     const now = dayjs();
-    const startYear = now.startOf('year').toISOString();
-    const endYear = now.endOf('year').toISOString();
+    const startDate = now
+      .utcOffset(0)
+      .subtract(1, 'year')
+      .startOf('year')
+      .add(7, 'months')
+      .startOf('day')
+      .toISOString();
+    const endDate = now
+      .utcOffset(0)
+      .endOf('year')
+      .subtract(5, 'months')
+      .endOf('months')
+      .toISOString();
+
+    // console.log(startDate, endDate);
     const transactions = await this.prisma.transaction.findMany({
       select: {
         id: true,
@@ -329,17 +342,21 @@ export class AccountsService {
         accountId: id,
         action: 'INTEREST',
         createdAt: {
-          gte: startYear,
-          lte: endYear,
+          gte: startDate,
+          lte: endDate,
         },
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
+    const initValue = new Prisma.Decimal(0);
     const sum = transactions
       .map((m) => m.interest)
-      .reduce((acc, current) => new Prisma.Decimal(acc).add(current));
+      .reduce(
+        (acc, current) => new Prisma.Decimal(acc).add(current),
+        initValue,
+      );
     const template = {
       sumOfInterest: sum,
       transactions,

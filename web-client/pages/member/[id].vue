@@ -295,7 +295,7 @@ init()
                     <InputMask
                         id="citizenId"
                         v-model="citizenId"
-                        mask="9-9999-99999-9-99"
+                        mask="9-9999-99999-99-9"
                         :class="{ 'p-invalid': citizenIdErrorMessage }"
                         placeholder="กรุณาใส่เลขบัตรประจำตัวประชาชน 13 หลัก"
                         class="w-4/5 px-1 py-0"

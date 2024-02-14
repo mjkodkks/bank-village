@@ -46,7 +46,7 @@ export class UsersController {
   }
 
   @ApiOperation({
-    summary: 'get )',
+    summary: 'get all adminList (ดึงข้อมูลแอดมินทั้งหมด)',
   })
   @UseGuards(JwtAuthGuard)
   @Get('adminList')

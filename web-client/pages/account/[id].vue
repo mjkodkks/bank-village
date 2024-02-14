@@ -244,7 +244,7 @@ init()
 </script>
 
 <template>
-  <div class="px-8 py-4 h-[calc(100dvh_-_60px)] md:flex md:flex-col overflow-auto">
+  <div class="px-8 py-4 h-[calc(100dvh_-_60px)] overflow-auto">
     <div class="max-w-lg">
       <Breadcrumb
         :model="breadcrumbItems"

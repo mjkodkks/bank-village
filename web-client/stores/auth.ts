@@ -1,11 +1,11 @@
-import Cookies from 'js-cookie';
+import Cookies from 'js-cookie'
 import { acceptHMRUpdate } from 'pinia'
 
 export const useAuthStore = defineStore('auth', {
   state: () => {
     return {
       isAuthenticated: false,
-      accessToken: ''
+      accessToken: '',
     }
   },
   getters: {
@@ -16,15 +16,16 @@ export const useAuthStore = defineStore('auth', {
       if (accessToken) {
         this.accessToken = accessToken
         this.isAuthenticated = true
-      } else {
+      }
+      else {
         this.accessToken = ''
         this.isAuthenticated = false
       }
     },
     logout() {
-      this.isAuthenticated = false;
+      this.isAuthenticated = false
       this.accessToken = ''
-      Cookies.remove("accessToken")
+      Cookies.remove('accessToken')
     },
   },
 })

@@ -1,5 +1,5 @@
 // import { useToast } from "primevue/usetoast"
-import { useAuthStore } from "~/stores/auth"
+import { useAuthStore } from '~/stores/auth'
 
 export default defineNuxtRouteMiddleware((to, from) => {
   const authStore = useAuthStore()
@@ -11,5 +11,4 @@ export default defineNuxtRouteMiddleware((to, from) => {
     alert(`เซสชั่น (Session) หมดอายุ ออกจากระบบ.. โปรดเข้าสู่ระบบใหม่`)
     return navigateTo('/')
   }
-
 })

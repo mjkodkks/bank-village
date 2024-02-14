@@ -1,6 +1,6 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/55c355a9-3735-425c-9aa8-06ca4e2f6a0b/deploy-status)](https://app.netlify.com/sites/vitesse-nuxt3-dkks/deploys)
 
-# [Vitesse](https://github.com/antfu/vitesse) for Nuxt 3 By DKKs 👋🏻 
+# [Vitesse](https://github.com/antfu/vitesse) for Nuxt 3 By DKKs 👋🏻
 
 [🖥 DEMO 🖥](https://vitesse-nuxt3-dkks.netlify.app/)
 
@@ -12,7 +12,6 @@ Or ```CodeSandbox```
 
 [![Open in CodeSandbox](https://img.shields.io/badge/Open%20in-CodeSandbox-blue?style=flat-square&logo=codesandbox)](https://githubbox.com/mjkodkks/nuxt3-vitesse-dkks)
 </p>
-
 
 ## Features
 
@@ -36,7 +35,7 @@ Or ```CodeSandbox```
 
 - 🦾 TypeScript, of course
 
-- 🩻 [Nuxt Devtools](https://devtools.nuxtjs.org/) ```npx nuxi@latest devtools enable``` 
+- 🩻 [Nuxt Devtools](https://devtools.nuxtjs.org/) ```npx nuxi@latest devtools enable```
 
 - 📱 [Nuxtr](https://marketplace.visualstudio.com/items?itemName=Nuxtr.nuxtr-vscode) Use nuxt commands with a few clicks.
 
@@ -56,7 +55,7 @@ We recommend using [VS Code](https://code.visualstudio.com/) with [Volar](https:
 ## Dev tools
 Improve your DX, finding bugs, tracking data flow and pinia
 - [Vue Devtool](https://chrome.google.com/webstore/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd?hl=en)
-- [Nuxt Devtools](https://devtools.nuxtjs.org/) ```npx nuxi@latest devtools enable``` 
+- [Nuxt Devtools](https://devtools.nuxtjs.org/) ```npx nuxi@latest devtools enable```
 
 ## Variations Original
 
@@ -69,10 +68,10 @@ Improve your DX, finding bugs, tracking data flow and pinia
 
 [Create a repo from this template on GitHub](https://github.com/mjkodkks/nuxt3-vitesse-dkks/generate).
 
-```for original``` 
+```for original```
 [Create a repo from this template on GitHub](https://github.com/antfu/vitesse-nuxt3/generate).
 
-## After fork this 
+## After fork this
 
 ### Development
 ```
@@ -98,7 +97,7 @@ nuxt.config.ts
     ...,
 }
 ```
-then 
+then
 ```
 pnpm run generate
 ```
@@ -115,17 +114,15 @@ or use inline command like this
 docker-compose down && docker-compose up -d --build && docker image prune --force --filter "dangling=true"
 ```
 
-
 ### I don't like pnpm 😵
-You can use npm or yarn to new package manager for this project 👍 . 
+You can use npm or yarn to new package manager for this project 👍 .
 
 1) search all 'pnpm' keyword in project then remove all code and config.
 
 2) try ```npm install && npm run dev``` or ```yarn install && yarn dev```
 3) deploy for ssr ```npm run build``` or ```yarn build``` and for csr, ssg ```npm run generate``` or ```yarn generate```
 
-
-### Update nuxt version by yourself 📈 
+### Update nuxt version by yourself 📈
 update package.json (pnpm example)
 ```
 pnpm update nuxt

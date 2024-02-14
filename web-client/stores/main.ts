@@ -11,7 +11,7 @@ export const useMainStore = defineStore('main', {
     }
   },
   getters: {
-    fullname: (state) => state.firstname + ' ' + state.surname
+    fullname: state => `${state.firstname} ${state.surname}`,
   },
   actions: {
   },

@@ -1,30 +1,37 @@
 <script setup>
+import { usePrimeVue } from 'primevue/config'
+
 useHead({
   title: 'ธนาคารหมู่บ้าน',
   link: [
     {
-      rel: 'icon', type: 'image/x-icon', href: '/favicon.ico',
+      rel: 'icon',
+      type: 'image/x-icon',
+      href: '/favicon.ico',
     },
     {
-      rel: 'preconnect', href: 'https://fonts.googleapis.com'
+      rel: 'preconnect',
+      href: 'https://fonts.googleapis.com',
     },
     {
-      rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: 'anonymous'
+      rel: 'preconnect',
+      href: 'https://fonts.gstatic.com',
+      crossorigin: 'anonymous',
     },
     {
-      rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500&display=swap'
-    }
+      rel: 'stylesheet',
+      href: 'https://fonts.googleapis.com/css2?family=Kanit:wght@200;300;400;500&display=swap',
+    },
   ],
 })
-import { usePrimeVue } from "primevue/config";
 // import { breakpointsTailwind, useBreakpoints } from '@vueuse/core'
 
 // const breakpoints = useBreakpoints(breakpointsTailwind)
 // const isMobile = breakpoints.smallerOrEqual('sm')
 
-const $primevue = usePrimeVue();
+const $primevue = usePrimeVue()
 defineExpose({
-  $primevue
+  $primevue,
 })
 </script>
 
@@ -34,8 +41,8 @@ defineExpose({
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
-    <Toast></Toast>
-    <ConfirmDialog style="white-space: pre;"></ConfirmDialog>
+    <Toast />
+    <ConfirmDialog style="white-space: pre;" />
   </div>
 </template>
 

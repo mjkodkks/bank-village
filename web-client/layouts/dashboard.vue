@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
-import { getProfileService } from '~/services/user';
-import { useAuthStore } from '~/stores/auth';
-import { useMainStore } from '~/stores/main';
+import { useToast } from 'primevue/usetoast'
+import { getProfileService } from '~/services/user'
+import { useAuthStore } from '~/stores/auth'
+import { useMainStore } from '~/stores/main'
 
 const router = useRouter()
 const route = useRoute()
@@ -16,10 +16,10 @@ function logout() {
   router.replace({
     path: '/',
     query: {
-      t: new Date().getTime()
-    }
+      t: new Date().getTime(),
+    },
   })
-  toast.add({ severity: 'success', summary: 'ออกจากระบบ', detail: 'ออกจากระบบสำเร็จ', life: 3000 });
+  toast.add({ severity: 'success', summary: 'ออกจากระบบ', detail: 'ออกจากระบบสำเร็จ', life: 3000 })
 }
 
 const { isSuccess, data, error } = await getProfileService()
@@ -28,22 +28,18 @@ if (isSuccess && data) {
     username: data.username,
     firstname: data.firstname,
     surname: data.surname,
-    id: data.id
+    id: data.id,
   })
 }
 
-const unwatch = watch(() => route.path,
-  () => {
-    mainStore.isSidebarOpen = false
-  }
-)
-
-onUnmounted(()=> {
-  unwatch();
+const unwatch = watch(() => route.path, () => {
+  mainStore.isSidebarOpen = false
 })
 
+onUnmounted(() => {
+  unwatch()
+})
 </script>
-
 
 <template>
   <div class="grid grid-cols-1 lg:grid-cols-[230px_1fr] h-full">
@@ -51,36 +47,45 @@ onUnmounted(()=> {
       v-model:visible="mainStore.isSidebarOpen"
       class="relative"
     >
-      <h1 class="flex-none text-center">ธนาคารหมู่บ้าน</h1>
-      <SidebarMenu></SidebarMenu>
+      <h1 class="flex-none text-center">
+        ธนาคารหมู่บ้าน
+      </h1>
+      <SidebarMenu />
       <div class="bottom-1.5 w-full p-2 absolute left-0">
         <Button
-          @click="logout"
           class="w-full"
           outlined
-        >ออกจากระบบ</Button>
+          @click="logout"
+        >
+          ออกจากระบบ
+        </Button>
       </div>
     </Sidebar>
     <aside class="shadow-lg h-[100vh] relative hidden lg:flex flex-col gap-1">
-      <h1 class="flex-none text-center">ธนาคารหมู่บ้าน</h1>
-      <SidebarMenu></SidebarMenu>
+      <h1 class="flex-none text-center">
+        ธนาคารหมู่บ้าน
+      </h1>
+      <SidebarMenu />
       <div class="bottom-1.5 left-0 w-full p-2 flex-none mt-auto">
         <Button
-          @click="logout"
           class="w-full"
           outlined
-        >ออกจากระบบ</Button>
+          @click="logout"
+        >
+          ออกจากระบบ
+        </Button>
       </div>
     </aside>
     <main
-      class="overflow-hidden"
       id="main"
+      class="overflow-hidden"
     >
       <Navbar
         :username="mainStore.username"
         :fullname="mainStore.fullname"
-        @toggleSidebar="mainStore.isSidebarOpen = !mainStore.isSidebarOpen"
-      ></Navbar>
+        @toggle-sidebar="mainStore.isSidebarOpen = !mainStore.isSidebarOpen"
+      />
       <slot />
     </main>
-</div></template>
+  </div>
+</template>

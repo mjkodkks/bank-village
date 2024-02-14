@@ -9,11 +9,11 @@ export default defineNuxtConfig({
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
       ],
       link: [
-        { rel: 'manifest', href: '/site.webmanifest.json'}
+        { rel: 'manifest', href: '/site.webmanifest.json' },
       ],
       htmlAttrs: {
-        lang: 'en'
-      }
+        lang: 'en',
+      },
     },
   },
 
@@ -34,12 +34,12 @@ export default defineNuxtConfig({
     '@vueuse/nuxt',
     '@pinia/nuxt',
     '@nuxtjs/color-mode',
-    'dayjs-nuxt'
+    'dayjs-nuxt',
   ],
 
   build: {
-		transpile: ["primevue"]
-	},
+    transpile: ['primevue'],
+  },
 
   colorMode: {
     classSuffix: '',
@@ -53,14 +53,14 @@ export default defineNuxtConfig({
     defaultTimezone: 'Asia/Bangkok',
   },
 
-  css: [ "primevue/resources/themes/lara-light-blue/theme.css", 'primevue/resources/primevue.min.css', '~/assets/css/main.css', 'primeicons/primeicons.css'],
+  css: ['primevue/resources/themes/lara-light-blue/theme.css', 'primevue/resources/primevue.min.css', '~/assets/css/main.css', 'primeicons/primeicons.css'],
 
   plugins: ['./plugins/primevue.ts', './plugins/scroll.client.ts'],
 
   imports: {
     dirs: [
-      'services'
-    ]
+      'services',
+    ],
   },
 
   postcss: {
@@ -74,15 +74,15 @@ export default defineNuxtConfig({
     tsConfig: {
       include: ['./types/**/*.d.ts', './utils/**/*.ts'],
     },
-    shim: false
+    shim: false,
   },
 
   devtools: {
-    enabled: true
+    enabled: true,
   },
   runtimeConfig: {
     public: {
-      API_URL: process.env.API_URL || ''
-    }
-  }
+      API_URL: process.env.API_URL || '',
+    },
+  },
 })

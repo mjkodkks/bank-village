@@ -29,7 +29,7 @@ const mainStore = useMainStore()
 
 const breadcrumbItems = ref<MenuItem[]>([
     { label: 'สมาชิก', to: '/member', icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
-    { label: 'โปรไฟล์สมาชิก', to: `/member/${userId}`, icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
+    { label: `โปรไฟล์สมาชิก${userId ? ` (${userId})` : ''}`, to: `/member/${userId}`, icon: 'pi pi-user', class: '[&_.p-menuitem-text]:ml-2' },
 ]);
 
 const { handleSubmit, resetForm } = useForm();
@@ -93,7 +93,7 @@ async function transaction(accountId: number, amount: number, type: string, user
         const { isSuccess, data, error } = await transactionService(accountId, amount, userId, note);
         if (isSuccess && data) {
             toast.add({ severity: 'success', summary: modeMessage, detail: successMessage, life: 5000 });
-            console.info(data);
+            console.log(data);
             init()
             isDialogVisible.value = false;
             loadingTransaction.value = false;
@@ -125,9 +125,11 @@ async function getTransactions(id: number) {
     const { isSuccess, data, error } = await getTransactionsService(id)
     if (isSuccess && data) {
         // console.log(data)
-        transactions.value = data.map(m => {
+        const transactionLength = data.length
+        transactions.value = data.map((m, i) => {
             return {
                 ...m,
+                runId: transactionLength - i,
                 staff: typeof m.staff !== 'string' ? `${m.staff?.username ? '(' + m.staff.username + ')' : ''}` : '',
                 createdAt: dayjs(m.createdAt).format('DD MMM BBBB'),
                 createdTime: dayjs(m.createdAt).format('HH:mm:ss'),
@@ -283,8 +285,11 @@ init()
                 <div
                     class="font-extralight"
                     id="detail_owner"
-                >{{ profile.owner?.username ? '(' + profile.owner?.username + ')' : '' }} {{
-                    profile.owner?.firstname || '' }} {{ profile.owner?.surname || '' }}</div>
+                >
+                    <div>รหัสสมาชิก <span class="font-normal">{{ userId }}</span> </div>
+                    {{ profile.owner?.username ? '(' + profile.owner?.username + ')' : '' }}
+                    {{ profile.owner?.firstname || '' }} {{ profile.owner?.surname || '' }}
+                </div>
             </div>
             <div>
                 <label>สร้างเมื่อ</label>
@@ -357,15 +362,17 @@ init()
                     scrollHeight="flex"
                     class="text-sm p-datatable-sm p-datatable-stripe"
                     tableStyle="min-width: 50rem"
-                    :globalFilterFields="['name', 'id', 'username', 'role']"
+                    :globalFilterFields="['name', 'id', 'username', 'role', 'runId']"
                     resizableColumns
                     columnResizeMode="fit"
                     showGridlines
                     selectionMode="single"
                 >
                     <Column
-                        field="id"
-                        header="เลขที่"
+                        field="runId"
+                        header="ลำดับที่"
+                        header-class="[&_.p-column-header-content]:justify-center"
+                        class="text-center"
                     ></Column>
                     <Column
                         field="staff"
@@ -528,7 +535,10 @@ init()
                             class="cursor-pointer p-0 border-none bg-transparent text-red-500 flex items-center"
                             @click="note = ''"
                             v-tooltip="'ลบหมายเหตุ'"
-                        ><i class="pi pi-times" style="font-size: 0.85rem"></i></button>
+                        ><i
+                                class="pi pi-times"
+                                style="font-size: 0.85rem"
+                            ></i></button>
                     </div>
                     <Textarea
                         id="note"
@@ -591,6 +601,5 @@ init()
                     ></Button>
                 </div>
             </form>
-        </Dialog>
-    </div>
-</template>
+    </Dialog>
+</div></template>

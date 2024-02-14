@@ -2,5 +2,6 @@
     "eslint.workingDirectories": [
         "web-client",
         "backend"
-    ]
+    ],
+    "eslint.experimental.useFlatConfig": true,
 }

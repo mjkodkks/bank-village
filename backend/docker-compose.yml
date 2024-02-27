@@ -8,7 +8,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    # Mount host directory to docker container to support watch mode
     env_file:
       - .env
     ports:
@@ -18,7 +17,7 @@ services:
 
   db:
     container_name: postgres
-    image: postgres:14.1-alpine
+    image: postgres:15.6
     restart: always
     volumes:
       - postgres-data:/var/lib/postgresql/data/

@@ -3,7 +3,7 @@ version: '3'
 services:
   postgres:
     container_name: postgres
-    image: postgres:14.1-alpine
+    image: postgres:15.6
     restart: always
     volumes:
       - postgres-data:/var/lib/postgresql/data/
@@ -12,7 +12,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=postgres
     ports:
-      - 5432:5432
+      - 5423:5432
       
 volumes:
   postgres-data:

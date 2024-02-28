@@ -160,7 +160,7 @@ export class AccountsService {
       select: {
         id: true,
         balance: true,
-        interest: true,
+        // interest: true,
         createdAt: true,
         userId: true,
         type: true,
@@ -245,7 +245,7 @@ export class AccountsService {
       select: {
         id: true,
         balance: true,
-        interest: true,
+        // interest: true,
         createdAt: true,
         userId: true,
         type: true,

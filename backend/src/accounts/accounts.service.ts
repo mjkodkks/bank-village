@@ -478,18 +478,10 @@ export class AccountsService {
       }
     }
     // update interest to account
+    // todo
     const tran = [];
     for (const [key, value] of mapInterest.entries()) {
-      tran.push(
-        this.prisma.account.update({
-          where: {
-            id: key,
-          },
-          data: {
-            interest: value,
-          },
-        }),
-      );
+      tran.push(null);
     }
 
     if (option && option.isDry) {

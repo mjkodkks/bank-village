@@ -20,8 +20,9 @@ import {
   RollbackTransactionDto,
 } from './dto/create-account.dto';
 import { UpdateAccountDto, UpdateInterestDto } from './dto/update-account.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/auth/jwt/jwt-auth.guard';
+import { QueryIntersetDto } from './dto/query-account.dto';
 
 @ApiTags('accounts')
 @Controller('accounts')
@@ -85,6 +86,7 @@ export class AccountsController {
     return result;
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Rollback transaction (ย้อนข้อมูลล่าสุดในบัญชีไป 1 ครั้ง)',
   })
@@ -132,14 +134,20 @@ export class AccountsController {
     return this.accountsService.findOne(+id);
   }
 
+  @ApiBearerAuth()
   @Get('/transactions/interest/:id')
   @ApiOperation({
     summary:
       'Get interest by account id (คำนวณ Interest ทั้งหมดของ account จาก id)',
   })
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    type: Number,
+  })
   @UseGuards(JwtAuthGuard)
-  findInterestPerYear(@Param('id') id: string) {
-    return this.accountsService.findInterestInYearFromAccountId(+id);
+  findInterestPerYear(@Param('id') id: string, @Query() query: QueryIntersetDto) {
+    return this.accountsService.findInterestInYearFromAccountId(+id, query?.year);
   }
 
   @Get('/transactions/:id')
@@ -149,7 +157,7 @@ export class AccountsController {
   })
   @UseGuards(JwtAuthGuard)
   findTransactions(@Param('id') id: string) {
-    return this.accountsService.findTransactioonAll(+id);
+    return this.accountsService.findTransactionAll(+id);
   }
 
   @Patch(':id')

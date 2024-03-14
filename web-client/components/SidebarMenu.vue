@@ -1,4 +1,7 @@
-<script setup lang="ts">
+<script
+  setup
+  lang="ts"
+>
 const routes = ref([
   {
     label: 'หน้าหลัก',
@@ -19,7 +22,11 @@ const routePage = useRoute()
 
 <template>
   <ul class="list-none p-0 overflow-y-auto overflow-x-hidden m-0 flex flex-col gap-2">
-    <li v-for="route in routes" class="px-4">
+    <li
+      v-for="route in routes"
+      :key="route.route"
+      class="px-4"
+    >
       <NuxtLink
         :to="route.route"
         class="w-full h-10 no-underline transition-all duration-200 flex items-center p-2 rounded-lg font-extralight"

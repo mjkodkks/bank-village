@@ -286,7 +286,7 @@ export class AccountsService {
     return account;
   }
 
-  async findTransactioonAll(id: number) {
+  async findTransactionAll(id: number) {
     const transactions = await this.prisma.transaction.findMany({
       select: {
         id: true,
@@ -315,12 +315,13 @@ export class AccountsService {
     return transactions;
   }
 
-  async findInterestInYearFromAccountId(id: number) {
-    const now = dayjs();
+  async findInterestInYearFromAccountId(id: number, year?: number) {
+    const dateFromYear = year ? new Date(year, 6, 31) : new Date()
+    const now = dayjs(dateFromYear);
     const startDate = now
       .utcOffset(0)
       .subtract(1, 'year')
-      .startOf('year')
+      .startOf('year') 
       .add(7, 'months')
       .startOf('day')
       .toISOString();

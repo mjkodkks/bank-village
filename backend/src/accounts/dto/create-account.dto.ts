@@ -70,3 +70,13 @@ export class RollbackTransactionDto {
   @IsNotEmpty()
   account_id: number;
 }
+
+export class UpdateInterestHisotryDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  account_id: number;
+
+  @ApiProperty()
+  @IsNotEmpty()
+  year: number;
+}

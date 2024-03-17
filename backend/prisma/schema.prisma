@@ -52,11 +52,13 @@ model Transaction {
 }
 
 model Interest {
-  id        Int      @id @unique @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   amounts   Decimal  @db.Decimal(10, 2)
   year      Int
-  account   Account? @relation(fields: [accountId], references: [id])
-  accountId Int?
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId Int
+
+  @@unique([year, accountId])
 }
 
 enum TransactionAction {

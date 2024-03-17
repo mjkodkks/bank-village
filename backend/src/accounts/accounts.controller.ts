@@ -18,6 +18,7 @@ import {
   CreateInterestTransactionDto,
   CreateWithdrawTransactionDto,
   RollbackTransactionDto,
+  UpdateInterestHisotryDto,
 } from './dto/create-account.dto';
 import { UpdateAccountDto, UpdateInterestDto } from './dto/update-account.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -158,6 +159,19 @@ export class AccountsController {
   @UseGuards(JwtAuthGuard)
   findTransactions(@Param('id') id: string) {
     return this.accountsService.findTransactionAll(+id);
+  }
+
+  @Post('/interest/history')
+  @ApiOperation({
+    summary:
+      'Save interest from sum interest per year',
+  })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async saveInterestHistory(@Body() updateInterestHisotryDto: UpdateInterestHisotryDto) {
+    const { account_id, year } = updateInterestHisotryDto
+    const { sumOfInterest } = await this.accountsService.findInterestInYearFromAccountId(account_id, year)
+    return this.accountsService.saveInterest(account_id, sumOfInterest, year);
   }
 
   @Patch(':id')

@@ -1,8 +1,16 @@
-import { Controller, Request, Post, UseGuards } from '@nestjs/common';
+import { Controller, Req, Post, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
+import type { Request } from 'express';
+import { User } from '@prisma/client';
 
+type MergeTypes<A, B> = {
+  [key in keyof A]: key extends keyof B ? B[key] : A[key];
+} & B;
+export interface loginRequest { 
+  user: User;
+}
 @ApiTags('authentication')
 @Controller('auth')
 export class AuthController {
@@ -21,7 +29,7 @@ export class AuthController {
       type: 'object',
     },
   })
-  async login(@Request() req: any): Promise<any> {
+  async login(@Req() req: MergeTypes<Request, loginRequest>) {
     return this.authService.login(req.user);
   }
 }

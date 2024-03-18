@@ -161,7 +161,6 @@ export class AccountsService {
       select: {
         id: true,
         balance: true,
-        // interest: true,
         createdAt: true,
         userId: true,
         type: true,
@@ -319,6 +318,7 @@ export class AccountsService {
   async findInterestInYearFromAccountId(id: number, year?: number) {
     const dateFromYear = year ? new Date(year, 6, 31) : new Date()
     const now = dayjs(dateFromYear);
+    // calculate. start from previous year 1 August to 31 July of current year. 
     const startDate = now
       .utcOffset(0)
       .subtract(1, 'year')
@@ -397,7 +397,7 @@ export class AccountsService {
       return interest
     } catch (error) {
       console.error('Error upserting Interest:', error);
-      return error
+      return "Error upserting Interest"
     }
   }
 

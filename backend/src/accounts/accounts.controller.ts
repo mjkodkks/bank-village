@@ -48,6 +48,7 @@ export class AccountsController {
     if (typeof result === 'string') {
       throw new HttpException(result, HttpStatus.BAD_REQUEST);
     }
+    console.log('deposit: ' + result);
     return result;
   }
 
@@ -66,6 +67,7 @@ export class AccountsController {
     if (typeof result === 'string') {
       throw new HttpException(result, HttpStatus.BAD_REQUEST);
     }
+    console.log('withdraw: ' + result);
     return result;
   }
 
@@ -84,6 +86,7 @@ export class AccountsController {
     if (typeof result === 'string') {
       throw new HttpException(result, HttpStatus.BAD_REQUEST);
     }
+    console.log('interest: ' + result);
     return result;
   }
 
@@ -171,7 +174,11 @@ export class AccountsController {
   async saveInterestHistory(@Body() updateInterestHisotryDto: UpdateInterestHisotryDto) {
     const { account_id, year } = updateInterestHisotryDto
     const { sumOfInterest } = await this.accountsService.findInterestInYearFromAccountId(account_id, year)
-    return this.accountsService.saveInterest(account_id, sumOfInterest, year);
+    const result = this.accountsService.saveInterest(account_id, sumOfInterest, year)
+    if (typeof result === 'string') {
+      throw new HttpException(result, HttpStatus.BAD_REQUEST);
+    }
+    return result;
   }
 
   @Patch(':id')

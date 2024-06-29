@@ -3,9 +3,72 @@ import Handlebars from 'handlebars';
 import { join, resolve } from 'path';
 import { readFileSync } from 'fs';
 import puppeteer from 'puppeteer';
+import { PrismaService } from '@/prisma/prisma.service';
+import { dateFrom1AugAgoTo31Jul } from '@/utils/useDate';
+import { AccountType, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ReportsService {
+  constructor(private prisma: PrismaService) {}
+  async createUserListInterest(option: { accountType?: AccountType } = { accountType: "SAVING"}) {
+    const { startDate, endDate } = dateFrom1AugAgoTo31Jul(2024);
+    const result = await this.prisma.user.findMany({
+      select: {
+        // id: true,
+        firstname: true,
+        surname: true,
+        username: true,
+        accountId: {
+          select: {
+            transactions: {
+              select: {
+                interest: true,
+                // createdAt: true
+              },
+              where: {
+                createdAt: {
+                  gte: startDate,
+                  lte: endDate,
+                },
+                action: "INTEREST"
+              },
+              orderBy: {
+                createdAt: 'desc'
+              }
+            }
+          },
+          where: {
+            type: option.accountType,
+          }
+        }
+      },
+      orderBy: {
+        id: 'asc',
+      }
+    });
+
+    const initValue = new Prisma.Decimal(0);
+    const excludeUser = ['super'];
+    const filterUser = result.filter(f => !excludeUser.includes(f.username) && f.accountId.length > 0 && f.accountId[0].transactions.length > 0);
+    const userAndTransaction = filterUser.map((m, i) => {
+      return {
+        // id: m.id,
+        runNo: i,
+        name: m.firstname + ' ' + m.surname,
+        // transactions: m.accountId.map((m) => m.transactions)
+        // .flat(),
+        sumOfinterest: m.accountId
+          .map((m) => m.transactions)
+          .flat()
+          .map((m) => m.interest)
+          .reduce((a, b) => a.add(b), initValue),
+      };
+    })
+    const template = {
+      userAndTransaction,
+    };
+    return template;
+  }
   async createStatement(option?: { isHTML?: boolean }) {
     const filePath = readFileSync(
       join(process.cwd(), '/views/statement/index.hbs'),

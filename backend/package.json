@@ -37,6 +37,7 @@
     "dotenv": "^16.4.4",
     "handlebars": "^4.7.8",
     "hbs": "^4.2.0",
+    "json-2-csv": "^5.5.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",
@@ -87,5 +88,6 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }

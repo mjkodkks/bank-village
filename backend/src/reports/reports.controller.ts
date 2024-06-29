@@ -10,10 +10,55 @@ import { ReportsService } from './reports.service';
 import type { Response } from 'express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/auth/jwt/jwt-auth.guard';
+import { json2csv } from 'json-2-csv';
+import { AccountType } from '@prisma/client';
 @ApiTags('reports')
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
+  @ApiOperation({
+    summary:
+      'list user receive interest CSV (ลิสต์ข้อมูลผู้ใช้ที่จะได้รับปันผลปีนี้ CSV),)',
+  })
+  @Get('/list-user-receive-interest')
+  async getReceiveInterestAnnuallyReport(
+    @Res({ passthrough: true }) res: Response,
+    @Query('accountType') accountType: AccountType,
+  ) {
+    // Call the createStatement() method of the reports service.
+    const { userAndTransaction } =
+      await this.reportsService.createUserListInterest({ accountType });
+
+    const timestamp = Date.now();
+    const csvBype = json2csv(userAndTransaction, {
+      keys: [
+        {
+          field: 'runNo',
+          title: 'ลําดับ',
+        },
+        {
+          field: 'name',
+          title: 'ชื่อ-นามสกุล',
+        },
+        {
+          field: 'sumOfinterest',
+          title: 'ปันผลปีนี้',
+        },
+      ],
+    });
+    const filename = `annual_interest_document_${timestamp}.csv`;
+
+    // // // Set the response headers to download the statement as a PDF file.
+    const setHeader = {
+      'Content-Type': 'text/csv',
+    };
+    setHeader['Content-Disposition'] = `attachment; filename="${filename}"`;
+    res.set(setHeader);
+
+    return csvBype;
+    // return resultList;
+  }
+
   @ApiOperation({
     summary: 'Create STATEMENT (สร้างรายการเดินบัญชี),)',
   })

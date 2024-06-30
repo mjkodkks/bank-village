@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import type { Response } from 'express';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiTags, PickType } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/auth/jwt/jwt-auth.guard';
 import { json2csv } from 'json-2-csv';
 import { AccountType } from '@prisma/client';
@@ -20,17 +20,21 @@ export class ReportsController {
     summary:
       'list user receive interest CSV (ลิสต์ข้อมูลผู้ใช้ที่จะได้รับปันผลปีนี้ CSV),)',
   })
+  @ApiQuery({
+    name: 'accountType',
+    enum: AccountType,
+    required: false,
+  })
   @Get('/list-user-receive-interest')
   async getReceiveInterestAnnuallyReport(
     @Res({ passthrough: true }) res: Response,
     @Query('accountType') accountType: AccountType,
   ) {
-    // Call the createStatement() method of the reports service.
     const { userAndTransaction } =
       await this.reportsService.createUserListInterest({ accountType });
 
     const timestamp = Date.now();
-    const csvBype = json2csv(userAndTransaction, {
+    const csvString = json2csv(userAndTransaction, {
       keys: [
         {
           field: 'runNo',
@@ -42,7 +46,7 @@ export class ReportsController {
         },
         {
           field: 'sumOfinterest',
-          title: 'ปันผลปีนี้',
+          title: 'ปันผล (บาท)',
         },
       ],
     });
@@ -50,12 +54,15 @@ export class ReportsController {
 
     // // // Set the response headers to download the statement as a PDF file.
     const setHeader = {
-      'Content-Type': 'text/csv',
+      'Content-Type': 'application/octet-stream',
     };
     setHeader['Content-Disposition'] = `attachment; filename="${filename}"`;
     res.set(setHeader);
 
-    return csvBype;
+    // csvString to Buffer
+    const csvBype = Buffer.from(csvString, 'utf-8');
+
+    return new StreamableFile(csvBype);
     // return resultList;
   }
 

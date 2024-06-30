@@ -53,7 +53,7 @@ export class ReportsService {
     const userAndTransaction = filterUser.map((m, i) => {
       return {
         // id: m.id,
-        runNo: i,
+        runNo: i + 1,
         name: m.firstname + ' ' + m.surname,
         // transactions: m.accountId.map((m) => m.transactions)
         // .flat(),

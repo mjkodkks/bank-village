@@ -12,6 +12,10 @@
       {
         "include": "../public/**/*.{png, jpg}",
         "outDir": "dist/public"
+      },
+      {
+        "include": "../assets/**/*",
+        "outDir": "dist/assets"
       }
     ],
     "watchAssets": true

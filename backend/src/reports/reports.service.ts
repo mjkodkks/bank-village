@@ -14,7 +14,7 @@ export class ReportsService {
     const { startDate, endDate } = dateFrom1AugAgoTo31Jul(2024);
     const result = await this.prisma.user.findMany({
       select: {
-        // id: true,
+        id: true,
         firstname: true,
         surname: true,
         username: true,
@@ -35,7 +35,8 @@ export class ReportsService {
               orderBy: {
                 createdAt: 'desc'
               }
-            }
+            },
+            balance: true
           },
           where: {
             type: option.accountType,
@@ -52,20 +53,26 @@ export class ReportsService {
     const filterUser = result.filter(f => !excludeUser.includes(f.username) && f.accountId.length > 0 && f.accountId[0].transactions.length > 0);
     const userAndTransaction = filterUser.map((m, i) => {
       return {
-        // id: m.id,
+        id: m.id,
         runNo: i + 1,
         name: m.firstname + ' ' + m.surname,
+        balance: +m.accountId.map((m) => m.balance).at(0),
         // transactions: m.accountId.map((m) => m.transactions)
         // .flat(),
-        sumOfinterest: m.accountId
+        sumOfinterest: +m.accountId
           .map((m) => m.transactions)
           .flat()
           .map((m) => m.interest)
           .reduce((a, b) => a.add(b), initValue),
       };
     })
+    const totalBalance = userAndTransaction.map(m => m.balance).reduce((a, b)=> a + b, 0)
+    const totalInterest = userAndTransaction.map(m => m.sumOfinterest).reduce((a, b)=> a + b, 0)
+    
     const template = {
       userAndTransaction,
+      totalBalance,
+      totalInterest
     };
     return template;
   }

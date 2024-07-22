@@ -10,8 +10,8 @@ import { AccountType, Prisma } from '@prisma/client';
 @Injectable()
 export class ReportsService {
   constructor(private prisma: PrismaService) {}
-  async createUserListInterest(option: { accountType?: AccountType } = { accountType: "SAVING"}) {
-    const { startDate, endDate } = dateFrom1AugAgoTo31Jul(2024);
+  async createUserListInterest(option: { accountType?: AccountType, year?: number } = { accountType: "SAVING", year: 2024 }) {
+    const { startDate, endDate } = dateFrom1AugAgoTo31Jul(option.year);
     const result = await this.prisma.user.findMany({
       select: {
         id: true,

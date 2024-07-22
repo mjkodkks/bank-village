@@ -27,14 +27,23 @@ export class ReportsController {
     name: 'accountType',
     enum: AccountType,
     required: false,
+    example: 'SAVING',
+  })
+  @ApiQuery({
+    name: 'year',
+    type: Number,
+    required: false,
+    example: 2024,
   })
   @Get('/list-user-receive-interest')
+  @UseGuards(JwtAuthGuard)
   async getReceiveInterestAnnuallyReport(
     @Res({ passthrough: true }) res: Response,
     @Query('accountType') accountType: AccountType,
+    @Query('year') year: number,
   ) {
     const { userAndTransaction, totalBalance, totalInterest } =
-      await this.reportsService.createUserListInterest({ accountType });
+      await this.reportsService.createUserListInterest({ accountType, year });
 
     const timestamp = Date.now();
 
@@ -123,6 +132,7 @@ export class ReportsController {
     };
     setHeader['Content-Disposition'] =
       `attachment; filename="${encodeURI(filename)}"`;
+    setHeader['Access-Control-Expose-Headers'] = "*"
     res.set(setHeader);
 
     const bufferWorkbook =

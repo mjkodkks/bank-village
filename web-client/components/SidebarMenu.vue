@@ -15,6 +15,10 @@ const routes = ref([
     label: 'บัญชีทั้งหมด',
     route: '/account',
   },
+  {
+    label: 'รายงาน',
+    route: '/report',
+  },
 ])
 
 const routePage = useRoute()

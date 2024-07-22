@@ -17,6 +17,9 @@ export function requestAPI() {
     async onResponse({ request, response, options }) {
       // Log response
       // console.log("[fetch response]", request, response.status, response.body);
+      console.log(response);
+      console.log(Array.from(response.headers.keys()));
+      
     },
   })
 

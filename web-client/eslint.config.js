@@ -3,6 +3,10 @@ import antfu from '@antfu/eslint-config'
 
 export default antfu({
   rules: {
-    curly: ['off'],
+    'curly': ['off'],
+    'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
+    'unused-imports/no-unused-vars': 'warn',
+    'unused-imports/no-unused-imports': 'warn',
   },
 })

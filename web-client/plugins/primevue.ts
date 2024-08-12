@@ -19,7 +19,9 @@ import InputMask from 'primevue/inputmask'
 import Skeleton from 'primevue/skeleton'
 import Textarea from 'primevue/textarea'
 import Tooltip from 'primevue/tooltip'
-import RadioButton from 'primevue/radiobutton';
+import RadioButton from 'primevue/radiobutton'
+import IconField from 'primevue/iconfield'
+import InputIcon from 'primevue/inputicon'
 import { defineNuxtPlugin } from '#app'
 
 export default defineNuxtPlugin((nuxtApp) => {
@@ -45,6 +47,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('Skeleton', Skeleton)
   nuxtApp.vueApp.component('Textarea', Textarea)
   nuxtApp.vueApp.component('RadioButton', RadioButton)
+  nuxtApp.vueApp.component('IconField', IconField)
+  nuxtApp.vueApp.component('InputIcon', InputIcon)
 
   // other components that you need
 })

@@ -116,6 +116,7 @@ async function getAccountProfile(id: number) {
       typeTH: mapAccoutType(data.type).th,
       createdAt: dayjs(data.createdAt).format('ddd DD MMMM YYYY เวลา HH:mm:ss'),
     }
+    // eslint-disable-next-line ts/no-unused-expressions
     breadcrumbItems.value[2] || breadcrumbItems.value.push({ label: `บัญชี ${data.type} (${id})`, icon: 'pi pi-wallet', class: '[&_.p-menuitem-text]:ml-2' })
   }
   return data

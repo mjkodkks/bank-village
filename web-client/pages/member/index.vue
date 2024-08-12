@@ -1,3 +1,4 @@
+<!-- eslint-disable unused-imports/no-unused-vars -->
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod'
 import { FilterMatchMode } from 'primevue/api'
@@ -171,7 +172,7 @@ async function fetctUser() {
   return data
 }
 
-const usersCount = computed(() => users && users.value.length)
+const usersCount = computed(() => users.value && users.value.length)
 
 function init() {
   fetctUser()
@@ -190,13 +191,13 @@ init()
     </div>
     <div class="flex gap-2 mt-4 header">
       <div class="flex justify-content-end">
-        <span class="p-input-icon-left">
-          <i class="pi pi-search" />
+        <IconField icon-position="left">
+          <InputIcon class="pi pi-search" />
           <InputText
             v-model="filters.global.value"
             placeholder="ค้นหาสมาชิกที่นี้"
           />
-        </span>
+        </IconField>
       </div>
       <div class="ml-auto">
         <Button

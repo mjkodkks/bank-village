@@ -12,6 +12,7 @@ import { AccountType, Prisma } from '@prisma/client';
 import { dayjs } from '@/utils/dayjs';
 import { SAVING_INTEREST } from '@/utils/interest';
 import { Decimal } from '@prisma/client/runtime/library';
+import { dateFrom1AugAgoTo31Jul } from '@/utils/useDate';
 
 @Injectable()
 export class AccountsService {
@@ -316,22 +317,7 @@ export class AccountsService {
   }
 
   async findInterestInYearFromAccountId(id: number, year?: number) {
-    const dateFromYear = year ? new Date(year, 6, 31) : new Date()
-    const now = dayjs(dateFromYear);
-    // calculate. start from previous year 1 August to 31 July of current year. 
-    const startDate = now
-      .utcOffset(0)
-      .subtract(1, 'year')
-      .startOf('year') 
-      .add(7, 'months')
-      .startOf('day')
-      .toISOString();
-    const endDate = now
-      .utcOffset(0)
-      .endOf('year')
-      .subtract(5, 'months')
-      .endOf('months')
-      .toISOString();
+    const { startDate, endDate } = dateFrom1AugAgoTo31Jul(year);
 
     console.log(startDate, endDate);
     const transactions = await this.prisma.transaction.findMany({

@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { ReportsService } from './reports.service';
 import type { Response } from 'express';
-import { ApiOperation, ApiQuery, ApiTags, PickType } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags, PickType } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/auth/jwt/jwt-auth.guard';
 import { json2csv } from 'json-2-csv';
 import { AccountType } from '@prisma/client';
@@ -37,6 +37,7 @@ export class ReportsController {
   })
   @Get('/list-user-receive-interest')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async getReceiveInterestAnnuallyReport(
     @Res({ passthrough: true }) res: Response,
     @Query('accountType') accountType: AccountType,
@@ -143,7 +144,7 @@ export class ReportsController {
   }
 
   @ApiOperation({
-    summary: 'Create STATEMENT (สร้างรายการเดินบัญชี),)',
+    summary: 'Create STATEMENT (สร้างรายการเดินบัญชี)',
   })
   @Get('/statement')
   async createStatement(

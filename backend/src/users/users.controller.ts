@@ -13,13 +13,14 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt-auth.guard';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'Create USER (สร้างสมาชิก)',
   })
@@ -28,12 +29,14 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.usersService.findAll();
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'get profile (ดึงข้อมูล profile ของตัวเอง)',
   })
@@ -45,6 +48,7 @@ export class UsersController {
     return user;
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'get all adminList (ดึงข้อมูลแอดมินทั้งหมด)',
   })
@@ -55,6 +59,7 @@ export class UsersController {
     return user;
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'get user profile by username (ค้นหาข้อมูลสมาชิกจาก username)',
   })
@@ -64,6 +69,7 @@ export class UsersController {
     return this.usersService.findOneByUsername(username);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'get user profile by id (ค้นหาข้อมูลสมาชิกจาก user id)',
   })
@@ -73,6 +79,7 @@ export class UsersController {
     return this.usersService.findOneByIdNoPassword(id);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'update user profile by id (แก้ไขข้อมูลสมาชิกจาก user id)',
   })
@@ -82,6 +89,7 @@ export class UsersController {
     return this.usersService.update(+id, updateUserDto);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({
     summary: 'delete user (ลบ user ออกจากระบบจาก id)',
   })

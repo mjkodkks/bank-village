@@ -30,6 +30,7 @@ import { QueryIntersetDto } from './dto/query-account.dto';
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create Account (เปิดบัญชี)' })
   @UseGuards(JwtAuthGuard)
   @Post()
@@ -37,6 +38,7 @@ export class AccountsController {
     return this.accountsService.create(createAccountDto);
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Deposit (ฝากเงินเข้าบัญชี)' })
   @UseGuards(JwtAuthGuard)
   @Post('deposit')
@@ -52,6 +54,7 @@ export class AccountsController {
     return result;
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Withdraw (ถอนเงินออกจาบัญชี)' })
   @UseGuards(JwtAuthGuard)
   @Post('withdraw')
@@ -71,6 +74,7 @@ export class AccountsController {
     return result;
   }
 
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Interest (ฝากดอกเบี้ยเข้าบัญชี)' })
   @UseGuards(JwtAuthGuard)
   @Post('interest')
@@ -105,6 +109,7 @@ export class AccountsController {
   }
 
   @Get('/types')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List account type' })
   @UseGuards(JwtAuthGuard)
   findAccountTypeAll() {
@@ -112,12 +117,14 @@ export class AccountsController {
   }
 
   @Get('/calculate-interest')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'calculate Interest' })
   calucateInterest(@Query() query: UpdateInterestDto) {
     return this.accountsService.calculateInterest(query);
   }
 
   @Get('/sum-interest')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'sum interest' })
   sumInterest(@Query() query: UpdateInterestDto) {
     console.log(query);
@@ -125,6 +132,7 @@ export class AccountsController {
   }
 
   @Get()
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List account' })
   @UseGuards(JwtAuthGuard)
   findAll() {
@@ -132,14 +140,15 @@ export class AccountsController {
   }
 
   @Get(':id')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'get account by id' })
   @UseGuards(JwtAuthGuard)
   findOne(@Param('id') id: string) {
     return this.accountsService.findOne(+id);
   }
 
-  @ApiBearerAuth()
   @Get('/transactions/interest/:id')
+  @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Get interest by account id (คำนวณ Interest ทั้งหมดของ account จาก id)',
@@ -155,6 +164,7 @@ export class AccountsController {
   }
 
   @Get('/transactions/:id')
+  @ApiBearerAuth()
   @ApiOperation({
     summary:
       'Get all transaction by account id (Transaction ทั้งหมดของ account จาก id)',

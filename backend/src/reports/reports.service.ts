@@ -105,7 +105,7 @@ export class ReportsService {
 
   async createPdfbyHtml(html: string) {
     const browser = await puppeteer.launch({
-      headless: 'new',
+      headless: true,
       args: [
         '--disable-gpu',
         '--disable-dev-shm-usage',

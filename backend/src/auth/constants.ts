@@ -1,3 +1,6 @@
-export const jwtConstants = {
-  secret: process.env.SALT_JWT_SECRET,
+export const jwtConstants = ()=> {
+  return {
+    secret: process.env.SALT_JWT_SECRET,
+  }
+
 };

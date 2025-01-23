@@ -8,6 +8,10 @@ Or try edit on ```Stackblitz```
 
 <a href="https://stackblitz.com/github/mjkodkks/nuxt3-vitesse-dkks"><img src="https://developer.stackblitz.com/img/open_in_stackblitz.svg" alt=""></a>
 
+Or try edit on ```Codeanywhere```
+
+<a href="https://app.codeanywhere.com/#https://github.com/mjkodkks/bank-village/blob/7c55624cb43a702d66bf135254b7142055bbb9be/web-client/README.md"><img src="https://codeanywhere.com/img/open-in-codeanywhere-btn.svg" alt=""></a>
+
 Or ```CodeSandbox```
 
 [![Open in CodeSandbox](https://img.shields.io/badge/Open%20in-CodeSandbox-blue?style=flat-square&logo=codesandbox)](https://githubbox.com/mjkodkks/nuxt3-vitesse-dkks)

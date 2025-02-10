@@ -11,6 +11,10 @@ Or try edit on ```Stackblitz```
 Or ```CodeSandbox```
 
 [![Open in CodeSandbox](https://img.shields.io/badge/Open%20in-CodeSandbox-blue?style=flat-square&logo=codesandbox)](https://githubbox.com/mjkodkks/nuxt3-vitesse-dkks)
+
+Or try edit on ```Codeanywhere```
+
+<a href="https://app.codeanywhere.com/#https://github.com/mjkodkks/bank-village"><img src="https://codeanywhere.com/img/open-in-codeanywhere-btn.svg" alt=""></a>
 </p>
 
 ## Features

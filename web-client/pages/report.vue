@@ -6,7 +6,11 @@ definePageMeta({
   layout: 'dashboard',
   middleware: ['auth'],
 })
-const yearList = [2024]
+const currentYear = new Date().getFullYear()
+const startYear = 2024
+// create year list from 2024 to current year
+// e.g. [2024, 2025, 2026, ..., currentYear
+const yearList = Array.from({ length: currentYear - 2023 }, (_, i) => startYear + i)
 const selectedYear = ref(2024)
 const isDialogVisible = ref(false)
 const headerDialog = ref('ดาวน์โหลดรายงาน')

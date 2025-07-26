@@ -54,7 +54,6 @@ export default defineNuxtConfig({
   },
 
   css: ['primevue/resources/themes/lara-light-blue/theme.css', 'primevue/resources/primevue.min.css', '~/assets/css/main.css', 'primeicons/primeicons.css'],
-
   plugins: ['./plugins/primevue.ts', './plugins/scroll.client.ts'],
 
   imports: {
@@ -80,9 +79,12 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
+
   runtimeConfig: {
     public: {
       API_URL: process.env.API_URL || '',
     },
   },
+
+  compatibilityDate: '2025-07-26',
 })

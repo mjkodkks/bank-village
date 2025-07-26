@@ -1,26 +1,27 @@
 import dayjs from "dayjs";
 
 export function dateFrom1AugAgoTo31Jul(year?: number) {
-  let now = null
+  let endYear = null
   if (year) {
-    now =  dayjs(new Date(year, 6, 31));
+    endYear =  dayjs(new Date(year, 6, 31));
   } else {
-    const isSameOrMore = (new Date().getMonth() + 1) >= 7;
+    const currentMonth = dayjs().month() + 1; // dayjs month is 0-indexed
+    const isSameOrMore = currentMonth >= 8;
     if (isSameOrMore) {
-      now =  dayjs(new Date()).add(1, 'year');
+      endYear = dayjs().add(1, 'year');
     } else {
-      now =  dayjs(new Date());
+      endYear = dayjs();
     }
   }
     // calculate. start from year ago 1 August to 31 July of current year. 
-    const startDate = now
+    const startDate = endYear
       .utcOffset(0)
       .subtract(1, 'year')
       .startOf('year') 
       .add(7, 'months')
       .startOf('day')
       .toISOString();
-    const endDate = now
+    const endDate = endYear
       .utcOffset(0)
       .endOf('year')
       .subtract(5, 'months')

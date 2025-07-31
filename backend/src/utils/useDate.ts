@@ -5,6 +5,8 @@ export function dateFrom1AugAgoTo31Jul(year?: number) {
   if (year) {
     endYear =  dayjs(new Date(year, 6, 31));
   } else {
+    console.log("check current Date: ", dayjs())
+    console.log("check current Month: ", dayjs().month() + 1);
     const currentMonth = dayjs().month() + 1; // dayjs month is 0-indexed
     const isSameOrMore = currentMonth >= 8;
     if (isSameOrMore) {

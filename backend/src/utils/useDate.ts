@@ -3,10 +3,8 @@ import { dayjs } from '@/utils/dayjs';
 export function dateFrom1AugAgoTo31Jul(year?: number) {
   let endYear = null
   if (year) {
-    endYear =  dayjs(new Date(year, 6, 31));
+    endYear =  dayjs.tz(new Date(year, 6, 31));
   } else {
-    console.log("check current Date: ", dayjs.tz())
-    console.log("check current Month: ", dayjs.tz().month() + 1);
     const currentMonth = dayjs.tz().month() + 1; // dayjs month is 0-indexed
     const isSameOrMore = currentMonth >= 8;
     if (isSameOrMore) {

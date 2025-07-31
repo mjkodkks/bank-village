@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import { dayjs } from '@/utils/dayjs';
 
 export function dateFrom1AugAgoTo31Jul(year?: number) {
   let endYear = null

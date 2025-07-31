@@ -389,9 +389,9 @@ export class AccountsService {
 
   async calculateInterest(option?: { isDry: boolean }) {
     // Get the start date of the current month
-    // const startDate = dayjs().startOf('month').format('YYYY-MM-DD');
+    // const startDate = dayjs.tz().startOf('month').format('YYYY-MM-DD');
     // Get the end date of the current month
-    // const endDate = dayjs().endOf('month').format('YYYY-MM-DD');
+    // const endDate = dayjs.tz().endOf('month').format('YYYY-MM-DD');
     const isExited = (interest) => {
       return interest !== undefined && interest !== null;
     };
@@ -485,7 +485,7 @@ export class AccountsService {
       },
     });
     // console.log(allInterestTransaction);
-    const isSameYear = (date) => dayjs().isSame(date, 'year');
+    const isSameYear = (date) => dayjs.tz().isSame(date, 'year');
     const transactionInYear = allInterestTransaction.filter((f) =>
       isSameYear(f.createdAt),
     );

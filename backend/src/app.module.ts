@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AccountsModule } from './accounts/accounts.module';
 import { StatsModule } from './stats/stats.module';
 import { ReportsModule } from './reports/reports.module';
+import { InterestModule } from './interest/interest.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ReportsModule } from './reports/reports.module';
     }),
     StatsModule,
     ReportsModule,
+    InterestModule,
   ],
   controllers: [AppController],
   providers: [AppService],

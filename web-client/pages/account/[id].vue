@@ -171,7 +171,7 @@ function findAdminById(id: number) {
   return adminList.value.find(f => f.id == id)
 }
 
-const { calInterestByType } = useInterest()
+const { calInterestByType, init: interestInit } = useInterest()
 const isCalIntresSuccess = ref(false)
 
 const isDialogVisible = ref(false)
@@ -238,6 +238,7 @@ async function init() {
   await getAccountProfile(+id)
   await getTransactions(+id)
   await getInterestPerYear(+id)
+  interestInit()
   getAdminList()
 }
 

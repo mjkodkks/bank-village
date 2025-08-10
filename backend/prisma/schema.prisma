@@ -32,7 +32,6 @@ model Account {
   owner        User?         @relation(fields: [userId], references: [id])
   userId       Int?
   transactions Transaction[]
-  interests    Interest[]
   type         AccountType   @default(SAVING)
 }
 
@@ -51,14 +50,20 @@ model Transaction {
   createdAt       DateTime          @default(now())
 }
 
-model Interest {
-  id        Int      @id @default(autoincrement())
-  amounts   Decimal  @db.Decimal(10, 2)
-  year      Int
-  account   Account @relation(fields: [accountId], references: [id])
-  accountId Int
+model InterestRate {
+  id            Int           @id @default(autoincrement())
+  type          InterestType
+  rate          Decimal       @db.Decimal(5, 2)
+  effectiveFrom DateTime
+  effectiveTo   DateTime?
 
-  @@unique([year, accountId])
+  @@index([type, effectiveFrom, effectiveTo])
+}
+
+enum InterestType {
+  SAVING_INTEREST
+  STOCK_INTEREST
+  LOAN_INTEREST
 }
 
 enum TransactionAction {

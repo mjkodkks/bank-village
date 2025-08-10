@@ -1,4 +1,3 @@
-import { LOAN_INTEREST, STOCK_INTEREST } from './../utils/interest';
 import { Injectable } from '@nestjs/common';
 import {
   CreateAccountDto,
@@ -10,7 +9,7 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AccountType, Prisma } from '@prisma/client';
 import { dayjs } from '@/utils/dayjs';
-import { SAVING_INTEREST } from '@/utils/interest';
+import { SAVING_INTEREST, LOAN_INTEREST, STOCK_INTEREST } from '@/utils/interest';
 import { Decimal } from '@prisma/client/runtime/library';
 import { dateFrom1AugAgoTo31Jul } from '@/utils/useDate';
 
@@ -352,40 +351,40 @@ export class AccountsService {
     return template;
   }
 
-  async saveInterest(accountId: number,  amount: Decimal, year: number) {
-    const isValidYear = (input) => {
-      // Check if the input is a valid year using Day.js
-      return dayjs(input, 'YYYY', true).isValid();
-    }
+  // async saveInterest(accountId: number,  amount: Decimal, year: number) {
+  //   const isValidYear = (input) => {
+  //     // Check if the input is a valid year using Day.js
+  //     return dayjs(input, 'YYYY', true).isValid();
+  //   }
     
-    if (!isValidYear(year)) {
-      return 'invalid year'
-    }
+  //   if (!isValidYear(year)) {
+  //     return 'invalid year'
+  //   }
 
-    try {
-      const interest = await this.prisma.interest.upsert({
-        where: {
-          year_accountId: {
-            year,
-            accountId,
-          }
-        },
-        update: {
-          amounts: amount,
-        },
-        create: {
-          amounts: amount,
-          year: year,
-          accountId,
-        },
-      })
-      console.log(`Upserted Interest: ${JSON.stringify(interest)}`);
-      return interest
-    } catch (error) {
-      console.error('Error upserting Interest:', error);
-      return "Error upserting Interest"
-    }
-  }
+  //   try {
+  //     const interest = await this.prisma.interest.upsert({
+  //       where: {
+  //         year_accountId: {
+  //           year,
+  //           accountId,
+  //         }
+  //       },
+  //       update: {
+  //         amounts: amount,
+  //       },
+  //       create: {
+  //         amounts: amount,
+  //         year: year,
+  //         accountId,
+  //       },
+  //     })
+  //     console.log(`Upserted Interest: ${JSON.stringify(interest)}`);
+  //     return interest
+  //   } catch (error) {
+  //     console.error('Error upserting Interest:', error);
+  //     return "Error upserting Interest"
+  //   }
+  // }
 
   async calculateInterest(option?: { isDry: boolean }) {
     // Get the start date of the current month

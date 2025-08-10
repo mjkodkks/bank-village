@@ -174,22 +174,22 @@ export class AccountsController {
     return this.accountsService.findTransactionAll(+id);
   }
 
-  @Post('/interest/history')
-  @ApiOperation({
-    summary:
-      'Save interest from sum interest per year',
-  })
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
-  async saveInterestHistory(@Body() updateInterestHisotryDto: UpdateInterestHisotryDto) {
-    const { account_id, year } = updateInterestHisotryDto
-    const { sumOfInterest } = await this.accountsService.findInterestInYearFromAccountId(account_id, year)
-    const result = this.accountsService.saveInterest(account_id, sumOfInterest, year)
-    if (typeof result === 'string') {
-      throw new HttpException(result, HttpStatus.BAD_REQUEST);
-    }
-    return result;
-  }
+  // @Post('/interest/history')
+  // @ApiOperation({
+  //   summary:
+  //     'Save interest from sum interest per year',
+  // })
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  // async saveInterestHistory(@Body() updateInterestHisotryDto: UpdateInterestHisotryDto) {
+  //   const { account_id, year } = updateInterestHisotryDto
+  //   const { sumOfInterest } = await this.accountsService.findInterestInYearFromAccountId(account_id, year)
+  //   const result = this.accountsService.saveInterest(account_id, sumOfInterest, year)
+  //   if (typeof result === 'string') {
+  //     throw new HttpException(result, HttpStatus.BAD_REQUEST);
+  //   }
+  //   return result;
+  // }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {

@@ -1,30 +1,31 @@
 function useInterest() {
-  const tempalteMonth = {
-    SAVING: 1, // 5% per year, divided by 12 months
-    STOCK: 1, // 8% per year, divided by 12 months
-    LOAN: 1, // 1.25% per year, divided by 12 months
-  }
+  const interestStore = useInterestStore()
 
   function calInterestByType(value: number, accountType: AccountType): number {
-    const newValue = tempalteMonth[accountType] * value
-    return newValue
+    const monthlyRates = {
+      SAVING: interestStore.savingInterest ?? 0,
+      STOCK: interestStore.stockInterest ?? 0,
+      LOAN: 1,
+    }
+
+    return (monthlyRates[accountType] ?? 0) * value
   }
 
   async function init() {
+    if (interestStore.savingInterest !== null && interestStore.stockInterest !== null) return
+
     const { isSuccess, data, error } = await getInterestService()
     if (isSuccess && data) { 
-      tempalteMonth.SAVING = data.saving_per_month
-      tempalteMonth.STOCK = data.stock_per_month
-      tempalteMonth.LOAN = data.loan_per_month
-    }
-    else {
+      interestStore.setSavingInterest(data.saving_per_month)
+      interestStore.setStockInterest(data.stock_per_month)
+    } else {
       console.error('Error fetching interest data:', error)
     }
   }
 
   return {
     calInterestByType,
-    init
+    init,
   }
 }
 

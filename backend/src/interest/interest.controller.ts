@@ -1,8 +1,3 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
-import { CreateDepositTransactionDto } from '@/accounts/dto/create-account.dto';
 import { JwtAuthGuard } from '@/auth/jwt/jwt-auth.guard';
 import { Body, Controller, Get, HttpException, HttpStatus, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';

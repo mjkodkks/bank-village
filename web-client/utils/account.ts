@@ -8,7 +8,16 @@ export interface Account {
   userId: number
   type: AccountType
 }
+interface Owner {
+  username: string;
+  role: string;
+  firstname: string;
+  surname: string;
+}
 
+export interface AccountTypeResponse extends Account {
+  owner: Owner
+}
 export interface Transaction {
   id: number
   action: string

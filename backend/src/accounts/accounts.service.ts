@@ -9,7 +9,11 @@ import { UpdateAccountDto } from './dto/update-account.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AccountType, Prisma } from '@prisma/client';
 import { dayjs } from '@/utils/dayjs';
-import { SAVING_INTEREST, LOAN_INTEREST, STOCK_INTEREST } from '@/utils/interest';
+import {
+  SAVING_INTEREST,
+  LOAN_INTEREST,
+  STOCK_INTEREST,
+} from '@/utils/interest';
 import { Decimal } from '@prisma/client/runtime/library';
 import { dateFrom1AugAgoTo31Jul } from '@/utils/useDate';
 
@@ -356,7 +360,7 @@ export class AccountsService {
   //     // Check if the input is a valid year using Day.js
   //     return dayjs(input, 'YYYY', true).isValid();
   //   }
-    
+
   //   if (!isValidYear(year)) {
   //     return 'invalid year'
   //   }

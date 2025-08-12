@@ -22,7 +22,7 @@ export async function getAccountTypesService() {
 export async function getAccountListService() {
   const { requestAuth } = await requestAPI()
   try {
-    const data = await requestAuth('/accounts', {
+    const data = await requestAuth<AccountTypeResponse[]>('/accounts', {
       method: 'GET',
     })
     return {

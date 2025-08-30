@@ -10,6 +10,7 @@ datasource db {
 
 model User {
   id          Int           @id @unique @default(autoincrement())
+  customerId  String?       @unique
   username    String?       @unique
   password    String?
   lastLogin   DateTime?
@@ -52,9 +53,9 @@ model Transaction {
 }
 
 model InterestRate {
-  id            Int           @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   type          InterestType
-  rate          Decimal       @db.Decimal(5, 2)
+  rate          Decimal      @db.Decimal(5, 2)
   effectiveFrom DateTime
   effectiveTo   DateTime?
 

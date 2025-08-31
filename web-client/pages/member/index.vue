@@ -385,6 +385,7 @@ init()
               v-model="customerId"
               :class="{ 'p-invalid': customerIdErrorMessage }"
               placeholder="กรุณาใส่เลขทะเบียนสมาชิก โดยไม่ซ้ำกับสมาชิกท่านอื่น"
+              autocomplete="off"
               class="w-full"
             />
             <label for="customerId">เลขทะเบียนสมาชิก</label>

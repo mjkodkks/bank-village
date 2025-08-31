@@ -386,6 +386,7 @@ init()
               :class="{ 'p-invalid': customerIdErrorMessage }"
               placeholder="กรุณาใส่เลขทะเบียนสมาชิก โดยไม่ซ้ำกับสมาชิกท่านอื่น"
               autocomplete="off"
+              aria-autocomplete="none"
               class="w-full"
             />
             <label for="customerId">เลขทะเบียนสมาชิก</label>

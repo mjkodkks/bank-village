@@ -36,4 +36,8 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @ApiPropertyOptional()
   @IsOptional()
   role?: Role;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  customerId?: Role;
 }

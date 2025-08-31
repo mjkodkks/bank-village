@@ -88,7 +88,7 @@ init()
     <h1>สถิติ (stat)</h1>
     <hr class="border-gray-200 border border-solid">
     <div class="grid grid-cols-1 2xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 gap-8 justify-center mt-8">
-      <HomeCardStat v-for="stat in stats" :color="stat.color" :title="stat.title" :score="strToCurrency(`${stat.score}`)" />
+      <HomeCardStat v-for="(stat, index) in stats" :key="index" :color="stat.color" :title="stat.title" :score="strToCurrency(`${stat.score}`)" />
     </div>
     <hr class="border-gray-200 border border-solid mt-8">
     <div class="flex justify-center mt-8">

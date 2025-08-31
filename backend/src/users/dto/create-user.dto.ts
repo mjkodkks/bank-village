@@ -17,6 +17,10 @@ export class CreateUserDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  customerId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
   firstname?: string;
 
   @ApiPropertyOptional()

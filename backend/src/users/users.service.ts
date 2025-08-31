@@ -1,8 +1,13 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +17,7 @@ export class UsersService {
       username,
       password,
       citizenId,
+      customerId,
       role,
       firstname,
       surname,
@@ -19,41 +25,75 @@ export class UsersService {
       tel,
     } = createUserDto;
 
-    if (role === 'ADMIN') {
-      const salt = await bcrypt.genSalt();
-      const hashPassword = await bcrypt.hash(password, salt);
+    try {
+      if (role === 'ADMIN') {
+        if (!username || !password) {
+          throw new BadRequestException(
+            'Username and password are required for ADMIN role',
+          );
+        }
 
-      const user = await this.prisma.user.upsert({
-        create: {
-          username,
-          password: hashPassword,
-          citizenId,
-          role: 'ADMIN',
-          firstname,
-          surname,
-          address,
-          tel,
-        },
-        update: {},
-        where: {
-          username: username,
-        },
-      });
-      console.log(user);
-    } else {
-      const user = await this.prisma.user.create({
-        data: {
-          citizenId,
-          role: 'USER',
-          firstname,
-          surname,
-          address,
-          tel,
-        },
-      });
-      console.log(user);
+        const salt = await bcrypt.genSalt();
+        const hashPassword = await bcrypt.hash(password, salt);
+
+        const user = await this.prisma.user.upsert({
+          where: { username },
+          create: {
+            username,
+            password: hashPassword,
+            citizenId,
+            customerId,
+            role: 'ADMIN',
+            firstname,
+            surname,
+            address,
+            tel,
+          },
+          update: {
+            // optional: decide what fields can be updated if username already exists
+            firstname,
+            surname,
+            address,
+            tel,
+          },
+        });
+
+        return user;
+      } else {
+        const user = await this.prisma.user.create({
+          data: {
+            citizenId,
+            customerId,
+            role: 'USER',
+            firstname,
+            surname,
+            address,
+            tel,
+          },
+        });
+        return user;
+      }
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        if (error.code === 'P2002') {
+          if (
+            error.meta &&
+            error.meta.target &&
+            Array.isArray(error.meta.target)
+          ) {
+            const fields = error.meta.target.join(', ');
+            throw new BadRequestException(
+              `Duplicate field value violates unique constraint on fields: ${fields}`,
+            );
+          }
+          // Unique constraint failed
+          throw new BadRequestException(
+            `User with given unique field already exists`,
+          );
+        }
+      }
+      throw new BadRequestException(error.message);
     }
-    return 'create success';
   }
 
   findAll() {
@@ -63,6 +103,7 @@ export class UsersService {
         username: true,
         nickName: true,
         citizenId: true,
+        customerId: true,
         brithday: true,
         role: true,
         firstname: true,
@@ -147,20 +188,55 @@ export class UsersService {
         createdAt: true,
         accountId: true,
         tel: true,
+        customerId: true,
       },
     });
 
     return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    const userUpdate = this.prisma.user.update({
-      data: updateUserDto,
-      where: {
-        id: id,
-      },
-    });
-    return userUpdate;
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    try {
+      return await this.prisma.user.update({
+        data: updateUserDto,
+        where: { id },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError) {
+        console.error(error);
+        if (error.code === 'P2025') {
+          // Record not found
+          throw new NotFoundException(`User with id ${id} not found`);
+        }
+        if (error.code === 'P2002') {
+          if (
+            error.meta &&
+            error.meta.target &&
+            Array.isArray(error.meta.target)
+          ) {
+            const fields = error.meta.target.join(', ');
+            const check = error.meta.target.includes('customerId');
+            if (check) {
+              throw new BadRequestException(
+                `มีผู้ใช้ในระบบที่มี ${check ? 'เลขทะเบียนสมาชิกนี้' : 'ข้อมูลนี้'} อยู่แล้ว`,
+              );
+            } else {
+              throw new BadRequestException(
+                `Duplicate field value violates unique constraint on fields: ${fields}`,
+              );
+            }
+          }
+
+          // Unique constraint failed
+          throw new BadRequestException(
+            'Duplicate field value violates unique constraint',
+          );
+        }
+      }
+
+      // Fallback for unexpected errors
+      throw new BadRequestException(error.message);
+    }
   }
 
   async remove(id: number) {

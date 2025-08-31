@@ -39,43 +39,44 @@ export async function getlistUserService() {
   }
 }
 
-export async function createUserService({ username, password, citizenId, role, firstname, surname, address, tel }: CreateUser) {
+export async function createUserService(user: CreateUser) {
   const { requestAuth } = await requestAPI()
+
   try {
-    const body = {} as { [x: string]: string | boolean | undefined }
-    if (role === 'ADMIN') {
-      body.username = username || undefined
-      body.password = password || undefined
-      body.citizenId = citizenId ? citizenId.replaceAll('-', '') : undefined
-      body.role = role || undefined
-      body.firstname = firstname || undefined
-      body.surname = surname || undefined
-      body.address = address || undefined
+    // base fields
+    const baseBody = {
+      citizenId: user.citizenId ? user.citizenId.replaceAll('-', '') : undefined,
+      customerId: user.customerId || undefined,
+      role: user.role || undefined,
+      firstname: user.firstname || undefined,
+      surname: user.surname || undefined,
+      address: user.address || undefined,
     }
-    else {
-      body.citizenId = citizenId ? citizenId.replaceAll('-', '') : undefined
-      body.role = role || undefined
-      body.firstname = firstname || undefined
-      body.surname = surname || undefined
-      body.address = address || undefined
-      body.tel = tel || undefined
-    }
+
+    // role-specific fields
+    const adminFields =
+      user.role === 'ADMIN'
+        ? {
+            username: user.username || undefined,
+            password: user.password || undefined,
+          }
+        : {
+            tel: user.tel || undefined,
+          }
+
+    const body = { ...baseBody, ...adminFields }
+
     const data = await requestAuth('/users', {
       method: 'POST',
-      body,
+      body, // <- ตรวจสอบว่า requestAuth แปลง JSON ให้หรือยัง
     })
-    return {
-      isSuccess: true,
-      data,
-    }
-  }
-  catch (error) {
-    return {
-      isSuccess: false,
-      error,
-    }
+
+    return { isSuccess: true, data }
+  } catch (error) {
+    return { isSuccess: false, error }
   }
 }
+
 
 export async function getUserProfileByIdService(id: number) {
   const { requestAuth } = await requestAPI()

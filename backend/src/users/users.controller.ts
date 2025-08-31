@@ -30,6 +30,9 @@ export class UsersController {
   }
 
   @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'get all users (ดึงข้อมูลสมาชิกทั้งหมด)',
+  })
   @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
@@ -85,8 +88,8 @@ export class UsersController {
   })
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  async update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+      return await this.usersService.update(+id, updateUserDto);
   }
 
   @ApiBearerAuth()

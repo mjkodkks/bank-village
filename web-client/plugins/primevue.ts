@@ -23,6 +23,7 @@ import RadioButton from 'primevue/radiobutton'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
 import { defineNuxtPlugin } from '#app'
+import Checkbox from 'primevue/checkbox'
 
 export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.use(PrimeVue, { ripple: true } as PrimeVueConfiguration)
@@ -49,6 +50,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('RadioButton', RadioButton)
   nuxtApp.vueApp.component('IconField', IconField)
   nuxtApp.vueApp.component('InputIcon', InputIcon)
+  nuxtApp.vueApp.component('Checkbox', Checkbox)
+
 
   // other components that you need
 })

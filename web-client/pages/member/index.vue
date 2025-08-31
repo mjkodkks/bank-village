@@ -44,16 +44,24 @@ const { value: surname, errorMessage: surnameErrorMessage } = useField('surname'
 })), {
   initialValue: '',
 })
-const { value: address, errorMessage: addressErrorMessage, resetField: addressResetField } = useField('address', toTypedSchema(z.string().nonempty({
-  message: 'กรุณาใส่ที่อยู่',
-})), {
-  initialValue: '',
-})
 const { value: tel, errorMessage: telErrorMessage } = useField('tel', toTypedSchema(z.string({
   description: '',
 }).max(16)), {
   initialValue: '',
 })
+const { value: address, errorMessage: addressErrorMessage, resetField: addressResetField } = useField('address', toTypedSchema(z.string().nonempty({
+  message: 'กรุณาใส่ที่อยู่',
+})), {
+  initialValue: '',
+})
+
+const noSpecialCharSchema = z.string().regex(/^[a-z0-9]+$/i, {
+  message: 'กรุณาใส่ตัวอักษรภาษาอังกฤษ หรือตัวเลขเท่านั้น',
+})
+const { value: customerId, errorMessage: customerIdErrorMessage, resetField: customerIdResetField } = useField('customerId', toTypedSchema(noSpecialCharSchema), {
+  initialValue: '',
+})
+
 const { value: role, errorMessage: roleErrorMessage } = useField('role', toTypedSchema(z.string().nonempty({
   message: 'กรุณาใส่ตำแหน่ง',
 })), {
@@ -89,21 +97,9 @@ function validateFieldPassword(value: any) {
 
 const loadingCreateUser = ref(false)
 const onSubmit = handleSubmit(async (values) => {
-  // console.log(values)
-  const { username, citizenId, role, password, firstname, surname, address, tel } = values as {
-    username: string
-    citizenId: string
-    role: ROLE
-    password: string
-    firstname: string
-    surname: string
-    address: string
-    tel: string
-  }
-
-  loadingCreateUser.value = true
+  const { username, citizenId, customerId, role, password, firstname, surname, address, tel } = values as CreateUser
   const isAdmin = role === 'ADMIN'
-  const confirmCreateUser = confirm
+
   confirm.require({
     message: `ยืนยันการสร้าง${isAdmin ? 'เจ้าหน้าที่' : 'สมาชิก'}`,
     header: 'ยืนยัน',
@@ -111,34 +107,37 @@ const onSubmit = handleSubmit(async (values) => {
     rejectLabel: 'ไม่',
     icon: 'pi pi-exclamation-triangle',
     accept: async () => {
-      const { isSuccess, data, error } = await createUserService(
-        {
+      loadingCreateUser.value = true
+      try {
+        const { isSuccess, data, error } = await createUserService({
           username: isAdmin ? username : undefined,
           password: isAdmin ? password : undefined,
           citizenId,
+          customerId,
           role,
           address,
           firstname,
           surname,
           tel,
-        },
-      )
-      if (isSuccess && data) {
-        // console.log(data)
-        toast.add({ severity: 'success', summary: 'สร้างสมาชิก', detail: 'สร้างสมาชิกสำเร็จ', life: 5000 })
-        fetctUser()
+        })
+
+        if (isSuccess && data) {
+          toast.add({ severity: 'success', summary: 'สร้างสมาชิก', detail: 'สร้างสมาชิกสำเร็จ', life: 5000 })
+          fetchUser() // <- ตรวจ spelling ด้วยนะครับ
+        }
+        else {
+          console.error(error)
+          const message = (error as any).data?.message || 'สร้างสมาชิกไม่สำเร็จ'
+          toast.add({ severity: 'error', summary: 'สร้างสมาชิกไม่สำเร็จ ', detail: message, life: 10000 })
+        }
+
+        isCreateUserDialogVisible.value = false
       }
-      else {
-        console.error(error)
-        toast.add({ severity: 'warn', summary: 'สร้างสมาชิก', detail: 'สร้างสมาชิกไม่สำเร็จ', life: 10000 })
+      finally {
+        loadingCreateUser.value = false
       }
-      isCreateUserDialogVisible.value = false
-      loadingCreateUser.value = false
     },
-    onHide() {
-      loadingCreateUser.value = false
-    },
-    reject: () => {
+    onHide: () => {
       loadingCreateUser.value = false
     },
   })
@@ -151,8 +150,19 @@ const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 })
 
+const checkedCustomerIdOnly = ref(false)
+
+const filterListCompute = computed(() => {
+  if (checkedCustomerIdOnly.value) {
+    return ['customerId']
+  }
+  else {
+    return ['id', 'name', 'customerId', 'username', 'role']
+  }
+})
+
 const userLoading = ref(false)
-async function fetctUser() {
+async function fetchUser() {
   userLoading.value = true
   const { isSuccess, data, error } = await getlistUserService()
   if (isSuccess && data) {
@@ -175,7 +185,7 @@ async function fetctUser() {
 const usersCount = computed(() => users.value && users.value.length)
 
 function init() {
-  fetctUser()
+  fetchUser()
 }
 
 init()
@@ -189,7 +199,7 @@ init()
     <div>
       <hr class="border border-gray-200 border-solid">
     </div>
-    <div class="flex gap-2 mt-4 header">
+    <div class="flex gap-4 mt-4 header">
       <div class="flex justify-content-end">
         <IconField icon-position="left">
           <InputIcon class="pi pi-search" />
@@ -199,6 +209,14 @@ init()
           />
         </IconField>
       </div>
+      <div class="flex items-center">
+        <Checkbox
+          v-model="checkedCustomerIdOnly" input-id="checkboxCustomerId"
+          name="checkboxCustomerId"
+          binary @change="() => { filters.global.value = null }"
+        />
+        <label for="checkboxCustomerId" class="ml-2"> ค้นเฉพาะข้อมูลเลขทะเบียน </label>
+      </div>
       <div class="ml-auto">
         <Button
           icon="pi pi-user-plus"
@@ -207,10 +225,7 @@ init()
         />
       </div>
     </div>
-    <div
-      v-if="users"
-      class="mt-4"
-    >
+    <div v-if="users" class="mt-4">
       จำนวนสมาชิก ({{ usersCount }})
     </div>
     <div class="flex-1 mt-4 overflow-hidden table-wrapper">
@@ -223,72 +238,57 @@ init()
           scroll-height="flex"
           class="text-sm p-datatable-sm row-selected"
           table-style="min-width: 50rem"
-          :global-filter-fields="['name', 'id', 'username', 'role']"
+          :global-filter-fields="filterListCompute"
           selection-mode="single"
           @row-click="rowClick"
         >
-          <Column
-            field="id"
-            header="รหัสสมาชิก"
-          />
-          <Column
-            field="username"
-            header="ชื่อผู้ใช้งาน"
-          >
+          <Column field="id" header="รหัสในระบบ" />
+          <Column field="customerId" header="เลขทะเบียน">
             <template #body="{ data }">
-              {{ data.username || '-' }}
+              {{ data.customerId || "-" }}
             </template>
           </Column>
-          <Column
-            field="name"
-            header="ชื่อ นามสกุล"
-          >
+          <Column field="username" header="ชื่อผู้ใช้งาน">
             <template #body="{ data }">
-              <span class="underline text-primary hover:text-pink-600">{{ data.name || '-' }}</span>
+              {{ data.username || "-" }}
             </template>
           </Column>
-          <Column
-            field="address"
-            header="ที่อยู่"
-          />
-          <Column
-            field="tel"
-            header="เบอร์โทรศํพท์"
-          >
+          <Column field="name" header="ชื่อ นามสกุล">
             <template #body="{ data }">
-              {{ data.tel || '-' }}
+              <span class="underline text-primary hover:text-pink-600">{{
+                data.name || "-"
+              }}</span>
             </template>
           </Column>
-          <Column
-            field="citizenId"
-            header="เลขบัตรประจำตัวประชาชน"
-          >
+          <Column field="address" header="ที่อยู่" />
+          <Column field="tel" header="เบอร์โทรศํพท์">
             <template #body="{ data }">
-              {{ data.citizenId || '-' }}
+              {{ data.tel || "-" }}
             </template>
           </Column>
-          <Column
-            field="role"
-            header="ตำแหน่ง"
-          />
-          <Column
-            field="createdAt"
-            header="เริ่มใช้งาน"
-          />
+          <Column field="citizenId" header="เลขบัตรประจำตัวประชาชน">
+            <template #body="{ data }">
+              {{ data.citizenId || "-" }}
+            </template>
+          </Column>
+          <Column field="role" header="ตำแหน่ง" />
+          <Column field="createdAt" header="เริ่มใช้งาน" />
         </DataTable>
       </template>
       <template v-else>
-        <TableLoading
-          :cols="7"
-          :rows="8"
-        />
+        <TableLoading :cols="7" :rows="8" />
       </template>
     </div>
     <Dialog
       v-model:visible="isCreateUserDialogVisible"
       modal
       header="เพิ่มสมาชิก"
-      :breakpoints="{ '1440px': '40vw', '1024px': '60vw', '820px': '80vw', '400px': '90vw' }"
+      :breakpoints="{
+        '1440px': '40vw',
+        '1024px': '60vw',
+        '820px': '80vw',
+        '400px': '90vw',
+      }"
       @hide="resetForm()"
     >
       <form
@@ -380,6 +380,22 @@ init()
         </div>
         <div class="mt-6">
           <div class="p-float-label">
+            <InputText
+              id="customerId"
+              v-model="customerId"
+              :class="{ 'p-invalid': customerIdErrorMessage }"
+              placeholder="กรุณาใส่เลขทะเบียนสมาชิก โดยไม่ซ้ำกับสมาชิกท่านอื่น"
+              class="w-full"
+            />
+            <label for="customerId">เลขทะเบียนสมาชิก</label>
+          </div>
+          <small
+            v-if="customerIdErrorMessage"
+            class="mt-2 text-pink-500 font-extralight p-error"
+          >{{ customerIdErrorMessage }}</small>
+        </div>
+        <div class="mt-8">
+          <div class="p-float-label">
             <Dropdown
               v-model="role"
               :options="rolesList"
@@ -396,10 +412,7 @@ init()
             class="mt-2 text-pink-500 font-extralight p-error"
           >{{ roleErrorMessage }}</small>
         </div>
-        <div
-          v-show="role === 'ADMIN'"
-          class="mt-8"
-        >
+        <div v-show="role === 'ADMIN'" class="mt-8">
           <div class="p-float-label">
             <InputText
               id="username"
@@ -415,10 +428,7 @@ init()
             class="mt-2 text-pink-500 font-extralight p-error"
           >{{ usernameErrorMessage }}</small>
         </div>
-        <div
-          v-show="role === 'ADMIN'"
-          key="passwordinput"
-        >
+        <div v-show="role === 'ADMIN'" key="passwordinput">
           <div class="mt-6 p-float-label">
             <Password
               id="password"

@@ -381,9 +381,9 @@ init()
         <div class="mt-6">
           <div class="p-float-label">
             <InputText
-              id="member_id"
+              id="memberCode"
               v-model="customerId"
-              name="member_id"
+              name="memberCode"
               :class="{ 'p-invalid': customerIdErrorMessage }"
               placeholder="กรุณาใส่เลขทะเบียนสมาชิก โดยไม่ซ้ำกับสมาชิกท่านอื่น"
               autocomplete="new-password"

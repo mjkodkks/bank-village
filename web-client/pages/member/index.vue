@@ -381,15 +381,16 @@ init()
         <div class="mt-6">
           <div class="p-float-label">
             <InputText
-              id="customerId"
+              id="member_id"
               v-model="customerId"
+              name="member_id"
               :class="{ 'p-invalid': customerIdErrorMessage }"
               placeholder="กรุณาใส่เลขทะเบียนสมาชิก โดยไม่ซ้ำกับสมาชิกท่านอื่น"
-              autocomplete="off"
+              autocomplete="new-password"
               aria-autocomplete="none"
               class="w-full"
             />
-            <label for="customerId">เลขทะเบียนสมาชิก</label>
+            <label for="member_id">เลขทะเบียนสมาชิก</label>
           </div>
           <small
             v-if="customerIdErrorMessage"

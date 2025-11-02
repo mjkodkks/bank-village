@@ -20,7 +20,7 @@ import {
   RollbackTransactionDto,
   UpdateInterestHisotryDto,
 } from './dto/create-account.dto';
-import { UpdateAccountDto, UpdateInterestDto } from './dto/update-account.dto';
+import { UpdateAccountBalanceDto, UpdateAccountDto, UpdateInterestDto, UpdateTransactionDto } from './dto/update-account.dto';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/auth/jwt/jwt-auth.guard';
 import { QueryIntersetDto } from './dto/query-account.dto';
@@ -191,9 +191,42 @@ export class AccountsController {
   //   return result;
   // }
 
+  @Post('/transactions/update')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Update transaction by id (แก้ไขข้อมูล transaction โดย id)',
+  })
+  @UseGuards(JwtAuthGuard)
+  async updateTransaction(@Body() updateAccountDto: UpdateTransactionDto) {
+    try {
+      return await this.accountsService.editTransaction(updateAccountDto);
+    } catch (error) {
+      console.error(error);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update Balance (อัพเดตยอดเงินในบัญชี)' })
+  @UseGuards(JwtAuthGuard)
+  @Patch('/update-balance/:id')
+  updateAccount(@Param('id') id: string, @Body() body: UpdateAccountBalanceDto) {
+    try {
+      return this.accountsService.recalculateAccountBalance(+id, body);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateAccountDto: UpdateAccountDto) {
-    return this.accountsService.update(+id, updateAccountDto);
+    try {
+      return this.accountsService.update(+id, updateAccountDto);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Delete(':id')

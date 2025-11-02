@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import {
   CreateAccountDto,
   CreateDepositTransactionDto,
   CreateWithdrawTransactionDto,
   RollbackTransactionDto,
 } from './dto/create-account.dto';
-import { UpdateAccountDto } from './dto/update-account.dto';
+import {
+  UpdateAccountDto,
+  UpdateTransactionDto,
+} from './dto/update-account.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AccountType, Prisma } from '@prisma/client';
 import { dayjs } from '@/utils/dayjs';
@@ -517,6 +520,126 @@ export class AccountsService {
     // console.log(tran);
     const accountUpdated = await this.prisma.$transaction(tran);
     return accountUpdated;
+  }
+
+  async editTransaction(updateTransactionDto: UpdateTransactionDto) {
+    if (typeof updateTransactionDto.id !== 'number') {
+      throw new BadRequestException('id must be a number');
+    }
+
+    if (typeof updateTransactionDto.accountId !== 'number') {
+      throw new BadRequestException('accountId must be a number');
+    }
+
+    if (Object.keys(updateTransactionDto).length === 0) {
+      throw new BadRequestException('updateTransactionDto must not be empty');
+    }
+
+    const { action } = updateTransactionDto;
+    if (!action) {
+      throw new BadRequestException('action is required');
+    }
+
+    const getValidDate = (dateInput: string): Date | undefined => {
+      if (!dateInput) return undefined;
+
+      const dayjsDate = dayjs(dateInput, "YYYY-MM-DD HH:mm:ss");
+      return dayjsDate.isValid() ? dayjsDate.toDate() : undefined;
+    };
+
+    const { amount, previousBalance, newBalance, createAt, note } =
+      updateTransactionDto;
+
+    const amountDecimal = amount ? new Prisma.Decimal(amount) : undefined;
+    const previousBalanceDecimal = previousBalance
+      ? new Prisma.Decimal(previousBalance)
+      : undefined;
+    const newBalanceDecimal = newBalance
+      ? new Prisma.Decimal(newBalance)
+      : undefined;
+
+    const updateData = {
+      amounts: amountDecimal,
+      previousBalance: previousBalanceDecimal,
+      changeBalance: newBalanceDecimal,
+      createdAt: getValidDate(createAt),
+      note: note || undefined,
+    };
+
+    console.info(
+      `Updating transaction #${updateTransactionDto.id} for account #${updateTransactionDto.accountId}`,
+    );
+
+    // Wrap in transaction for financial operation atomicity
+    return this.prisma.$transaction(async (txPrisma) => {
+      const update = await txPrisma.transaction.update({
+        where: { id: updateTransactionDto.id },
+        data: { ...updateData },
+        select: {
+          id: true,
+          action: true,
+          previousBalance: true,
+          changeBalance: true,
+          amounts: true,
+          interest: true,
+          note: true,
+          createdAt: true,
+          staffId: true,
+          accountId: true,
+        },
+      });
+
+      // Recalculate balance if financial fields changed
+      if (updateData.amounts || updateData.previousBalance || updateData.changeBalance) {
+        await this.recalculateAccountBalance(update.accountId, { isDry: false });
+      }
+
+      return update;
+    });
+  }
+
+  async recalculateAccountBalance(id: number, option?: { isDry?: boolean }) {
+    console.info(
+      `Recalculating balance for account ID: ${id} with option:`,
+      option,
+    );
+    return this.prisma.$transaction(async (txPrisma) => {
+      const transactions = await txPrisma.transaction.findMany({
+        where: {
+          accountId: id,
+          action: {
+            in: ['DEPOSIT', 'WITHDRAWAL'],
+          },
+        },
+        select: {
+          amounts: true,
+          action: true,
+        },
+      });
+
+      let sum = new Prisma.Decimal(0);
+      for (const tx of transactions) {
+        if (tx.action === 'DEPOSIT') {
+          sum = sum.add(tx.amounts);
+        }
+        if (tx.action === 'WITHDRAWAL') {
+          sum = sum.minus(tx.amounts);
+        }
+      }
+
+      if (option?.isDry) {
+        return { id, recalculatedBalance: sum };
+      }
+
+      return txPrisma.account.update({
+        where: {
+          id,
+        },
+        data: {
+          balance: sum,
+        },
+      });
+    });
   }
 
   update(id: number, updateAccountDto: UpdateAccountDto) {

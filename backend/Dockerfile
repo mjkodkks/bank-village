@@ -19,6 +19,6 @@ COPY package*.json bun.lock ./
 RUN bun install --production
 COPY . .
 RUN bun run gen:prisma
-RUN bunx @nestjs/cli build
+RUN bunx @nestjs/cli@10.4.8 build
 
-CMD [ "bun", "run", "dist/main.js" ]
+CMD [ "bun", "dist/main.js" ]

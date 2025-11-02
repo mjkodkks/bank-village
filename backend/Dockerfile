@@ -1,4 +1,4 @@
-FROM node:18-slim AS base
+FROM oven/bun:1 AS base
 
 # install dependencies
 RUN apt-get update \
@@ -14,9 +14,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
+COPY package*.json bun.lock ./
+RUN bun install --production
 COPY . .
-RUN yarn install
-RUN yarn gen:prisma
-RUN yarn build
+RUN bun run gen:prisma
+RUN bun run build
 
-CMD [ "node", "dist/main.js" ]
+CMD [ "bun", "run", "dist/main.js" ]

@@ -15,9 +15,10 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY package*.json bun.lock ./
+# Install only production dependencies - bunx will handle @nestjs/cli
 RUN bun install --production
 COPY . .
 RUN bun run gen:prisma
-RUN bun run build
+RUN bunx @nestjs/cli build
 
 CMD [ "bun", "run", "dist/main.js" ]

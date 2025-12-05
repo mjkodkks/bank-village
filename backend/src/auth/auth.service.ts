@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { User } from '@myprisma/client';
 @Injectable()
 export class AuthService {
   constructor(
@@ -25,6 +25,7 @@ export class AuthService {
 
   async login(user: User) {
     const payload = { username: user.username, sub: user.id };
+    console.log('payload', payload);
     const signedJWT = this.jwtService.sign(payload);
     const decodedJwtAccessToken = this.jwtService.decode(signedJWT);
     const expires = decodedJwtAccessToken['exp'];

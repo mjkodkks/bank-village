@@ -3,5 +3,5 @@
         "./web-client",
         "./backend"
     ],
-    "eslint.experimental.useFlatConfig": true,
+    "eslint.useFlatConfig": true
 }

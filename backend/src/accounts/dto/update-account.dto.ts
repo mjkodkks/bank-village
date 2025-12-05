@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, PartialType } from '@nestjs/swagger';
 import { CreateAccountDto } from './create-account.dto';
 import { Transform } from 'class-transformer';
-import { TransactionAction } from '@prisma/client';
+import { TransactionAction } from '@myprisma/client';
 import { IsBoolean } from 'class-validator';
 
 export class UpdateAccountDto extends PartialType(CreateAccountDto) {}

@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
 import type { Request } from 'express';
-import { User } from '@prisma/client';
+import { User } from '@myprisma/client';
 
 type MergeTypes<A, B> = {
   [key in keyof A]: key extends keyof B ? B[key] : A[key];

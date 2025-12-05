@@ -18,4 +18,7 @@ docker exec -t {your-db-container} pg_dumpall -c -U postgres > dump_`date +%d-%m
 
 ## restore
 cat {your_dump.sql} | docker exec -i {your-db-container} psql -U {your-db-user} -d {your-db-name}
+
+## sql clear extsting data
+TRUNCATE TABLE your_table_name RESTART IDENTITY CASCADE;
 ```

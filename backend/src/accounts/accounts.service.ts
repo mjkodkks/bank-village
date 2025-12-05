@@ -10,14 +10,14 @@ import {
   UpdateTransactionDto,
 } from './dto/update-account.dto';
 import { PrismaService } from '@/prisma/prisma.service';
-import { AccountType, Prisma } from '@prisma/client';
+import { Prisma, AccountType } from '@myprisma/client';
 import { dayjs } from '@/utils/dayjs';
 import {
   SAVING_INTEREST,
   LOAN_INTEREST,
   STOCK_INTEREST,
 } from '@/utils/interest';
-import { Decimal } from '@prisma/client/runtime/library';
+// import { Decimal } from '@prisma/client/runtime/library';
 import { dateFrom1AugAgoTo31Jul } from '@/utils/useDate';
 
 @Injectable()

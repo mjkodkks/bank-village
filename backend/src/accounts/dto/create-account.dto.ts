@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { AccountType } from '@prisma/client';
+import { AccountType } from '@myprisma/client';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
 // export enum AccountType {

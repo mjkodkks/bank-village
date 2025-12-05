@@ -19,8 +19,15 @@
     "noFallthroughCasesInSwitch": false,
     "esModuleInterop": true,
     "paths": {
-      "@/*": ["./src/*"],
-      "@assets/*": ["./src/assets/*"],
+      "@/*": [
+        "./src/*"
+      ],
+      "@assets/*": [
+        "./src/assets/*"
+      ],
+      "@myprisma/*": [
+        "./prisma/generated/prisma/*"
+      ]
     }
   }
 }

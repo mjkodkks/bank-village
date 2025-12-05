@@ -39,3 +39,6 @@ lerna-debug.log*
 
 .DS_Store
 .cache
+
+# Prisma
+/prisma/generated/

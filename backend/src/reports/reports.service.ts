@@ -5,7 +5,7 @@ import { readFileSync } from 'fs';
 import puppeteer from 'puppeteer';
 import { PrismaService } from '@/prisma/prisma.service';
 import { dateFrom1AugAgoTo31Jul } from '@/utils/useDate';
-import { AccountType, Prisma } from '@prisma/client';
+import { AccountType, Prisma } from '@myprisma/client';
 
 @Injectable()
 export class ReportsService {

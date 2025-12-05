@@ -11,7 +11,7 @@ import type { Response } from 'express';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags, PickType } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@/auth/jwt/jwt-auth.guard';
 import { json2csv } from 'json-2-csv';
-import { AccountType } from '@prisma/client';
+import { AccountType } from '@myprisma/client';
 import * as ExcelJS from 'exceljs';
 import * as path from 'path';
 

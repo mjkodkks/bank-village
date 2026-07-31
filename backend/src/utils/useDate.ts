@@ -1,36 +1,32 @@
 import { dayjs } from '@/utils/dayjs';
 
-export function dateFrom1AugAgoTo31Jul(year?: number) {
-  let endYear = null
-  if (year) {
-    endYear =  dayjs.tz(new Date(year, 6, 31));
-  } else {
-    const currentMonth = dayjs.tz().month() + 1; // dayjs month is 0-indexed
-    const isSameOrMore = currentMonth >= 8;
-    if (isSameOrMore) {
-      endYear = dayjs.tz().add(1, 'year');
-    } else {
-      endYear = dayjs.tz();
-    }
-  }
-    // calculate. start from year ago 1 August to 31 July of current year. 
-    const startDate = endYear
-      .utcOffset(0)
-      .subtract(1, 'year')
-      .startOf('year') 
-      .add(7, 'months')
-      .startOf('day')
-      .toISOString();
-    const endDate = endYear
-      .utcOffset(0)
-      .endOf('year')
-      .subtract(5, 'months')
-      .endOf('months')
-      .toISOString();
+/**
+ * Calculates the date range from August 1st of the previous year to July 31st of the target year.
+ * @param targetEndYear The target ending year (if omitted, automatically determined based on current date).
+ */
+export function dateFrom1AugAgoTo31Jul(targetEndYear?: number) {
+  const now = dayjs.tz();
 
-    console.log(startDate, endDate);
-    return {
-        startDate,
-        endDate
-    }
+  // If no year is provided:
+  // - If the current month is August or later (0-indexed month >= 7), the cycle ends next year.
+  // - Otherwise, the cycle ends in the current year.
+  const endYear = targetEndYear ?? (now.month() >= 7 ? now.year() + 1 : now.year());
+  const startYear = endYear - 1;
+
+  // August 1st (startYear) at 00:00:00.000
+  const startDate = dayjs
+    .tz(`${startYear}-08-01`, 'Asia/Bangkok')
+    .startOf('day')
+    .toISOString();
+
+  // July 31st (endYear) at 23:59:59.999
+  const endDate = dayjs
+    .tz(`${endYear}-07-31`, 'Asia/Bangkok')
+    .endOf('day')
+    .toISOString();
+
+  return {
+    startDate,
+    endDate,
+  };
 }

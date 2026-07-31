@@ -18,7 +18,7 @@ import * as path from 'path';
 @ApiTags('reports')
 @Controller('reports')
 export class ReportsController {
-  constructor(private readonly reportsService: ReportsService) {}
+  constructor(private readonly reportsService: ReportsService) { }
   @ApiOperation({
     summary:
       'list user receive interest Excel (ลิสต์ข้อมูลผู้ใช้ที่จะได้รับปันผลปีนี้ Excel)',
@@ -48,9 +48,8 @@ export class ReportsController {
 
     const timestamp = Date.now();
 
-    const filePath = path.resolve(
-      __dirname,
-      '..',
+    const filePath = path.join(
+      process.cwd(),
       'assets',
       'templates',
       'template_bankvillage_interest.xlsx',

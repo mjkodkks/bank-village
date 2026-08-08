@@ -12,67 +12,69 @@ export class ReportsService {
   constructor(private prisma: PrismaService) {}
   async createUserListInterest(option: { accountType?: AccountType, year?: number } = { accountType: "SAVING", year: 2024 }) {
     const { startDate, endDate } = dateFrom1AugAgoTo31Jul(option.year);
-    const result = await this.prisma.user.findMany({
-      select: {
-        id: true,
-        firstname: true,
-        surname: true,
-        username: true,
-        accountId: {
-          select: {
-            transactions: {
-              select: {
-                interest: true,
-                // createdAt: true
-              },
-              where: {
-                createdAt: {
-                  gte: startDate,
-                  lte: endDate,
-                },
-                action: "INTEREST"
-              },
-              orderBy: {
-                createdAt: 'desc'
-              }
-            },
-            balance: true
+    const result = await this.prisma.account.findMany({
+      where: {
+        type: option.accountType,
+        transactions: {
+          some: {
+            createdAt: { gte: startDate, lte: endDate },
+            action: 'INTEREST',
           },
-          where: {
-            type: option.accountType,
-          }
-        }
+        },
       },
-      orderBy: {
-        id: 'asc',
-      }
+      select: {
+        balance: true,
+        owner: {
+          select: { id: true, firstname: true, surname: true, username: true },
+        },
+        transactions: {
+          where: {
+            createdAt: { gte: startDate, lte: endDate },
+            action: 'INTEREST',
+          },
+          select: { interest: true },
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+      orderBy: { owner: { id: 'asc' } },
     });
 
     const initValue = new Prisma.Decimal(0);
     const excludeUser = ['super'];
-    const filterUser = result.filter(f => !excludeUser.includes(f.username) && f.accountId.length > 0 && f.accountId[0].transactions.length > 0);
-    const userAndTransaction = filterUser.map((m, i) => {
-      return {
-        id: m.id,
-        runNo: i + 1,
-        name: m.firstname + ' ' + m.surname,
-        balance: +m.accountId.map((m) => m.balance).at(0),
-        // transactions: m.accountId.map((m) => m.transactions)
-        // .flat(),
-        sumOfinterest: +m.accountId
-          .map((m) => m.transactions)
-          .flat()
-          .map((m) => m.interest)
+
+    const filterAccount = result.filter(f => !excludeUser.includes(f.owner.username));
+
+    let i = 0;
+    let userAndTransaction: {
+      id: number;
+      runNo: number;
+      name: string;
+      balance: number;
+      sumOfinterest: number;
+    }[] = []
+    for (const acc of filterAccount) {
+      const uid = acc.owner.id;
+
+      const template = {
+        id: uid,
+        runNo: ++i,
+        name: acc.owner.firstname + ' ' + acc.owner.surname,
+        balance: +acc.balance,
+        sumOfinterest: +acc.transactions
+          .map(t => t.interest ?? initValue)
           .reduce((a, b) => a.add(b), initValue),
-      };
-    })
-    const totalBalance = userAndTransaction.map(m => m.balance).reduce((a, b)=> a + b, 0)
-    const totalInterest = userAndTransaction.map(m => m.sumOfinterest).reduce((a, b)=> a + b, 0)
-    
+      }
+
+      userAndTransaction.push(template)
+    }
+
+    const totalBalance = userAndTransaction.map(m => m.balance).reduce((a, b) => a + b, 0);
+    const totalInterest = userAndTransaction.map(m => m.sumOfinterest).reduce((a, b) => a + b, 0);
+
     const template = {
       userAndTransaction,
       totalBalance,
-      totalInterest
+      totalInterest,
     };
     return template;
   }

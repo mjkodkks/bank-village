@@ -60,11 +60,52 @@ export class ReportsController {
 
     const worksheet = workbook.getWorksheet(1); // Assuming you want to work with the first sheet
 
-    // Add headers starting from A2
-    // const headers = ['ลำดับ', 'ชื่อ-นามสกุล', 'รวมเงินหุ้น (บาท)', 'ยอดปันผล (บาท)', 'ลายมือผู้รับ', 'วัน/เดือน/ปี รับ'];
+    const savingHeaders = [
+      'เลขที่ทะเบียนในระบบ',
+      'ชื่อ-นามสกุล',
+      'รวมเงินฝาก (บาท)',
+      'ยอดปันผล (บาท)',
+      'ลายมือผู้รับ',
+      'วัน/เดือน/ปี รับ',
+    ];
+    const stockHeaders = [
+      'เลขที่ทะเบียนในระบบ',
+      'ชื่อ-นามสกุล',
+      'รวมเงินหุ้น (บาท)',
+      'ยอดปันผล (บาท)',
+      'ลายมือผู้รับ',
+      'วัน/เดือน/ปี รับ',
+    ];
+    const headers = accountType === 'STOCK' ? stockHeaders : savingHeaders;
+
+    // Write headers starting from A2, overwriting the template values
+    headers.forEach((header, index) => {
+      const cell = worksheet.getCell(2, index + 1);
+      cell.value = header;
+      cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    });
+
+    let accountName = '';
+    if (accountType === 'SAVING') {
+      accountName = 'ออมทรัพย์';
+    } else if (accountType === 'STOCK') {
+      accountName = 'หุ้น';
+    }
+
+    const title = `บัญชีรายชื่อสมาชิก รับเงิน "ปันผล ฝาก${accountName}" ธนาคารหมู่บ้านตามแนวพระราชดำริ
+ศูนย์เครือข่าย สาขา บ้านกุดโดน ประจำปี ${Number(year) - 1} - ${year}`;
+
+    // Add title merged from col A-G at row 1
+    worksheet.mergeCells('A1:F1');
+    const titleCell = worksheet.getCell(1, 1);
+    titleCell.value = title;
+    titleCell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: false };
+
     const dataGrid = userAndTransaction.map((m) => {
       return [m.id, m.name, m.balance, m.sumOfinterest, '', ''];
     });
+
+    // setup for add table
     const startRowIndex = 3;
     const totalRowNumber = 1
     const endRowIndex = startRowIndex + dataGrid.length + totalRowNumber;
@@ -105,7 +146,7 @@ export class ReportsController {
               horizontal: 'center',
               vertical: 'middle',
             };
-            cell.numFmt = '#,##0.##';
+            cell.numFmt = '0';
           }
           if (colNumber === 3 || colNumber === 4) {
             cell.alignment = {
@@ -118,12 +159,6 @@ export class ReportsController {
       });
     });
 
-    let accountName = '';
-    if (accountType === 'SAVING') {
-      accountName = 'ออมทรัพย์';
-    } else if (accountType === 'STOCK') {
-      accountName = 'หุ้น';
-    }
     const filename = `ดอกเบี้ย${accountName}ธนาคารหมู่บ้าน_สาขากุดโดน_${timestamp}.xlsx`;
 
     // // // Set the response headers to download the statement as a PDF file.

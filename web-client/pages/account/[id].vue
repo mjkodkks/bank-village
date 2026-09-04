@@ -147,8 +147,14 @@ async function getTransactions(id: number) {
 }
 
 const sumOfInterests = ref('')
-async function getInterestPerYear(id: number) {
-  const { isSuccess, data, error } = await interestPerYearService(id)
+const currentInterestYear = computed(() => {
+  const now = dayjs.tz()
+  return now.month() >= 7 ? now.year() + 1 : now.year()
+})
+const selectedYear = ref(new Date(currentInterestYear.value, 0, 1))
+const selectedYearValue = computed(() => selectedYear.value?.getFullYear() ?? currentInterestYear.value)
+async function getInterestPerYear(id: number, year?: number) {
+  const { isSuccess, data, error } = await interestPerYearService(id, year)
   if (isSuccess && data) {
     const { sumOfInterest, transactions } = data
     sumOfInterests.value = sumOfInterest
@@ -156,6 +162,10 @@ async function getInterestPerYear(id: number) {
 
   return data
 }
+
+watch(selectedYear, () => {
+  getInterestPerYear(+id, selectedYearValue.value)
+})
 
 const adminList = ref<AdminList>([])
 async function getAdminList() {
@@ -237,7 +247,7 @@ async function rollback() {
 async function init() {
   await getAccountProfile(+id)
   await getTransactions(+id)
-  await getInterestPerYear(+id)
+  await getInterestPerYear(+id, selectedYearValue.value)
   interestInit()
   getAdminList()
 }
@@ -350,14 +360,20 @@ init()
     </div>
     <div class="flex flex-col md:flex-row">
       <h3>บันทึกรายการธุรกรรม</h3>
-      <div class="ml-auto flex items-center gap-2 mb-2 md:mb-0">
+      <div class="ml-auto flex items-center gap-2 mb-2 md:mb-0 flex-wrap">
         <div
-          v-if="sumOfInterests"
-          class="border-[#655DBB] border-solid p-2 rounded-lg font-light"
+          class="border-[#655DBB] border-solid p-2 rounded-lg font-light flex items-center gap-2"
         >
           <i class="pi pi-star text-yellow-400" />
-          ดอกเบี้ยปีนี้ <span class="tracking-[1.2px] font-bold">{{ sumOfInterests }}</span> (บาท)
+          <span>ดอกเบี้ยปี {{ selectedYearValue }}</span>
+          <span class="tracking-[1.2px] font-bold">{{ sumOfInterests || '0.00' }}</span> (บาท)
         </div>
+        <Calendar
+          v-model="selectedYear"
+          view="year"
+          date-format="yy"
+          show-icon
+        />
         <div>
           <Button
             severity="danger"

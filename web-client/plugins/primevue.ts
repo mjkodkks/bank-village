@@ -22,6 +22,7 @@ import Tooltip from 'primevue/tooltip'
 import RadioButton from 'primevue/radiobutton'
 import IconField from 'primevue/iconfield'
 import InputIcon from 'primevue/inputicon'
+import Calendar from 'primevue/calendar'
 import { defineNuxtPlugin } from '#app'
 import Checkbox from 'primevue/checkbox'
 
@@ -51,6 +52,7 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.vueApp.component('IconField', IconField)
   nuxtApp.vueApp.component('InputIcon', InputIcon)
   nuxtApp.vueApp.component('Checkbox', Checkbox)
+  nuxtApp.vueApp.component('Calendar', Calendar)
 
 
   // other components that you need
